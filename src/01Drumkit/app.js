@@ -16602,7 +16602,7 @@ var main = function __do() {
     var v4 = Control_Monad_Reader_Trans.runReaderT(getAllKeys(Control_Monad_Reader_Trans.bindReaderT(Effect.bindEffect))(Control_Monad_Reader_Trans.monadReaderT(Effect.monadEffect))(Control_Monad_Reader_Trans.monadAskReaderT(Effect.monadEffect))(Control_Monad_Reader_Trans.monadEffectReader(Effect_Class.monadEffectEffect)))(v1)();
     var v5 = Web_DOM_NodeList.toArray(v4)();
     Effect.foreachE(v5)(function (key) {
-        return Web_Event_EventTarget.addEventListener("transitioned")(v3)(false)(Web_HTML_Window.toEventTarget(v));
+        return Web_Event_EventTarget.addEventListener("transitionend")(v3)(false)(Web_HTML_Window.toEventTarget(v));
     })();
     return Web_Event_EventTarget.addEventListener("keydown")(v2)(false)(Web_HTML_Window.toEventTarget(v))();
 };

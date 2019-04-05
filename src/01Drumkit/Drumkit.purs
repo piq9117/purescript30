@@ -104,5 +104,5 @@ main = do
   keyEvt <- keyEvtListener
   nList <- runReaderT getAllKeys p
   nodes <- NodeList.toArray nList
-  E.foreachE nodes (\key -> EvtTarget.addEventListener (EventType "transitioned") keyEvt false (Window.toEventTarget w))
+  E.foreachE nodes (\key -> EvtTarget.addEventListener (EventType "transitionend") keyEvt false (Window.toEventTarget w))
   EvtTarget.addEventListener (EventType "keydown") evt false (Window.toEventTarget w)
