@@ -1,0 +1,22 @@
+{
+  "name": "purescript30",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^4.1.0",
+    "purescript-console": "^4.2.0",
+    "purescript-effect": "^2.0.1",
+    "purescript-web-events": "^2.0.0",
+    "purescript-web-html": "^2.0.0",
+    "purescript-web-uievents": "^2.0.0",
+    "purescript-web-dom": "^2.0.0",
+    "purescript-transformers": "^4.2.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^4.0.0"
+  }
+}
