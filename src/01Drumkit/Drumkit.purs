@@ -1,9 +1,10 @@
 module Drumkit where
 
-import Prelude (class Bind, Unit, bind, discard, pure, show, void, ($), (<<<), (<>), (=<<))
+import Prelude (class Bind, Unit, bind, discard, pure, show, void, ($), (<<<), (<>), (=<<), (/=))
 import Web.Event.EventTarget (EventListener)
 import Web.Event.EventTarget as EvtTarget
-import Web.Event.Event (EventType(..))
+import Web.Event.Event (EventType(..), Event)
+import Web.Event.Event as WebEvent
 import Web.HTML as Web
 import Web.HTML.Window as Window
 import Web.HTML.HTMLDocument as HTMLDoc
@@ -21,12 +22,14 @@ import Control.Monad.Reader.Trans
 import Effect.Class (class MonadEffect)
 import Effect.Class as EffClass
 import Web.HTML.HTMLElement as HTMLElement
-import Web.DOM.DOMTokenList as WebDOM
+import Web.DOM.DOMTokenList as DOMTokenList
+import Web.DOM.Node as DOMNode
 import Control.Monad (class Monad)
 import Web.DOM.NodeList as NodeList
-import Data.Function as F
+import Web.DOM.Element as WebElement
 
 foreign import keyCode :: KeyboardEvent -> Int
+foreign import propertyName :: Event -> String
 
 docNode :: Effect ParentNode
 docNode = do
@@ -85,24 +88,42 @@ evtListener p = EvtTarget.eventListener $ \e -> void do
                   case HTMLElement.fromElement k of
                     Just htmlElement -> do
                       domTokenList <- HTMLElement.classList htmlElement
-                      WebDOM.add domTokenList "playing"
+                      DOMTokenList.add domTokenList "playing"
                     Nothing -> logShow "No HTML element."
                 Nothing -> logShow "No Keycode found"
             Nothing -> logShow "No audio."
         Nothing -> logShow "No audio element."
     Nothing -> logShow "No Keycode found"
 
-keyEvtListener :: Effect EventListener
-keyEvtListener = EvtTarget.eventListener $ \e -> void do
-  logShow "otin"
+removeTransition :: Effect EventListener
+removeTransition = EvtTarget.eventListener $ \e -> void
+  if propertyName e /= "transform"
+  then logShow "Otin"
+  else do
+    mEventTarget <- pure $ WebEvent.target e
+    case mEventTarget of
+      Just eventTarget -> do
+        mElement <- pure $ WebElement.fromEventTarget eventTarget
+        case mElement of
+          Just element -> do
+            mHtmlElement <- pure $ HTMLElement.fromElement element
+            case mHtmlElement of
+              Just htmlElement -> do
+                domTokenList <- HTMLElement.classList htmlElement
+                DOMTokenList.remove domTokenList "playing"
+              Nothing -> logShow "No HTML Element found."
+          Nothing -> logShow "No Element found."
+      Nothing -> logShow "No Event found."
 
 main :: Effect Unit
 main = do
   w <- Web.window
   p <- docNode
   evt <- evtListener p
-  keyEvt <- keyEvtListener
+  removeTrans <- removeTransition
   nList <- runReaderT getAllKeys p
   nodes <- NodeList.toArray nList
-  E.foreachE nodes (\key -> EvtTarget.addEventListener (EventType "transitionend") keyEvt false (Window.toEventTarget w))
+  E.foreachE
+    nodes
+    (\key -> EvtTarget.addEventListener (EventType "transitionend") removeTrans false (DOMNode.toEventTarget key))
   EvtTarget.addEventListener (EventType "keydown") evt false (Window.toEventTarget w)
