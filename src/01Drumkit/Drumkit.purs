@@ -1,6 +1,6 @@
 module Drumkit where
 
-import Prelude (class Bind, Unit, bind, discard, pure, show, void, ($), (<<<), (<>), (=<<), (/=))
+import Prelude (class Bind, Unit, bind, discard, pure, show, void, ($), (<<<), (<>), (=<<), (/=), unit)
 import Web.Event.EventTarget (EventListener)
 import Web.Event.EventTarget as EvtTarget
 import Web.Event.Event (EventType(..), Event)
@@ -37,28 +37,18 @@ docNode = do
   doc <- Window.document w
   pure $ HTMLDoc.toParentNode doc
 
--- TODO: find common function with getKeyEl
-getAudioEl
+getElement
   :: forall m. Bind m
   => MonadAsk ParentNode m
   => MonadEffect m
   => String
+  -> String
   -> m (Maybe Element)
-getAudioEl kcode = do
+getElement className kcode = do
   p <- ask
-  mElement <- EffClass.liftEffect $ WebPNode.querySelector (QuerySelector $ "audio[data-key='" <> kcode <>"']") p
-  pure mElement
-
-  -- TODO: find common function with getAudioEl
-getKeyEl
-  :: forall m. Bind m
-  => MonadAsk ParentNode m
-  => MonadEffect m
-  => String
-  -> m (Maybe Element)
-getKeyEl kcode = do
-  p <- ask
-  mElement <- EffClass.liftEffect $ WebPNode.querySelector (QuerySelector $ ".key[data-key='"<> kcode <>"']") p
+  mElement <-
+    EffClass.liftEffect $
+    WebPNode.querySelector (QuerySelector $ className <>"[data-key='" <> kcode <>"']") p
   pure mElement
 
 getAllKeys
@@ -75,14 +65,14 @@ evtListener p = EvtTarget.eventListener $ \e -> void do
   mKeyboardEvnt <- pure $ KbEvent.fromEvent e
   case mKeyboardEvnt of
     Just keyboardEvnt -> do
-      mAudio <- runReaderT (getAudioEl <<< show <<< keyCode $ keyboardEvnt) p
+      mAudio <- runReaderT (getElement "audio" <<< show <<< keyCode $ keyboardEvnt) p
       case mAudio of
         Just audioElement ->
           case MediaEl.fromElement audioElement of
             Just audio -> do
               MediaEl.setCurrentTime 0.0 audio
               MediaEl.play audio
-              mKeyCode <- runReaderT (getKeyEl <<< show <<< keyCode $ keyboardEvnt) p
+              mKeyCode <- runReaderT (getElement ".key" <<< show <<< keyCode $ keyboardEvnt) p
               case mKeyCode of
                 Just k ->
                   case HTMLElement.fromElement k of
@@ -98,7 +88,7 @@ evtListener p = EvtTarget.eventListener $ \e -> void do
 removeTransition :: Effect EventListener
 removeTransition = EvtTarget.eventListener $ \e -> void
   if propertyName e /= "transform"
-  then logShow "Otin"
+  then pure unit
   else do
     mEventTarget <- pure $ WebEvent.target e
     case mEventTarget of

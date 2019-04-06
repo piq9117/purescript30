@@ -16493,6 +16493,7 @@ var Data_Functor = require("../Data.Functor/index.js");
 var Data_Maybe = require("../Data.Maybe/index.js");
 var Data_Semigroup = require("../Data.Semigroup/index.js");
 var Data_Show = require("../Data.Show/index.js");
+var Data_Unit = require("../Data.Unit/index.js");
 var Effect = require("../Effect/index.js");
 var Effect_Class = require("../Effect.Class/index.js");
 var Effect_Console = require("../Effect.Console/index.js");
@@ -16513,9 +16514,9 @@ var Web_HTML_Window = require("../Web.HTML.Window/index.js");
 var Web_UIEvent_KeyboardEvent = require("../Web.UIEvent.KeyboardEvent/index.js");
 var removeTransition = Web_Event_EventTarget.eventListener(function (e) {
     return Data_Functor["void"](Effect.functorEffect)((function () {
-        var $32 = $foreign.propertyName(e) !== "transform";
-        if ($32) {
-            return Effect_Console.logShow(Data_Show.showString)("Otin");
+        var $27 = $foreign.propertyName(e) !== "transform";
+        if ($27) {
+            return Control_Applicative.pure(Effect.applicativeEffect)(Data_Unit.unit);
         };
         return function __do() {
             var v = Web_Event_Event.target(e);
@@ -16530,42 +16531,31 @@ var removeTransition = Web_Event_EventTarget.eventListener(function (e) {
                     if (v2 instanceof Data_Maybe.Nothing) {
                         return Effect_Console.logShow(Data_Show.showString)("No HTML Element found.")();
                     };
-                    throw new Error("Failed pattern match at Drumkit line 110, column 13 - line 115, column 11: " + [ v2.constructor.name ]);
+                    throw new Error("Failed pattern match at Drumkit line 100, column 13 - line 105, column 11: " + [ v2.constructor.name ]);
                 };
                 if (v1 instanceof Data_Maybe.Nothing) {
                     return Effect_Console.logShow(Data_Show.showString)("No Element found.")();
                 };
-                throw new Error("Failed pattern match at Drumkit line 107, column 9 - line 116, column 7: " + [ v1.constructor.name ]);
+                throw new Error("Failed pattern match at Drumkit line 97, column 9 - line 106, column 7: " + [ v1.constructor.name ]);
             };
             if (v instanceof Data_Maybe.Nothing) {
                 return Effect_Console.logShow(Data_Show.showString)("No Event found.")();
             };
-            throw new Error("Failed pattern match at Drumkit line 104, column 5 - line 118, column 1: " + [ v.constructor.name ]);
+            throw new Error("Failed pattern match at Drumkit line 94, column 5 - line 108, column 1: " + [ v.constructor.name ]);
         };
     })());
 });
-var getKeyEl = function (dictBind) {
+var getElement = function (dictBind) {
     return function (dictMonadAsk) {
         return function (dictMonadEffect) {
-            return function (kcode) {
-                return Control_Bind.bind(dictBind)(Control_Monad_Reader_Class.ask(dictMonadAsk))(function (v) {
-                    return Control_Bind.bind(dictBind)(Effect_Class.liftEffect(dictMonadEffect)(Web_DOM_ParentNode.querySelector(Web_DOM_ParentNode.QuerySelector(".key[data-key='" + (kcode + "']")))(v)))(function (v1) {
-                        return Control_Applicative.pure((dictMonadAsk.Monad0()).Applicative0())(v1);
+            return function (className) {
+                return function (kcode) {
+                    return Control_Bind.bind(dictBind)(Control_Monad_Reader_Class.ask(dictMonadAsk))(function (v) {
+                        return Control_Bind.bind(dictBind)(Effect_Class.liftEffect(dictMonadEffect)(Web_DOM_ParentNode.querySelector(Web_DOM_ParentNode.QuerySelector(className + ("[data-key='" + (kcode + "']"))))(v)))(function (v1) {
+                            return Control_Applicative.pure((dictMonadAsk.Monad0()).Applicative0())(v1);
+                        });
                     });
-                });
-            };
-        };
-    };
-};
-var getAudioEl = function (dictBind) {
-    return function (dictMonadAsk) {
-        return function (dictMonadEffect) {
-            return function (kcode) {
-                return Control_Bind.bind(dictBind)(Control_Monad_Reader_Class.ask(dictMonadAsk))(function (v) {
-                    return Control_Bind.bind(dictBind)(Effect_Class.liftEffect(dictMonadEffect)(Web_DOM_ParentNode.querySelector(Web_DOM_ParentNode.QuerySelector("audio[data-key='" + (kcode + "']")))(v)))(function (v1) {
-                        return Control_Applicative.pure((dictMonadAsk.Monad0()).Applicative0())(v1);
-                    });
-                });
+                };
             };
         };
     };
@@ -16574,8 +16564,8 @@ var getAllKeys = function (dictBind) {
     return function (dictMonad) {
         return function (dictMonadAsk) {
             return function (dictMonadEffect) {
-                return Control_Bind.bindFlipped(dictBind)(function ($69) {
-                    return Effect_Class.liftEffect(dictMonadEffect)(Web_DOM_ParentNode.querySelectorAll(".key")($69));
+                return Control_Bind.bindFlipped(dictBind)(function ($62) {
+                    return Effect_Class.liftEffect(dictMonadEffect)(Web_DOM_ParentNode.querySelectorAll(".key")($62));
                 })(Control_Monad_Reader_Class.ask(dictMonadAsk));
             };
         };
@@ -16586,13 +16576,13 @@ var evtListener = function (p) {
         return Data_Functor["void"](Effect.functorEffect)(function __do() {
             var v = Web_UIEvent_KeyboardEvent.fromEvent(e);
             if (v instanceof Data_Maybe.Just) {
-                var v1 = Control_Monad_Reader_Trans.runReaderT(getAudioEl(Control_Monad_Reader_Trans.bindReaderT(Effect.bindEffect))(Control_Monad_Reader_Trans.monadAskReaderT(Effect.monadEffect))(Control_Monad_Reader_Trans.monadEffectReader(Effect_Class.monadEffectEffect))(Data_Show.show(Data_Show.showInt)($foreign.keyCode(v.value0))))(p)();
+                var v1 = Control_Monad_Reader_Trans.runReaderT(getElement(Control_Monad_Reader_Trans.bindReaderT(Effect.bindEffect))(Control_Monad_Reader_Trans.monadAskReaderT(Effect.monadEffect))(Control_Monad_Reader_Trans.monadEffectReader(Effect_Class.monadEffectEffect))("audio")(Data_Show.show(Data_Show.showInt)($foreign.keyCode(v.value0))))(p)();
                 if (v1 instanceof Data_Maybe.Just) {
                     var v2 = Web_HTML_HTMLMediaElement.fromElement(v1.value0);
                     if (v2 instanceof Data_Maybe.Just) {
                         Web_HTML_HTMLMediaElement.setCurrentTime(0.0)(v2.value0)();
                         Web_HTML_HTMLMediaElement.play(v2.value0)();
-                        var v3 = Control_Monad_Reader_Trans.runReaderT(getKeyEl(Control_Monad_Reader_Trans.bindReaderT(Effect.bindEffect))(Control_Monad_Reader_Trans.monadAskReaderT(Effect.monadEffect))(Control_Monad_Reader_Trans.monadEffectReader(Effect_Class.monadEffectEffect))(Data_Show.show(Data_Show.showInt)($foreign.keyCode(v.value0))))(p)();
+                        var v3 = Control_Monad_Reader_Trans.runReaderT(getElement(Control_Monad_Reader_Trans.bindReaderT(Effect.bindEffect))(Control_Monad_Reader_Trans.monadAskReaderT(Effect.monadEffect))(Control_Monad_Reader_Trans.monadEffectReader(Effect_Class.monadEffectEffect))(".key")(Data_Show.show(Data_Show.showInt)($foreign.keyCode(v.value0))))(p)();
                         if (v3 instanceof Data_Maybe.Just) {
                             var v4 = Web_HTML_HTMLElement.fromElement(v3.value0);
                             if (v4 instanceof Data_Maybe.Just) {
@@ -16602,27 +16592,27 @@ var evtListener = function (p) {
                             if (v4 instanceof Data_Maybe.Nothing) {
                                 return Effect_Console.logShow(Data_Show.showString)("No HTML element.")();
                             };
-                            throw new Error("Failed pattern match at Drumkit line 88, column 19 - line 93, column 17: " + [ v4.constructor.name ]);
+                            throw new Error("Failed pattern match at Drumkit line 78, column 19 - line 83, column 17: " + [ v4.constructor.name ]);
                         };
                         if (v3 instanceof Data_Maybe.Nothing) {
                             return Effect_Console.logShow(Data_Show.showString)("No Keycode found")();
                         };
-                        throw new Error("Failed pattern match at Drumkit line 86, column 15 - line 94, column 13: " + [ v3.constructor.name ]);
+                        throw new Error("Failed pattern match at Drumkit line 76, column 15 - line 84, column 13: " + [ v3.constructor.name ]);
                     };
                     if (v2 instanceof Data_Maybe.Nothing) {
                         return Effect_Console.logShow(Data_Show.showString)("No audio.")();
                     };
-                    throw new Error("Failed pattern match at Drumkit line 81, column 11 - line 95, column 9: " + [ v2.constructor.name ]);
+                    throw new Error("Failed pattern match at Drumkit line 71, column 11 - line 85, column 9: " + [ v2.constructor.name ]);
                 };
                 if (v1 instanceof Data_Maybe.Nothing) {
                     return Effect_Console.logShow(Data_Show.showString)("No audio element.")();
                 };
-                throw new Error("Failed pattern match at Drumkit line 79, column 7 - line 96, column 5: " + [ v1.constructor.name ]);
+                throw new Error("Failed pattern match at Drumkit line 69, column 7 - line 86, column 5: " + [ v1.constructor.name ]);
             };
             if (v instanceof Data_Maybe.Nothing) {
                 return Effect_Console.logShow(Data_Show.showString)("No Keycode found")();
             };
-            throw new Error("Failed pattern match at Drumkit line 76, column 3 - line 98, column 1: " + [ v.constructor.name ]);
+            throw new Error("Failed pattern match at Drumkit line 66, column 3 - line 88, column 1: " + [ v.constructor.name ]);
         });
     });
 };
@@ -16645,8 +16635,7 @@ var main = function __do() {
 };
 module.exports = {
     docNode: docNode,
-    getAudioEl: getAudioEl,
-    getKeyEl: getKeyEl,
+    getElement: getElement,
     getAllKeys: getAllKeys,
     evtListener: evtListener,
     removeTransition: removeTransition,
@@ -16655,7 +16644,7 @@ module.exports = {
     propertyName: $foreign.propertyName
 };
 
-},{"../Control.Applicative/index.js":3,"../Control.Bind/index.js":9,"../Control.Monad.Reader.Class/index.js":19,"../Control.Monad.Reader.Trans/index.js":20,"../Control.Monad/index.js":25,"../Control.Semigroupoid/index.js":29,"../Data.Eq/index.js":56,"../Data.Function/index.js":65,"../Data.Functor/index.js":68,"../Data.Maybe/index.js":85,"../Data.Semigroup/index.js":113,"../Data.Show/index.js":117,"../Effect.Class/index.js":143,"../Effect.Console/index.js":145,"../Effect/index.js":153,"../Prelude/index.js":164,"../Web.DOM.DOMTokenList/index.js":178,"../Web.DOM.Element/index.js":185,"../Web.DOM.Internal.Types/index.js":188,"../Web.DOM.Node/index.js":190,"../Web.DOM.NodeList/index.js":192,"../Web.DOM.ParentNode/index.js":199,"../Web.Event.Event/index.js":206,"../Web.Event.EventTarget/index.js":209,"../Web.HTML.HTMLDocument/index.js":238,"../Web.HTML.HTMLElement/index.js":240,"../Web.HTML.HTMLMediaElement/index.js":272,"../Web.HTML.Window/index.js":344,"../Web.HTML/index.js":346,"../Web.UIEvent.KeyboardEvent/index.js":352,"./foreign.js":141}],143:[function(require,module,exports){
+},{"../Control.Applicative/index.js":3,"../Control.Bind/index.js":9,"../Control.Monad.Reader.Class/index.js":19,"../Control.Monad.Reader.Trans/index.js":20,"../Control.Monad/index.js":25,"../Control.Semigroupoid/index.js":29,"../Data.Eq/index.js":56,"../Data.Function/index.js":65,"../Data.Functor/index.js":68,"../Data.Maybe/index.js":85,"../Data.Semigroup/index.js":113,"../Data.Show/index.js":117,"../Data.Unit/index.js":139,"../Effect.Class/index.js":143,"../Effect.Console/index.js":145,"../Effect/index.js":153,"../Prelude/index.js":164,"../Web.DOM.DOMTokenList/index.js":178,"../Web.DOM.Element/index.js":185,"../Web.DOM.Internal.Types/index.js":188,"../Web.DOM.Node/index.js":190,"../Web.DOM.NodeList/index.js":192,"../Web.DOM.ParentNode/index.js":199,"../Web.Event.Event/index.js":206,"../Web.Event.EventTarget/index.js":209,"../Web.HTML.HTMLDocument/index.js":238,"../Web.HTML.HTMLElement/index.js":240,"../Web.HTML.HTMLMediaElement/index.js":272,"../Web.HTML.Window/index.js":344,"../Web.HTML/index.js":346,"../Web.UIEvent.KeyboardEvent/index.js":352,"./foreign.js":141}],143:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Category = require("../Control.Category/index.js");
