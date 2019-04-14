@@ -1,18 +1,20 @@
 module Clock where
 
-import Control.Monad.Reader.Trans
-import Data.Array
-import Data.JSDate
-import Data.Maybe
-import Effect
-import Effect.Class
-import Effect.Timer
-import Effect.Uncurried
 import Prelude
 
+import Control.Monad.Reader.Trans (class MonadAsk, runReaderT, ask)
+import Data.JSDate (getHours, getMinutes, getSeconds, now)
+import Data.Maybe (Maybe(..))
+
+-- Effect
+import Effect (Effect)
+import Effect.Timer (setInterval)
+import Effect.Uncurried (EffectFn2, runEffectFn2)
 import Effect.Class (class MonadEffect)
 import Effect.Class as EffectClass
 import Effect.Console (logShow)
+
+-- DOM
 import Web.DOM.Internal.Types (Element)
 import Web.DOM.ParentNode (QuerySelector(..), ParentNode)
 import Web.DOM.ParentNode as WebPNode
@@ -50,16 +52,16 @@ data ClockHands = ClockHands
   , hourHand :: Element
   }
 
-setDate
-  :: forall m. Bind m
-  => MonadAsk ClockHands m
-  => MonadEffect m
-  => m (Effect Unit)
-setDate = do
-  (ClockHands { secondHand, minuteHand, hourHand }) <- ask
-  dt <- EffectClass.liftEffect now
-  secs <- EffectClass.liftEffect $ getSeconds dt
-  pure $ transform secondHand ("rotate(" <> show ( ((secs / 60.0) * 360.0) + 90.0 ) <> "deg)")
+setDate :: ClockHands -> Effect Unit
+setDate (ClockHands {secondHand, minuteHand, hourHand}) = do
+  date <- now
+  secs <- getSeconds date
+  mins <- getMinutes date
+  hours <- getHours date
+  transform secondHand $ rotate secs 60.0
+  transform minuteHand $ rotate mins 60.0
+  transform hourHand $ rotate hours 12.0
+  where rotate t num = "rotate(" <> show ( ((t / num) * 360.0) + 90.0 ) <> "deg)"
 
 main :: Effect Unit
 main = do
@@ -76,5 +78,4 @@ main = do
           case mHourHand of
             Nothing -> logShow "Nothing"
             Just hourHand -> do
-              sDate <- runReaderT setDate (ClockHands { secondHand: secondHand, minuteHand: minuteHand, hourHand: hourHand })
-              void $ setInterval 1000 sDate
+              void $ setInterval 1000 (setDate (ClockHands { secondHand: secondHand, minuteHand: minuteHand, hourHand: hourHand }))

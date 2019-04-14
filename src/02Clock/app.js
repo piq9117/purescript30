@@ -10,7 +10,6 @@ var Control_Applicative = require("../Control.Applicative/index.js");
 var Control_Bind = require("../Control.Bind/index.js");
 var Control_Monad_Reader_Class = require("../Control.Monad.Reader.Class/index.js");
 var Control_Monad_Reader_Trans = require("../Control.Monad.Reader.Trans/index.js");
-var Data_Array = require("../Data.Array/index.js");
 var Data_EuclideanRing = require("../Data.EuclideanRing/index.js");
 var Data_Function = require("../Data.Function/index.js");
 var Data_Functor = require("../Data.Functor/index.js");
@@ -46,16 +45,20 @@ var transform = function (el) {
         };
     };
 };
-var setDate = function (dictBind) {
-    return function (dictMonadAsk) {
-        return function (dictMonadEffect) {
-            return Control_Bind.bind(dictBind)(Control_Monad_Reader_Class.ask(dictMonadAsk))(function (v) {
-                return Effect_Class.liftEffect(dictMonadEffect)(function __do() {
-                    var secs = Control_Bind.bind(Effect.bindEffect)(Data_JSDate.now)(Data_JSDate.getSeconds)();
-                    return transform(v.value0.secondHand)("rotate(" + (Data_Show.show(Data_Show.showNumber)((secs / 60.0) * 360.0 + 90.0) + "deg)"));
-                });
-            });
+var setDate = function (v) {
+    var rotate = function (t) {
+        return function (num) {
+            return "rotate(" + (Data_Show.show(Data_Show.showNumber)((t / num) * 360.0 + 90.0) + "deg)");
         };
+    };
+    return function __do() {
+        var v1 = Data_JSDate.now();
+        var v2 = Data_JSDate.getSeconds(v1)();
+        var v3 = Data_JSDate.getMinutes(v1)();
+        var v4 = Data_JSDate.getHours(v1)();
+        transform(v.value0.secondHand)(rotate(v2)(60.0))();
+        transform(v.value0.minuteHand)(rotate(v3)(60.0))();
+        return transform(v.value0.hourHand)(rotate(v4)(12.0))();
     };
 };
 var getElement = function (dictBind) {
@@ -93,18 +96,17 @@ var main = function __do() {
                 return Effect_Console.logShow(Data_Show.showString)("Nothing")();
             };
             if (v3 instanceof Data_Maybe.Just) {
-                var v4 = Control_Monad_Reader_Trans.runReaderT(setDate(Control_Monad_Reader_Trans.bindReaderT(Effect.bindEffect))(Control_Monad_Reader_Trans.monadAskReaderT(Effect.monadEffect))(Control_Monad_Reader_Trans.monadEffectReader(Effect_Class.monadEffectEffect)))(new ClockHands({
+                return Data_Functor["void"](Effect.functorEffect)(Effect_Timer.setInterval(1000)(setDate(new ClockHands({
                     secondHand: v1.value0,
                     minuteHand: v2.value0,
                     hourHand: v3.value0
-                }))();
-                return Data_Functor["void"](Effect.functorEffect)(Effect_Timer.setInterval(1000)(v4))();
+                }))))();
             };
-            throw new Error("Failed pattern match at Clock line 76, column 11 - line 80, column 39: " + [ v3.constructor.name ]);
+            throw new Error("Failed pattern match at Clock line 78, column 11 - line 81, column 131: " + [ v3.constructor.name ]);
         };
-        throw new Error("Failed pattern match at Clock line 73, column 7 - line 80, column 39: " + [ v2.constructor.name ]);
+        throw new Error("Failed pattern match at Clock line 75, column 7 - line 81, column 131: " + [ v2.constructor.name ]);
     };
-    throw new Error("Failed pattern match at Clock line 70, column 3 - line 80, column 39: " + [ v1.constructor.name ]);
+    throw new Error("Failed pattern match at Clock line 72, column 3 - line 81, column 131: " + [ v1.constructor.name ]);
 };
 module.exports = {
     transform: transform,
@@ -116,7 +118,7 @@ module.exports = {
     transformImpl: $foreign.transformImpl
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Control.Monad.Reader.Class/index.js":21,"../Control.Monad.Reader.Trans/index.js":22,"../Data.Array/index.js":42,"../Data.EuclideanRing/index.js":71,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.JSDate/index.js":92,"../Data.Maybe/index.js":98,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Effect.Class/index.js":154,"../Effect.Console/index.js":156,"../Effect.Timer/index.js":162,"../Effect.Uncurried/index.js":164,"../Effect/index.js":166,"../Prelude/index.js":177,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.ParentNode/index.js":212,"../Web.HTML.HTMLDocument/index.js":251,"../Web.HTML.Window/index.js":357,"../Web.HTML/index.js":359,"./foreign.js":1}],3:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Control.Monad.Reader.Class/index.js":21,"../Control.Monad.Reader.Trans/index.js":22,"../Data.EuclideanRing/index.js":60,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.JSDate/index.js":81,"../Data.Maybe/index.js":87,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Effect.Class/index.js":143,"../Effect.Console/index.js":145,"../Effect.Timer/index.js":151,"../Effect.Uncurried/index.js":153,"../Effect/index.js":155,"../Prelude/index.js":166,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.ParentNode/index.js":201,"../Web.HTML.HTMLDocument/index.js":240,"../Web.HTML.Window/index.js":346,"../Web.HTML/index.js":348,"./foreign.js":1}],3:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Functor = require("../Data.Functor/index.js");
@@ -137,7 +139,7 @@ module.exports = {
     altArray: altArray
 };
 
-},{"../Data.Functor/index.js":81,"../Data.Semigroup/index.js":126}],4:[function(require,module,exports){
+},{"../Data.Functor/index.js":70,"../Data.Semigroup/index.js":115}],4:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -159,7 +161,7 @@ module.exports = {
     alternativeArray: alternativeArray
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Plus/index.js":34,"../Data.Functor/index.js":81}],5:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Plus/index.js":30,"../Data.Functor/index.js":70}],5:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Apply = require("../Control.Apply/index.js");
@@ -227,7 +229,7 @@ module.exports = {
     applicativeArray: applicativeArray
 };
 
-},{"../Control.Apply/index.js":7,"../Data.Functor/index.js":81,"../Data.Unit/index.js":152}],6:[function(require,module,exports){
+},{"../Control.Apply/index.js":7,"../Data.Functor/index.js":70,"../Data.Unit/index.js":141}],6:[function(require,module,exports){
 "use strict";
 
 exports.arrayApply = function (fs) {
@@ -347,7 +349,7 @@ module.exports = {
     applyArray: applyArray
 };
 
-},{"../Control.Category/index.js":12,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"./foreign.js":6}],8:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"./foreign.js":6}],8:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Biapply = require("../Control.Biapply/index.js");
@@ -423,7 +425,7 @@ module.exports = {
     bilift3: bilift3
 };
 
-},{"../Control.Category/index.js":12,"../Data.Bifunctor/index.js":49,"../Data.Function/index.js":78}],10:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Data.Bifunctor/index.js":38,"../Data.Function/index.js":67}],10:[function(require,module,exports){
 "use strict";
 
 exports.arrayBind = function (arr) {
@@ -529,7 +531,7 @@ module.exports = {
     discardUnit: discardUnit
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Unit/index.js":152,"./foreign.js":10}],12:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Unit/index.js":141,"./foreign.js":10}],12:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Semigroupoid = require("../Control.Semigroupoid/index.js");
@@ -551,7 +553,7 @@ module.exports = {
     categoryFn: categoryFn
 };
 
-},{"../Control.Semigroupoid/index.js":35}],13:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31}],13:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Extend = require("../Control.Extend/index.js");
@@ -568,7 +570,7 @@ module.exports = {
     extract: extract
 };
 
-},{"../Control.Extend/index.js":15,"../Data.Functor/index.js":81}],14:[function(require,module,exports){
+},{"../Control.Extend/index.js":15,"../Data.Functor/index.js":70}],14:[function(require,module,exports){
 "use strict";
 
 exports.arrayExtend = function(f) {
@@ -648,7 +650,7 @@ module.exports = {
     extendArray: extendArray
 };
 
-},{"../Control.Category/index.js":12,"../Data.Functor/index.js":81,"../Data.Semigroup/index.js":126,"./foreign.js":14}],16:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Data.Functor/index.js":70,"../Data.Semigroup/index.js":115,"./foreign.js":14}],16:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Unit = require("../Data.Unit/index.js");
@@ -682,7 +684,7 @@ module.exports = {
     lazyUnit: lazyUnit
 };
 
-},{"../Data.Unit/index.js":152}],17:[function(require,module,exports){
+},{"../Data.Unit/index.js":141}],17:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Prelude = require("../Prelude/index.js");
@@ -698,7 +700,7 @@ module.exports = {
     callCC: callCC
 };
 
-},{"../Prelude/index.js":177}],18:[function(require,module,exports){
+},{"../Prelude/index.js":166}],18:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -821,7 +823,7 @@ module.exports = {
     monadErrorEffect: monadErrorEffect
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Control.Semigroupoid/index.js":35,"../Data.Either/index.js":65,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Unit/index.js":152,"../Effect.Exception/index.js":158,"../Effect/index.js":166,"../Prelude/index.js":177}],19:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Control.Semigroupoid/index.js":31,"../Data.Either/index.js":54,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Unit/index.js":141,"../Effect.Exception/index.js":147,"../Effect/index.js":155,"../Prelude/index.js":166}],19:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -1138,7 +1140,7 @@ module.exports = {
     monadWriterExceptT: monadWriterExceptT
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Monad.Cont.Class/index.js":17,"../Control.Monad.Error.Class/index.js":18,"../Control.Monad.Reader.Class/index.js":21,"../Control.Monad.Rec.Class/index.js":23,"../Control.Monad.State.Class/index.js":28,"../Control.Monad.Trans.Class/index.js":29,"../Control.Monad.Writer.Class/index.js":30,"../Control.Monad/index.js":31,"../Control.MonadPlus/index.js":32,"../Control.MonadZero/index.js":33,"../Control.Plus/index.js":34,"../Control.Semigroupoid/index.js":35,"../Data.Either/index.js":65,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Semigroup/index.js":126,"../Data.Tuple/index.js":146,"../Effect.Class/index.js":154,"../Prelude/index.js":177}],20:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Monad.Cont.Class/index.js":17,"../Control.Monad.Error.Class/index.js":18,"../Control.Monad.Reader.Class/index.js":21,"../Control.Monad.Rec.Class/index.js":23,"../Control.Monad.State.Class/index.js":24,"../Control.Monad.Trans.Class/index.js":25,"../Control.Monad.Writer.Class/index.js":26,"../Control.Monad/index.js":27,"../Control.MonadPlus/index.js":28,"../Control.MonadZero/index.js":29,"../Control.Plus/index.js":30,"../Control.Semigroupoid/index.js":31,"../Data.Either/index.js":54,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Semigroup/index.js":115,"../Data.Tuple/index.js":135,"../Effect.Class/index.js":143,"../Prelude/index.js":166}],20:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Monad_Error_Class = require("../Control.Monad.Error.Class/index.js");
@@ -1163,7 +1165,7 @@ module.exports = {
     withExcept: withExcept
 };
 
-},{"../Control.Monad.Error.Class/index.js":18,"../Control.Monad.Except.Trans/index.js":19,"../Control.Semigroupoid/index.js":35,"../Data.Either/index.js":65,"../Data.Identity/index.js":86,"../Data.Newtype/index.js":108,"../Prelude/index.js":177}],21:[function(require,module,exports){
+},{"../Control.Monad.Error.Class/index.js":18,"../Control.Monad.Except.Trans/index.js":19,"../Control.Semigroupoid/index.js":31,"../Data.Either/index.js":54,"../Data.Identity/index.js":75,"../Data.Newtype/index.js":97,"../Prelude/index.js":166}],21:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Category = require("../Control.Category/index.js");
@@ -1206,7 +1208,7 @@ module.exports = {
     monadReaderFun: monadReaderFun
 };
 
-},{"../Control.Category/index.js":12,"../Control.Monad/index.js":31,"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Prelude/index.js":177}],22:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Control.Monad/index.js":27,"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Prelude/index.js":166}],22:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -1492,7 +1494,7 @@ module.exports = {
     monadRecReaderT: monadRecReaderT
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad.Cont.Class/index.js":17,"../Control.Monad.Error.Class/index.js":18,"../Control.Monad.Reader.Class/index.js":21,"../Control.Monad.Rec.Class/index.js":23,"../Control.Monad.State.Class/index.js":28,"../Control.Monad.Trans.Class/index.js":29,"../Control.Monad.Writer.Class/index.js":30,"../Control.Monad/index.js":31,"../Control.MonadPlus/index.js":32,"../Control.MonadZero/index.js":33,"../Control.Plus/index.js":34,"../Control.Semigroupoid/index.js":35,"../Data.Distributive/index.js":63,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Semigroup/index.js":126,"../Effect.Class/index.js":154,"../Prelude/index.js":177}],23:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad.Cont.Class/index.js":17,"../Control.Monad.Error.Class/index.js":18,"../Control.Monad.Reader.Class/index.js":21,"../Control.Monad.Rec.Class/index.js":23,"../Control.Monad.State.Class/index.js":24,"../Control.Monad.Trans.Class/index.js":25,"../Control.Monad.Writer.Class/index.js":26,"../Control.Monad/index.js":27,"../Control.MonadPlus/index.js":28,"../Control.MonadZero/index.js":29,"../Control.Plus/index.js":30,"../Control.Semigroupoid/index.js":31,"../Data.Distributive/index.js":52,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Semigroup/index.js":115,"../Effect.Class/index.js":143,"../Prelude/index.js":166}],23:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -1739,204 +1741,7 @@ module.exports = {
     monadRecMaybe: monadRecMaybe
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Control.Semigroupoid/index.js":35,"../Data.Bifunctor/index.js":49,"../Data.Either/index.js":65,"../Data.Functor/index.js":81,"../Data.Identity/index.js":86,"../Data.Maybe/index.js":98,"../Data.Unit/index.js":152,"../Effect.Ref/index.js":160,"../Effect/index.js":166,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177}],24:[function(require,module,exports){
-"use strict";
-
-exports.map_ = function (f) {
-  return function (a) {
-    return function () {
-      return f(a());
-    };
-  };
-};
-
-exports.pure_ = function (a) {
-  return function () {
-    return a;
-  };
-};
-
-exports.bind_ = function (a) {
-  return function (f) {
-    return function () {
-      return f(a())();
-    };
-  };
-};
-
-exports.run = function (f) {
-  return f();
-};
-
-exports["while"] = function (f) {
-  return function (a) {
-    return function () {
-      while (f()) {
-        a();
-      }
-    };
-  };
-};
-
-exports["for"] = function (lo) {
-  return function (hi) {
-    return function (f) {
-      return function () {
-        for (var i = lo; i < hi; i++) {
-          f(i)();
-        }
-      };
-    };
-  };
-};
-
-exports.foreach = function (as) {
-  return function (f) {
-    return function () {
-      for (var i = 0, l = as.length; i < l; i++) {
-        f(as[i])();
-      }
-    };
-  };
-};
-
-exports.new = function (val) {
-  return function () {
-    return { value: val };
-  };
-};
-
-exports.read = function (ref) {
-  return function () {
-    return ref.value;
-  };
-};
-
-exports["modify'"] = function (f) {
-  return function (ref) {
-    return function () {
-      var t = f(ref.value);
-      ref.value = t.state;
-      return t.value;
-    };
-  };
-};
-
-exports.write = function (a) {
-  return function (ref) {
-    return function () {
-      return ref.value = a; // eslint-disable-line no-return-assign
-    };
-  };
-};
-
-},{}],25:[function(require,module,exports){
-// Generated by purs version 0.12.1
-"use strict";
-var $foreign = require("./foreign.js");
-var Control_Applicative = require("../Control.Applicative/index.js");
-var Control_Apply = require("../Control.Apply/index.js");
-var Control_Bind = require("../Control.Bind/index.js");
-var Control_Monad = require("../Control.Monad/index.js");
-var Control_Monad_Rec_Class = require("../Control.Monad.Rec.Class/index.js");
-var Data_Functor = require("../Data.Functor/index.js");
-var Data_Unit = require("../Data.Unit/index.js");
-var Partial_Unsafe = require("../Partial.Unsafe/index.js");
-var Prelude = require("../Prelude/index.js");
-var modify = function (f) {
-    return $foreign["modify'"](function (s) {
-        var s$prime = f(s);
-        return {
-            state: s$prime,
-            value: s$prime
-        };
-    });
-};
-var functorST = new Data_Functor.Functor($foreign.map_);
-var monadST = new Control_Monad.Monad(function () {
-    return applicativeST;
-}, function () {
-    return bindST;
-});
-var bindST = new Control_Bind.Bind(function () {
-    return applyST;
-}, $foreign.bind_);
-var applyST = new Control_Apply.Apply(function () {
-    return functorST;
-}, Control_Monad.ap(monadST));
-var applicativeST = new Control_Applicative.Applicative(function () {
-    return applyST;
-}, $foreign.pure_);
-var monadRecST = new Control_Monad_Rec_Class.MonadRec(function () {
-    return monadST;
-}, function (f) {
-    return function (a) {
-        var isLooping = function (v) {
-            if (v instanceof Control_Monad_Rec_Class.Loop) {
-                return true;
-            };
-            return false;
-        };
-        var fromDone = function (v) {
-            var $__unused = function (dictPartial1) {
-                return function ($dollar6) {
-                    return $dollar6;
-                };
-            };
-            return $__unused()((function () {
-                if (v instanceof Control_Monad_Rec_Class.Done) {
-                    return v.value0;
-                };
-                throw new Error("Failed pattern match at Control.Monad.ST.Internal line 54, column 32 - line 54, column 46: " + [ v.constructor.name ]);
-            })());
-        };
-        return Control_Bind.bind(bindST)(Control_Bind.bindFlipped(bindST)($foreign["new"])(f(a)))(function (v) {
-            return Control_Bind.discard(Control_Bind.discardUnit)(bindST)($foreign["while"](Data_Functor.map(functorST)(isLooping)($foreign.read(v)))(Control_Bind.bind(bindST)($foreign.read(v))(function (v1) {
-                if (v1 instanceof Control_Monad_Rec_Class.Loop) {
-                    return Control_Bind.bind(bindST)(f(v1.value0))(function (v2) {
-                        return Data_Functor["void"](functorST)($foreign.write(v2)(v));
-                    });
-                };
-                if (v1 instanceof Control_Monad_Rec_Class.Done) {
-                    return Control_Applicative.pure(applicativeST)(Data_Unit.unit);
-                };
-                throw new Error("Failed pattern match at Control.Monad.ST.Internal line 46, column 18 - line 50, column 28: " + [ v1.constructor.name ]);
-            })))(function () {
-                return Data_Functor.map(functorST)(fromDone)($foreign.read(v));
-            });
-        });
-    };
-});
-module.exports = {
-    modify: modify,
-    functorST: functorST,
-    applyST: applyST,
-    applicativeST: applicativeST,
-    bindST: bindST,
-    monadST: monadST,
-    monadRecST: monadRecST,
-    map_: $foreign.map_,
-    pure_: $foreign.pure_,
-    bind_: $foreign.bind_,
-    run: $foreign.run,
-    "while": $foreign["while"],
-    "for": $foreign["for"],
-    foreach: $foreign.foreach,
-    "new": $foreign["new"],
-    read: $foreign.read,
-    "modify'": $foreign["modify'"],
-    write: $foreign.write
-};
-
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad.Rec.Class/index.js":23,"../Control.Monad/index.js":31,"../Data.Functor/index.js":81,"../Data.Unit/index.js":152,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177,"./foreign.js":24}],26:[function(require,module,exports){
-// Generated by purs version 0.12.1
-"use strict";
-var Control_Monad_ST_Internal = require("../Control.Monad.ST.Internal/index.js");
-module.exports = {};
-
-},{"../Control.Monad.ST.Internal/index.js":25}],27:[function(require,module,exports){
-arguments[4][26][0].apply(exports,arguments)
-},{"../Control.Monad.ST.Internal/index.js":25,"dup":26}],28:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Control.Semigroupoid/index.js":31,"../Data.Bifunctor/index.js":38,"../Data.Either/index.js":54,"../Data.Functor/index.js":70,"../Data.Identity/index.js":75,"../Data.Maybe/index.js":87,"../Data.Unit/index.js":141,"../Effect.Ref/index.js":149,"../Effect/index.js":155,"../Partial.Unsafe/index.js":163,"../Prelude/index.js":166}],24:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Tuple = require("../Data.Tuple/index.js");
@@ -1993,7 +1798,7 @@ module.exports = {
     modify_: modify_
 };
 
-},{"../Data.Tuple/index.js":146,"../Data.Unit/index.js":152,"../Prelude/index.js":177}],29:[function(require,module,exports){
+},{"../Data.Tuple/index.js":135,"../Data.Unit/index.js":141,"../Prelude/index.js":166}],25:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Prelude = require("../Prelude/index.js");
@@ -2008,7 +1813,7 @@ module.exports = {
     MonadTrans: MonadTrans
 };
 
-},{"../Prelude/index.js":177}],30:[function(require,module,exports){
+},{"../Prelude/index.js":166}],26:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -2062,7 +1867,7 @@ module.exports = {
     censor: censor
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Data.Function/index.js":78,"../Data.Tuple/index.js":146,"../Prelude/index.js":177}],31:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Data.Function/index.js":67,"../Data.Tuple/index.js":135,"../Prelude/index.js":166}],27:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -2132,7 +1937,7 @@ module.exports = {
     monadArray: monadArray
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Data.Functor/index.js":81,"../Data.Unit/index.js":152}],32:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Data.Functor/index.js":70,"../Data.Unit/index.js":141}],28:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -2155,7 +1960,7 @@ module.exports = {
     monadPlusArray: monadPlusArray
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Control.MonadZero/index.js":33,"../Control.Plus/index.js":34,"../Data.Functor/index.js":81}],33:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Control.MonadZero/index.js":29,"../Control.Plus/index.js":30,"../Data.Functor/index.js":70}],29:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -2193,7 +1998,7 @@ module.exports = {
     monadZeroArray: monadZeroArray
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Control.Plus/index.js":34,"../Data.Functor/index.js":81,"../Data.Unit/index.js":152}],34:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Control.Plus/index.js":30,"../Data.Functor/index.js":70,"../Data.Unit/index.js":141}],30:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -2214,7 +2019,7 @@ module.exports = {
     plusArray: plusArray
 };
 
-},{"../Control.Alt/index.js":3,"../Data.Functor/index.js":81}],35:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Data.Functor/index.js":70}],31:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Semigroupoid = function (compose) {
@@ -2244,1355 +2049,7 @@ module.exports = {
     semigroupoidFn: semigroupoidFn
 };
 
-},{}],36:[function(require,module,exports){
-"use strict";
-
-exports.fold1Impl = function (f) {
-  return function (xs) {
-    var acc = xs[0];
-    var len = xs.length;
-    for (var i = 1; i < len; i++) {
-      acc = f(acc)(xs[i]);
-    }
-    return acc;
-  };
-};
-
-exports.traverse1Impl = function () {
-  function Cont(fn) {
-    this.fn = fn;
-  }
-
-  var emptyList = {};
-
-  var ConsCell = function (head, tail) {
-    this.head = head;
-    this.tail = tail;
-  };
-
-  function finalCell(head) {
-    return new ConsCell(head, emptyList);
-  }
-
-  function consList(x) {
-    return function (xs) {
-      return new ConsCell(x, xs);
-    };
-  }
-
-  function listToArray(list) {
-    var arr = [];
-    var xs = list;
-    while (xs !== emptyList) {
-      arr.push(xs.head);
-      xs = xs.tail;
-    }
-    return arr;
-  }
-
-  return function (apply) {
-    return function (map) {
-      return function (f) {
-        var buildFrom = function (x, ys) {
-          return apply(map(consList)(f(x)))(ys);
-        };
-
-        var go = function (acc, currentLen, xs) {
-          if (currentLen === 0) {
-            return acc;
-          } else {
-            var last = xs[currentLen - 1];
-            return new Cont(function () {
-              var built = go(buildFrom(last, acc), currentLen - 1, xs);
-              return built;
-            });
-          }
-        };
-
-        return function (array) {
-          var acc = map(finalCell)(f(array[array.length - 1]));
-          var result = go(acc, array.length - 1, array);
-          while (result instanceof Cont) {
-            result = result.fn();
-          }
-
-          return map(listToArray)(result);
-        };
-      };
-    };
-  };
-}();
-
-},{}],37:[function(require,module,exports){
-// Generated by purs version 0.12.1
-"use strict";
-var $foreign = require("./foreign.js");
-var Control_Alt = require("../Control.Alt/index.js");
-var Control_Applicative = require("../Control.Applicative/index.js");
-var Control_Apply = require("../Control.Apply/index.js");
-var Control_Bind = require("../Control.Bind/index.js");
-var Control_Monad = require("../Control.Monad/index.js");
-var Data_Eq = require("../Data.Eq/index.js");
-var Data_Foldable = require("../Data.Foldable/index.js");
-var Data_FoldableWithIndex = require("../Data.FoldableWithIndex/index.js");
-var Data_Functor = require("../Data.Functor/index.js");
-var Data_FunctorWithIndex = require("../Data.FunctorWithIndex/index.js");
-var Data_Ord = require("../Data.Ord/index.js");
-var Data_Semigroup = require("../Data.Semigroup/index.js");
-var Data_Semigroup_Foldable = require("../Data.Semigroup.Foldable/index.js");
-var Data_Semigroup_Traversable = require("../Data.Semigroup.Traversable/index.js");
-var Data_Show = require("../Data.Show/index.js");
-var Data_Traversable = require("../Data.Traversable/index.js");
-var Data_TraversableWithIndex = require("../Data.TraversableWithIndex/index.js");
-var Data_Unfoldable1 = require("../Data.Unfoldable1/index.js");
-var Prelude = require("../Prelude/index.js");
-var NonEmptyArray = function (x) {
-    return x;
-};
-var unfoldable1NonEmptyArray = Data_Unfoldable1.unfoldable1Array;
-var traversableWithIndexNonEmptyArray = Data_TraversableWithIndex.traversableWithIndexArray;
-var traversableNonEmptyArray = Data_Traversable.traversableArray;
-var showNonEmptyArray = function (dictShow) {
-    return new Data_Show.Show(function (v) {
-        return "(NonEmptyArray " + (Data_Show.show(Data_Show.showArray(dictShow))(v) + ")");
-    });
-};
-var semigroupNonEmptyArray = Data_Semigroup.semigroupArray;
-var ordNonEmptyArray = function (dictOrd) {
-    return Data_Ord.ordArray(dictOrd);
-};
-var ord1NonEmptyArray = Data_Ord.ord1Array;
-var monadNonEmptyArray = Control_Monad.monadArray;
-var functorWithIndexNonEmptyArray = Data_FunctorWithIndex.functorWithIndexArray;
-var functorNonEmptyArray = Data_Functor.functorArray;
-var foldableWithIndexNonEmptyArray = Data_FoldableWithIndex.foldableWithIndexArray;
-var foldableNonEmptyArray = Data_Foldable.foldableArray;
-var foldable1NonEmptyArray = new Data_Semigroup_Foldable.Foldable1(function () {
-    return foldableNonEmptyArray;
-}, function (dictSemigroup) {
-    return $foreign.fold1Impl(Data_Semigroup.append(dictSemigroup));
-}, function (dictSemigroup) {
-    return Data_Semigroup_Foldable.foldMap1Default(foldable1NonEmptyArray)(functorNonEmptyArray)(dictSemigroup);
-});
-var traversable1NonEmptyArray = new Data_Semigroup_Traversable.Traversable1(function () {
-    return foldable1NonEmptyArray;
-}, function () {
-    return traversableNonEmptyArray;
-}, function (dictApply) {
-    return Data_Semigroup_Traversable.sequence1Default(traversable1NonEmptyArray)(dictApply);
-}, function (dictApply) {
-    return $foreign.traverse1Impl(Control_Apply.apply(dictApply))(Data_Functor.map(dictApply.Functor0()));
-});
-var eqNonEmptyArray = function (dictEq) {
-    return Data_Eq.eqArray(dictEq);
-};
-var eq1NonEmptyArray = Data_Eq.eq1Array;
-var bindNonEmptyArray = Control_Bind.bindArray;
-var applyNonEmptyArray = Control_Apply.applyArray;
-var applicativeNonEmptyArray = Control_Applicative.applicativeArray;
-var altNonEmptyArray = Control_Alt.altArray;
-module.exports = {
-    showNonEmptyArray: showNonEmptyArray,
-    eqNonEmptyArray: eqNonEmptyArray,
-    eq1NonEmptyArray: eq1NonEmptyArray,
-    ordNonEmptyArray: ordNonEmptyArray,
-    ord1NonEmptyArray: ord1NonEmptyArray,
-    semigroupNonEmptyArray: semigroupNonEmptyArray,
-    functorNonEmptyArray: functorNonEmptyArray,
-    functorWithIndexNonEmptyArray: functorWithIndexNonEmptyArray,
-    foldableNonEmptyArray: foldableNonEmptyArray,
-    foldableWithIndexNonEmptyArray: foldableWithIndexNonEmptyArray,
-    foldable1NonEmptyArray: foldable1NonEmptyArray,
-    unfoldable1NonEmptyArray: unfoldable1NonEmptyArray,
-    traversableNonEmptyArray: traversableNonEmptyArray,
-    traversableWithIndexNonEmptyArray: traversableWithIndexNonEmptyArray,
-    traversable1NonEmptyArray: traversable1NonEmptyArray,
-    applyNonEmptyArray: applyNonEmptyArray,
-    applicativeNonEmptyArray: applicativeNonEmptyArray,
-    bindNonEmptyArray: bindNonEmptyArray,
-    monadNonEmptyArray: monadNonEmptyArray,
-    altNonEmptyArray: altNonEmptyArray
-};
-
-},{"../Control.Alt/index.js":3,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Data.Eq/index.js":69,"../Data.Foldable/index.js":74,"../Data.FoldableWithIndex/index.js":75,"../Data.Functor/index.js":81,"../Data.FunctorWithIndex/index.js":83,"../Data.Ord/index.js":117,"../Data.Semigroup.Foldable/index.js":122,"../Data.Semigroup.Traversable/index.js":124,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Data.Traversable/index.js":144,"../Data.TraversableWithIndex/index.js":145,"../Data.Unfoldable1/index.js":150,"../Prelude/index.js":177,"./foreign.js":36}],38:[function(require,module,exports){
-// Generated by purs version 0.12.1
-"use strict";
-var Control_Applicative = require("../Control.Applicative/index.js");
-var Control_Bind = require("../Control.Bind/index.js");
-var Control_Monad_ST = require("../Control.Monad.ST/index.js");
-var Control_Monad_ST_Internal = require("../Control.Monad.ST.Internal/index.js");
-var Control_Monad_ST_Ref = require("../Control.Monad.ST.Ref/index.js");
-var Control_Semigroupoid = require("../Control.Semigroupoid/index.js");
-var Data_Array_ST = require("../Data.Array.ST/index.js");
-var Data_Function = require("../Data.Function/index.js");
-var Data_Functor = require("../Data.Functor/index.js");
-var Data_HeytingAlgebra = require("../Data.HeytingAlgebra/index.js");
-var Data_Maybe = require("../Data.Maybe/index.js");
-var Data_Semiring = require("../Data.Semiring/index.js");
-var Prelude = require("../Prelude/index.js");
-var Iterator = (function () {
-    function Iterator(value0, value1) {
-        this.value0 = value0;
-        this.value1 = value1;
-    };
-    Iterator.create = function (value0) {
-        return function (value1) {
-            return new Iterator(value0, value1);
-        };
-    };
-    return Iterator;
-})();
-var peek = function (v) {
-    return function __do() {
-        var v1 = Control_Monad_ST_Internal.read(v.value1)();
-        return v.value0(v1);
-    };
-};
-var next = function (v) {
-    return function __do() {
-        var v1 = Control_Monad_ST_Internal.read(v.value1)();
-        var v2 = Control_Monad_ST_Internal.modify(function (v2) {
-            return v2 + 1 | 0;
-        })(v.value1)();
-        return v.value0(v1);
-    };
-};
-var pushWhile = function (p) {
-    return function (iter) {
-        return function (array) {
-            return function __do() {
-                var v = Control_Monad_ST_Internal["new"](false)();
-                while (Data_Functor.map(Control_Monad_ST_Internal.functorST)(Data_HeytingAlgebra.not(Data_HeytingAlgebra.heytingAlgebraBoolean))(Control_Monad_ST_Internal.read(v))()) {
-                    (function __do() {
-                        var v1 = peek(iter)();
-                        if (v1 instanceof Data_Maybe.Just && p(v1.value0)) {
-                            var v2 = Data_Array_ST.push(v1.value0)(array)();
-                            return Data_Functor["void"](Control_Monad_ST_Internal.functorST)(next(iter))();
-                        };
-                        return Data_Functor["void"](Control_Monad_ST_Internal.functorST)(Control_Monad_ST_Internal.write(true)(v))();
-                    })();
-                };
-                return {};
-            };
-        };
-    };
-};
-var pushAll = pushWhile(Data_Function["const"](true));
-var iterator = function (f) {
-    return Data_Functor.map(Control_Monad_ST_Internal.functorST)(Iterator.create(f))(Control_Monad_ST_Internal["new"](0));
-};
-var iterate = function (iter) {
-    return function (f) {
-        return function __do() {
-            var v = Control_Monad_ST_Internal["new"](false)();
-            while (Data_Functor.map(Control_Monad_ST_Internal.functorST)(Data_HeytingAlgebra.not(Data_HeytingAlgebra.heytingAlgebraBoolean))(Control_Monad_ST_Internal.read(v))()) {
-                (function __do() {
-                    var v1 = next(iter)();
-                    if (v1 instanceof Data_Maybe.Just) {
-                        return f(v1.value0)();
-                    };
-                    if (v1 instanceof Data_Maybe.Nothing) {
-                        return Data_Functor["void"](Control_Monad_ST_Internal.functorST)(Control_Monad_ST_Internal.write(true)(v))();
-                    };
-                    throw new Error("Failed pattern match at Data.Array.ST.Iterator line 42, column 5 - line 44, column 47: " + [ v1.constructor.name ]);
-                })();
-            };
-            return {};
-        };
-    };
-};
-var exhausted = function ($27) {
-    return Data_Functor.map(Control_Monad_ST_Internal.functorST)(Data_Maybe.isNothing)(peek($27));
-};
-module.exports = {
-    iterator: iterator,
-    iterate: iterate,
-    next: next,
-    peek: peek,
-    exhausted: exhausted,
-    pushWhile: pushWhile,
-    pushAll: pushAll
-};
-
-},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Control.Monad.ST.Internal/index.js":25,"../Control.Monad.ST.Ref/index.js":26,"../Control.Monad.ST/index.js":27,"../Control.Semigroupoid/index.js":35,"../Data.Array.ST/index.js":40,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Semiring/index.js":128,"../Prelude/index.js":177}],39:[function(require,module,exports){
-"use strict";
-
-exports.empty = function () {
-  return [];
-};
-
-exports.peekImpl = function (just) {
-  return function (nothing) {
-    return function (i) {
-      return function (xs) {
-        return function () {
-          return i >= 0 && i < xs.length ? just(xs[i]) : nothing;
-        };
-      };
-    };
-  };
-};
-
-exports.poke = function (i) {
-  return function (a) {
-    return function (xs) {
-      return function () {
-        var ret = i >= 0 && i < xs.length;
-        if (ret) xs[i] = a;
-        return ret;
-      };
-    };
-  };
-};
-
-exports.pushAll = function (as) {
-  return function (xs) {
-    return function () {
-      return xs.push.apply(xs, as);
-    };
-  };
-};
-
-exports.splice = function (i) {
-  return function (howMany) {
-    return function (bs) {
-      return function (xs) {
-        return function () {
-          return xs.splice.apply(xs, [i, howMany].concat(bs));
-        };
-      };
-    };
-  };
-};
-
-exports.copyImpl = function (xs) {
-  return function () {
-    return xs.slice();
-  };
-};
-
-exports.sortByImpl = function (comp) {
-  return function (xs) {
-    return function () {
-      return xs.sort(function (x, y) {
-        return comp(x)(y);
-      });
-    };
-  };
-};
-
-exports.toAssocArray = function (xs) {
-  return function () {
-    var n = xs.length;
-    var as = new Array(n);
-    for (var i = 0; i < n; i++) as[i] = { value: xs[i], index: i };
-    return as;
-  };
-};
-
-},{}],40:[function(require,module,exports){
-// Generated by purs version 0.12.1
-"use strict";
-var $foreign = require("./foreign.js");
-var Control_Applicative = require("../Control.Applicative/index.js");
-var Control_Bind = require("../Control.Bind/index.js");
-var Control_Monad_ST = require("../Control.Monad.ST/index.js");
-var Control_Monad_ST_Internal = require("../Control.Monad.ST.Internal/index.js");
-var Control_Semigroupoid = require("../Control.Semigroupoid/index.js");
-var Data_Maybe = require("../Data.Maybe/index.js");
-var Data_Ord = require("../Data.Ord/index.js");
-var Data_Ordering = require("../Data.Ordering/index.js");
-var Data_Ring = require("../Data.Ring/index.js");
-var Prelude = require("../Prelude/index.js");
-var Unsafe_Coerce = require("../Unsafe.Coerce/index.js");
-var unsafeThaw = function ($11) {
-    return Control_Applicative.pure(Control_Monad_ST_Internal.applicativeST)($11);
-};
-var unsafeFreeze = function ($12) {
-    return Control_Applicative.pure(Control_Monad_ST_Internal.applicativeST)($12);
-};
-var thaw = $foreign.copyImpl;
-var withArray = function (f) {
-    return function (xs) {
-        return function __do() {
-            var v = thaw(xs)();
-            var v1 = f(v)();
-            return unsafeFreeze(v)();
-        };
-    };
-};
-var sortBy = function (comp) {
-    var comp$prime = function (x) {
-        return function (y) {
-            var v = comp(x)(y);
-            if (v instanceof Data_Ordering.GT) {
-                return 1;
-            };
-            if (v instanceof Data_Ordering.EQ) {
-                return 0;
-            };
-            if (v instanceof Data_Ordering.LT) {
-                return -1 | 0;
-            };
-            throw new Error("Failed pattern match at Data.Array.ST line 94, column 15 - line 99, column 1: " + [ v.constructor.name ]);
-        };
-    };
-    return $foreign.sortByImpl(comp$prime);
-};
-var sortWith = function (dictOrd) {
-    return function (f) {
-        return sortBy(Data_Ord.comparing(dictOrd)(f));
-    };
-};
-var sort = function (dictOrd) {
-    return sortBy(Data_Ord.compare(dictOrd));
-};
-var run = function (st) {
-    return Control_Bind.bind(Control_Monad_ST_Internal.bindST)(st)(unsafeFreeze)();
-};
-var push = function (a) {
-    return $foreign.pushAll([ a ]);
-};
-var peek = $foreign.peekImpl(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
-var modify = function (i) {
-    return function (f) {
-        return function (xs) {
-            return function __do() {
-                var v = peek(i)(xs)();
-                if (v instanceof Data_Maybe.Just) {
-                    return $foreign.poke(i)(f(v.value0))(xs)();
-                };
-                if (v instanceof Data_Maybe.Nothing) {
-                    return false;
-                };
-                throw new Error("Failed pattern match at Data.Array.ST line 156, column 3 - line 158, column 26: " + [ v.constructor.name ]);
-            };
-        };
-    };
-};
-var freeze = $foreign.copyImpl;
-module.exports = {
-    run: run,
-    withArray: withArray,
-    peek: peek,
-    push: push,
-    modify: modify,
-    sort: sort,
-    sortBy: sortBy,
-    sortWith: sortWith,
-    freeze: freeze,
-    thaw: thaw,
-    unsafeFreeze: unsafeFreeze,
-    unsafeThaw: unsafeThaw,
-    empty: $foreign.empty,
-    poke: $foreign.poke,
-    pushAll: $foreign.pushAll,
-    splice: $foreign.splice,
-    toAssocArray: $foreign.toAssocArray
-};
-
-},{"../Control.Applicative/index.js":5,"../Control.Bind/index.js":11,"../Control.Monad.ST.Internal/index.js":25,"../Control.Monad.ST/index.js":27,"../Control.Semigroupoid/index.js":35,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"./foreign.js":39}],41:[function(require,module,exports){
-"use strict";
-
-//------------------------------------------------------------------------------
-// Array creation --------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports.range = function (start) {
-  return function (end) {
-    var step = start > end ? -1 : 1;
-    var result = new Array(step * (end - start) + 1);
-    var i = start, n = 0;
-    while (i !== end) {
-      result[n++] = i;
-      i += step;
-    }
-    result[n] = i;
-    return result;
-  };
-};
-
-var replicateFill = function (count) {
-  return function (value) {
-    if (count < 1) {
-      return [];
-    }
-    var result = new Array(count);
-    return result.fill(value);
-  };
-};
-
-var replicatePolyfill = function (count) {
-  return function (value) {
-    var result = [];
-    var n = 0;
-    for (var i = 0; i < count; i++) {
-      result[n++] = value;
-    }
-    return result;
-  };
-};
-
-// In browsers that have Array.prototype.fill we use it, as it's faster.
-exports.replicate = typeof Array.prototype.fill === "function" ? replicateFill : replicatePolyfill;
-
-exports.fromFoldableImpl = (function () {
-  function Cons(head, tail) {
-    this.head = head;
-    this.tail = tail;
-  }
-  var emptyList = {};
-
-  function curryCons(head) {
-    return function (tail) {
-      return new Cons(head, tail);
-    };
-  }
-
-  function listToArray(list) {
-    var result = [];
-    var count = 0;
-    var xs = list;
-    while (xs !== emptyList) {
-      result[count++] = xs.head;
-      xs = xs.tail;
-    }
-    return result;
-  }
-
-  return function (foldr) {
-    return function (xs) {
-      return listToArray(foldr(curryCons)(emptyList)(xs));
-    };
-  };
-})();
-
-//------------------------------------------------------------------------------
-// Array size ------------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports.length = function (xs) {
-  return xs.length;
-};
-
-//------------------------------------------------------------------------------
-// Extending arrays ------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports.cons = function (e) {
-  return function (l) {
-    return [e].concat(l);
-  };
-};
-
-exports.snoc = function (l) {
-  return function (e) {
-    var l1 = l.slice();
-    l1.push(e);
-    return l1;
-  };
-};
-
-//------------------------------------------------------------------------------
-// Non-indexed reads -----------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports["uncons'"] = function (empty) {
-  return function (next) {
-    return function (xs) {
-      return xs.length === 0 ? empty({}) : next(xs[0])(xs.slice(1));
-    };
-  };
-};
-
-//------------------------------------------------------------------------------
-// Indexed operations ----------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports.indexImpl = function (just) {
-  return function (nothing) {
-    return function (xs) {
-      return function (i) {
-        return i < 0 || i >= xs.length ? nothing :  just(xs[i]);
-      };
-    };
-  };
-};
-
-exports.findIndexImpl = function (just) {
-  return function (nothing) {
-    return function (f) {
-      return function (xs) {
-        for (var i = 0, l = xs.length; i < l; i++) {
-          if (f(xs[i])) return just(i);
-        }
-        return nothing;
-      };
-    };
-  };
-};
-
-exports.findLastIndexImpl = function (just) {
-  return function (nothing) {
-    return function (f) {
-      return function (xs) {
-        for (var i = xs.length - 1; i >= 0; i--) {
-          if (f(xs[i])) return just(i);
-        }
-        return nothing;
-      };
-    };
-  };
-};
-
-exports._insertAt = function (just) {
-  return function (nothing) {
-    return function (i) {
-      return function (a) {
-        return function (l) {
-          if (i < 0 || i > l.length) return nothing;
-          var l1 = l.slice();
-          l1.splice(i, 0, a);
-          return just(l1);
-        };
-      };
-    };
-  };
-};
-
-exports._deleteAt = function (just) {
-  return function (nothing) {
-    return function (i) {
-      return function (l) {
-        if (i < 0 || i >= l.length) return nothing;
-        var l1 = l.slice();
-        l1.splice(i, 1);
-        return just(l1);
-      };
-    };
-  };
-};
-
-exports._updateAt = function (just) {
-  return function (nothing) {
-    return function (i) {
-      return function (a) {
-        return function (l) {
-          if (i < 0 || i >= l.length) return nothing;
-          var l1 = l.slice();
-          l1[i] = a;
-          return just(l1);
-        };
-      };
-    };
-  };
-};
-
-//------------------------------------------------------------------------------
-// Transformations -------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports.reverse = function (l) {
-  return l.slice().reverse();
-};
-
-exports.concat = function (xss) {
-  if (xss.length <= 10000) {
-    // This method is faster, but it crashes on big arrays.
-    // So we use it when can and fallback to simple variant otherwise.
-    return Array.prototype.concat.apply([], xss);
-  }
-
-  var result = [];
-  for (var i = 0, l = xss.length; i < l; i++) {
-    var xs = xss[i];
-    for (var j = 0, m = xs.length; j < m; j++) {
-      result.push(xs[j]);
-    }
-  }
-  return result;
-};
-
-exports.filter = function (f) {
-  return function (xs) {
-    return xs.filter(f);
-  };
-};
-
-exports.partition = function (f) {
-  return function (xs) {
-    var yes = [];
-    var no  = [];
-    for (var i = 0; i < xs.length; i++) {
-      var x = xs[i];
-      if (f(x))
-        yes.push(x);
-      else
-        no.push(x);
-    }
-    return { yes: yes, no: no };
-  };
-};
-
-//------------------------------------------------------------------------------
-// Sorting ---------------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports.sortImpl = function (f) {
-  return function (l) {
-    return l.slice().sort(function (x, y) {
-      return f(x)(y);
-    });
-  };
-};
-
-//------------------------------------------------------------------------------
-// Subarrays -------------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports.slice = function (s) {
-  return function (e) {
-    return function (l) {
-      return l.slice(s, e);
-    };
-  };
-};
-
-exports.take = function (n) {
-  return function (l) {
-    return n < 1 ? [] : l.slice(0, n);
-  };
-};
-
-exports.drop = function (n) {
-  return function (l) {
-    return n < 1 ? l : l.slice(n);
-  };
-};
-
-//------------------------------------------------------------------------------
-// Zipping ---------------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports.zipWith = function (f) {
-  return function (xs) {
-    return function (ys) {
-      var l = xs.length < ys.length ? xs.length : ys.length;
-      var result = new Array(l);
-      for (var i = 0; i < l; i++) {
-        result[i] = f(xs[i])(ys[i]);
-      }
-      return result;
-    };
-  };
-};
-
-//------------------------------------------------------------------------------
-// Partial ---------------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-exports.unsafeIndexImpl = function (xs) {
-  return function (n) {
-    return xs[n];
-  };
-};
-
-},{}],42:[function(require,module,exports){
-// Generated by purs version 0.12.1
-"use strict";
-var $foreign = require("./foreign.js");
-var Control_Alt = require("../Control.Alt/index.js");
-var Control_Alternative = require("../Control.Alternative/index.js");
-var Control_Applicative = require("../Control.Applicative/index.js");
-var Control_Apply = require("../Control.Apply/index.js");
-var Control_Bind = require("../Control.Bind/index.js");
-var Control_Category = require("../Control.Category/index.js");
-var Control_Lazy = require("../Control.Lazy/index.js");
-var Control_Monad_Rec_Class = require("../Control.Monad.Rec.Class/index.js");
-var Control_Monad_ST = require("../Control.Monad.ST/index.js");
-var Control_Monad_ST_Internal = require("../Control.Monad.ST.Internal/index.js");
-var Control_Semigroupoid = require("../Control.Semigroupoid/index.js");
-var Data_Array_NonEmpty_Internal = require("../Data.Array.NonEmpty.Internal/index.js");
-var Data_Array_ST = require("../Data.Array.ST/index.js");
-var Data_Array_ST_Iterator = require("../Data.Array.ST.Iterator/index.js");
-var Data_Boolean = require("../Data.Boolean/index.js");
-var Data_Eq = require("../Data.Eq/index.js");
-var Data_Foldable = require("../Data.Foldable/index.js");
-var Data_Function = require("../Data.Function/index.js");
-var Data_Functor = require("../Data.Functor/index.js");
-var Data_HeytingAlgebra = require("../Data.HeytingAlgebra/index.js");
-var Data_Maybe = require("../Data.Maybe/index.js");
-var Data_Ord = require("../Data.Ord/index.js");
-var Data_Ordering = require("../Data.Ordering/index.js");
-var Data_Ring = require("../Data.Ring/index.js");
-var Data_Semigroup = require("../Data.Semigroup/index.js");
-var Data_Semiring = require("../Data.Semiring/index.js");
-var Data_Traversable = require("../Data.Traversable/index.js");
-var Data_Tuple = require("../Data.Tuple/index.js");
-var Data_Unfoldable = require("../Data.Unfoldable/index.js");
-var Partial_Unsafe = require("../Partial.Unsafe/index.js");
-var Prelude = require("../Prelude/index.js");
-var Unsafe_Coerce = require("../Unsafe.Coerce/index.js");
-var zipWithA = function (dictApplicative) {
-    return function (f) {
-        return function (xs) {
-            return function (ys) {
-                return Data_Traversable.sequence(Data_Traversable.traversableArray)(dictApplicative)($foreign.zipWith(f)(xs)(ys));
-            };
-        };
-    };
-};
-var zip = $foreign.zipWith(Data_Tuple.Tuple.create);
-var updateAtIndices = function (dictFoldable) {
-    return function (us) {
-        return function (xs) {
-            return Data_Array_ST.withArray(function (res) {
-                return Data_Foldable.traverse_(Control_Monad_ST_Internal.applicativeST)(dictFoldable)(function (v) {
-                    return Data_Array_ST.poke(v.value0)(v.value1)(res);
-                })(us);
-            })(xs)();
-        };
-    };
-};
-var updateAt = $foreign._updateAt(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
-var unsafeIndex = function (dictPartial) {
-    return $foreign.unsafeIndexImpl;
-};
-var uncons = $foreign["uncons'"](Data_Function["const"](Data_Maybe.Nothing.value))(function (x) {
-    return function (xs) {
-        return new Data_Maybe.Just({
-            head: x,
-            tail: xs
-        });
-    };
-});
-var toUnfoldable = function (dictUnfoldable) {
-    return function (xs) {
-        var len = $foreign.length(xs);
-        var f = function (i) {
-            if (i < len) {
-                return new Data_Maybe.Just(new Data_Tuple.Tuple(unsafeIndex()(xs)(i), i + 1 | 0));
-            };
-            if (Data_Boolean.otherwise) {
-                return Data_Maybe.Nothing.value;
-            };
-            throw new Error("Failed pattern match at Data.Array line 143, column 3 - line 145, column 26: " + [ i.constructor.name ]);
-        };
-        return Data_Unfoldable.unfoldr(dictUnfoldable)(f)(0);
-    };
-};
-var takeEnd = function (n) {
-    return function (xs) {
-        return $foreign.drop($foreign.length(xs) - n | 0)(xs);
-    };
-};
-var tail = $foreign["uncons'"](Data_Function["const"](Data_Maybe.Nothing.value))(function (v) {
-    return function (xs) {
-        return new Data_Maybe.Just(xs);
-    };
-});
-var sortBy = function (comp) {
-    return function (xs) {
-        var comp$prime = function (x) {
-            return function (y) {
-                var v = comp(x)(y);
-                if (v instanceof Data_Ordering.GT) {
-                    return 1;
-                };
-                if (v instanceof Data_Ordering.EQ) {
-                    return 0;
-                };
-                if (v instanceof Data_Ordering.LT) {
-                    return -1 | 0;
-                };
-                throw new Error("Failed pattern match at Data.Array line 702, column 15 - line 707, column 1: " + [ v.constructor.name ]);
-            };
-        };
-        return $foreign.sortImpl(comp$prime)(xs);
-    };
-};
-var sortWith = function (dictOrd) {
-    return function (f) {
-        return sortBy(Data_Ord.comparing(dictOrd)(f));
-    };
-};
-var sort = function (dictOrd) {
-    return function (xs) {
-        return sortBy(Data_Ord.compare(dictOrd))(xs);
-    };
-};
-var singleton = function (a) {
-    return [ a ];
-};
-var $$null = function (xs) {
-    return $foreign.length(xs) === 0;
-};
-var nubByEq = function (eq) {
-    return function (xs) {
-        return (function __do() {
-            var v = Data_Array_ST.empty();
-            Control_Monad_ST_Internal.foreach(xs)(function (x) {
-                return function __do() {
-                    var v1 = Data_Functor.map(Control_Monad_ST_Internal.functorST)(function ($113) {
-                        return !Data_Foldable.any(Data_Foldable.foldableArray)(Data_HeytingAlgebra.heytingAlgebraBoolean)(function (v1) {
-                            return eq(v1)(x);
-                        })($113);
-                    })(Data_Array_ST.unsafeFreeze(v))();
-                    return Control_Applicative.when(Control_Monad_ST_Internal.applicativeST)(v1)(Data_Functor["void"](Control_Monad_ST_Internal.functorST)(Data_Array_ST.push(x)(v)))();
-                };
-            })();
-            return Data_Array_ST.unsafeFreeze(v)();
-        })();
-    };
-};
-var nubEq = function (dictEq) {
-    return nubByEq(Data_Eq.eq(dictEq));
-};
-var modifyAtIndices = function (dictFoldable) {
-    return function (is) {
-        return function (f) {
-            return function (xs) {
-                return Data_Array_ST.withArray(function (res) {
-                    return Data_Foldable.traverse_(Control_Monad_ST_Internal.applicativeST)(dictFoldable)(function (i) {
-                        return Data_Array_ST.modify(i)(f)(res);
-                    })(is);
-                })(xs)();
-            };
-        };
-    };
-};
-var mapWithIndex = function (f) {
-    return function (xs) {
-        return $foreign.zipWith(f)($foreign.range(0)($foreign.length(xs) - 1 | 0))(xs);
-    };
-};
-var some = function (dictAlternative) {
-    return function (dictLazy) {
-        return function (v) {
-            return Control_Apply.apply((dictAlternative.Applicative0()).Apply0())(Data_Functor.map(((dictAlternative.Plus1()).Alt0()).Functor0())($foreign.cons)(v))(Control_Lazy.defer(dictLazy)(function (v1) {
-                return many(dictAlternative)(dictLazy)(v);
-            }));
-        };
-    };
-};
-var many = function (dictAlternative) {
-    return function (dictLazy) {
-        return function (v) {
-            return Control_Alt.alt((dictAlternative.Plus1()).Alt0())(some(dictAlternative)(dictLazy)(v))(Control_Applicative.pure(dictAlternative.Applicative0())([  ]));
-        };
-    };
-};
-var insertAt = $foreign._insertAt(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
-var init = function (xs) {
-    if ($$null(xs)) {
-        return Data_Maybe.Nothing.value;
-    };
-    if (Data_Boolean.otherwise) {
-        return new Data_Maybe.Just($foreign.slice(0)($foreign.length(xs) - 1 | 0)(xs));
-    };
-    throw new Error("Failed pattern match at Data.Array line 323, column 1 - line 323, column 45: " + [ xs.constructor.name ]);
-};
-var index = $foreign.indexImpl(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
-var last = function (xs) {
-    return index(xs)($foreign.length(xs) - 1 | 0);
-};
-var unsnoc = function (xs) {
-    return Control_Apply.apply(Data_Maybe.applyMaybe)(Data_Functor.map(Data_Maybe.functorMaybe)(function (v) {
-        return function (v1) {
-            return {
-                init: v,
-                last: v1
-            };
-        };
-    })(init(xs)))(last(xs));
-};
-var modifyAt = function (i) {
-    return function (f) {
-        return function (xs) {
-            var go = function (x) {
-                return updateAt(i)(f(x))(xs);
-            };
-            return Data_Maybe.maybe(Data_Maybe.Nothing.value)(go)(index(xs)(i));
-        };
-    };
-};
-var span = function (p) {
-    return function (arr) {
-        var go = function ($copy_i) {
-            var $tco_done = false;
-            var $tco_result;
-            function $tco_loop(i) {
-                var v = index(arr)(i);
-                if (v instanceof Data_Maybe.Just) {
-                    var $77 = p(v.value0);
-                    if ($77) {
-                        $copy_i = i + 1 | 0;
-                        return;
-                    };
-                    $tco_done = true;
-                    return new Data_Maybe.Just(i);
-                };
-                if (v instanceof Data_Maybe.Nothing) {
-                    $tco_done = true;
-                    return Data_Maybe.Nothing.value;
-                };
-                throw new Error("Failed pattern match at Data.Array line 834, column 5 - line 836, column 25: " + [ v.constructor.name ]);
-            };
-            while (!$tco_done) {
-                $tco_result = $tco_loop($copy_i);
-            };
-            return $tco_result;
-        };
-        var breakIndex = go(0);
-        if (breakIndex instanceof Data_Maybe.Just && breakIndex.value0 === 0) {
-            return {
-                init: [  ],
-                rest: arr
-            };
-        };
-        if (breakIndex instanceof Data_Maybe.Just) {
-            return {
-                init: $foreign.slice(0)(breakIndex.value0)(arr),
-                rest: $foreign.slice(breakIndex.value0)($foreign.length(arr))(arr)
-            };
-        };
-        if (breakIndex instanceof Data_Maybe.Nothing) {
-            return {
-                init: arr,
-                rest: [  ]
-            };
-        };
-        throw new Error("Failed pattern match at Data.Array line 821, column 3 - line 827, column 30: " + [ breakIndex.constructor.name ]);
-    };
-};
-var takeWhile = function (p) {
-    return function (xs) {
-        return (span(p)(xs)).init;
-    };
-};
-var unzip = function (xs) {
-    return (function __do() {
-        var v = Data_Array_ST.empty();
-        var v1 = Data_Array_ST.empty();
-        var v2 = Data_Array_ST_Iterator.iterator(function (v2) {
-            return index(xs)(v2);
-        })();
-        Data_Array_ST_Iterator.iterate(v2)(function (v3) {
-            return function __do() {
-                Data_Functor["void"](Control_Monad_ST_Internal.functorST)(Data_Array_ST.push(v3.value0)(v))();
-                return Data_Functor["void"](Control_Monad_ST_Internal.functorST)(Data_Array_ST.push(v3.value1)(v1))();
-            };
-        })();
-        var v3 = Data_Array_ST.unsafeFreeze(v)();
-        var v4 = Data_Array_ST.unsafeFreeze(v1)();
-        return new Data_Tuple.Tuple(v3, v4);
-    })();
-};
-var head = function (xs) {
-    return index(xs)(0);
-};
-var nubBy = function (comp) {
-    return function (xs) {
-        var indexedAndSorted = sortBy(function (x) {
-            return function (y) {
-                return comp(Data_Tuple.snd(x))(Data_Tuple.snd(y));
-            };
-        })(mapWithIndex(Data_Tuple.Tuple.create)(xs));
-        var v = head(indexedAndSorted);
-        if (v instanceof Data_Maybe.Nothing) {
-            return [  ];
-        };
-        if (v instanceof Data_Maybe.Just) {
-            return Data_Functor.map(Data_Functor.functorArray)(Data_Tuple.snd)(sortWith(Data_Ord.ordInt)(Data_Tuple.fst)((function __do() {
-                var v1 = Data_Array_ST.unsafeThaw(singleton(v.value0))();
-                Control_Monad_ST_Internal.foreach(indexedAndSorted)(function (v2) {
-                    return function __do() {
-                        var v3 = Data_Functor.map(Control_Monad_ST_Internal.functorST)(function ($114) {
-                            return Data_Tuple.snd((function ($115) {
-                                return Data_Maybe.fromJust()(last($115));
-                            })($114));
-                        })(Data_Array_ST.unsafeFreeze(v1))();
-                        return Control_Applicative.when(Control_Monad_ST_Internal.applicativeST)(Data_Eq.notEq(Data_Ordering.eqOrdering)(comp(v3)(v2.value1))(Data_Ordering.EQ.value))(Data_Functor["void"](Control_Monad_ST_Internal.functorST)(Data_Array_ST.push(v2)(v1)))();
-                    };
-                })();
-                return Data_Array_ST.unsafeFreeze(v1)();
-            })()));
-        };
-        throw new Error("Failed pattern match at Data.Array line 903, column 17 - line 911, column 29: " + [ v.constructor.name ]);
-    };
-};
-var nub = function (dictOrd) {
-    return nubBy(Data_Ord.compare(dictOrd));
-};
-var groupBy = function (op) {
-    return function (xs) {
-        return (function __do() {
-            var v = Data_Array_ST.empty();
-            var v1 = Data_Array_ST_Iterator.iterator(function (v1) {
-                return index(xs)(v1);
-            })();
-            Data_Array_ST_Iterator.iterate(v1)(function (x) {
-                return Data_Functor["void"](Control_Monad_ST_Internal.functorST)(function __do() {
-                    var v2 = Data_Array_ST.empty();
-                    var v3 = Data_Array_ST.push(x)(v2)();
-                    Data_Array_ST_Iterator.pushWhile(op(x))(v1)(v2)();
-                    var v4 = Data_Array_ST.unsafeFreeze(v2)();
-                    return Data_Array_ST.push(v4)(v)();
-                });
-            })();
-            return Data_Array_ST.unsafeFreeze(v)();
-        })();
-    };
-};
-var group = function (dictEq) {
-    return function (xs) {
-        return groupBy(Data_Eq.eq(dictEq))(xs);
-    };
-};
-var group$prime = function (dictOrd) {
-    return function ($116) {
-        return group(dictOrd.Eq0())(sort(dictOrd)($116));
-    };
-};
-var fromFoldable = function (dictFoldable) {
-    return $foreign.fromFoldableImpl(Data_Foldable.foldr(dictFoldable));
-};
-var foldRecM = function (dictMonadRec) {
-    return function (f) {
-        return function (a) {
-            return function (array) {
-                var go = function (res) {
-                    return function (i) {
-                        if (i >= $foreign.length(array)) {
-                            return Control_Applicative.pure((dictMonadRec.Monad0()).Applicative0())(new Control_Monad_Rec_Class.Done(res));
-                        };
-                        if (Data_Boolean.otherwise) {
-                            return Control_Bind.bind((dictMonadRec.Monad0()).Bind1())(f(res)(unsafeIndex()(array)(i)))(function (v) {
-                                return Control_Applicative.pure((dictMonadRec.Monad0()).Applicative0())(new Control_Monad_Rec_Class.Loop({
-                                    a: v,
-                                    b: i + 1 | 0
-                                }));
-                            });
-                        };
-                        throw new Error("Failed pattern match at Data.Array line 1101, column 3 - line 1105, column 42: " + [ res.constructor.name, i.constructor.name ]);
-                    };
-                };
-                return Control_Monad_Rec_Class.tailRecM2(dictMonadRec)(go)(a)(0);
-            };
-        };
-    };
-};
-var foldM = function (dictMonad) {
-    return function (f) {
-        return function (a) {
-            return $foreign["uncons'"](function (v) {
-                return Control_Applicative.pure(dictMonad.Applicative0())(a);
-            })(function (b) {
-                return function (bs) {
-                    return Control_Bind.bind(dictMonad.Bind1())(f(a)(b))(function (a$prime) {
-                        return foldM(dictMonad)(f)(a$prime)(bs);
-                    });
-                };
-            });
-        };
-    };
-};
-var findLastIndex = $foreign.findLastIndexImpl(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
-var insertBy = function (cmp) {
-    return function (x) {
-        return function (ys) {
-            var i = Data_Maybe.maybe(0)(function (v) {
-                return v + 1 | 0;
-            })(findLastIndex(function (y) {
-                return Data_Eq.eq(Data_Ordering.eqOrdering)(cmp(x)(y))(Data_Ordering.GT.value);
-            })(ys));
-            return Data_Maybe.fromJust()(insertAt(i)(x)(ys));
-        };
-    };
-};
-var insert = function (dictOrd) {
-    return insertBy(Data_Ord.compare(dictOrd));
-};
-var findIndex = $foreign.findIndexImpl(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
-var intersectBy = function (eq) {
-    return function (xs) {
-        return function (ys) {
-            return $foreign.filter(function (x) {
-                return Data_Maybe.isJust(findIndex(eq(x))(ys));
-            })(xs);
-        };
-    };
-};
-var intersect = function (dictEq) {
-    return intersectBy(Data_Eq.eq(dictEq));
-};
-var elemLastIndex = function (dictEq) {
-    return function (x) {
-        return findLastIndex(function (v) {
-            return Data_Eq.eq(dictEq)(v)(x);
-        });
-    };
-};
-var elemIndex = function (dictEq) {
-    return function (x) {
-        return findIndex(function (v) {
-            return Data_Eq.eq(dictEq)(v)(x);
-        });
-    };
-};
-var dropWhile = function (p) {
-    return function (xs) {
-        return (span(p)(xs)).rest;
-    };
-};
-var dropEnd = function (n) {
-    return function (xs) {
-        return $foreign.take($foreign.length(xs) - n | 0)(xs);
-    };
-};
-var deleteAt = $foreign._deleteAt(Data_Maybe.Just.create)(Data_Maybe.Nothing.value);
-var deleteBy = function (v) {
-    return function (v1) {
-        return function (v2) {
-            if (v2.length === 0) {
-                return [  ];
-            };
-            return Data_Maybe.maybe(v2)(function (i) {
-                return Data_Maybe.fromJust()(deleteAt(i)(v2));
-            })(findIndex(v(v1))(v2));
-        };
-    };
-};
-var unionBy = function (eq) {
-    return function (xs) {
-        return function (ys) {
-            return Data_Semigroup.append(Data_Semigroup.semigroupArray)(xs)(Data_Foldable.foldl(Data_Foldable.foldableArray)(Data_Function.flip(deleteBy(eq)))(nubByEq(eq)(ys))(xs));
-        };
-    };
-};
-var union = function (dictEq) {
-    return unionBy(Data_Eq.eq(dictEq));
-};
-var $$delete = function (dictEq) {
-    return deleteBy(Data_Eq.eq(dictEq));
-};
-var difference = function (dictEq) {
-    return Data_Foldable.foldr(Data_Foldable.foldableArray)($$delete(dictEq));
-};
-var concatMap = Data_Function.flip(Control_Bind.bind(Control_Bind.bindArray));
-var mapMaybe = function (f) {
-    return concatMap(function ($117) {
-        return Data_Maybe.maybe([  ])(singleton)(f($117));
-    });
-};
-var filterA = function (dictApplicative) {
-    return function (p) {
-        return function ($118) {
-            return Data_Functor.map((dictApplicative.Apply0()).Functor0())(mapMaybe(function (v) {
-                if (v.value1) {
-                    return new Data_Maybe.Just(v.value0);
-                };
-                return Data_Maybe.Nothing.value;
-            }))(Data_Traversable.traverse(Data_Traversable.traversableArray)(dictApplicative)(function (x) {
-                return Data_Functor.map((dictApplicative.Apply0()).Functor0())(Data_Tuple.Tuple.create(x))(p(x));
-            })($118));
-        };
-    };
-};
-var catMaybes = mapMaybe(Control_Category.identity(Control_Category.categoryFn));
-var alterAt = function (i) {
-    return function (f) {
-        return function (xs) {
-            var go = function (x) {
-                var v = f(x);
-                if (v instanceof Data_Maybe.Nothing) {
-                    return deleteAt(i)(xs);
-                };
-                if (v instanceof Data_Maybe.Just) {
-                    return updateAt(i)(v.value0)(xs);
-                };
-                throw new Error("Failed pattern match at Data.Array line 544, column 10 - line 546, column 32: " + [ v.constructor.name ]);
-            };
-            return Data_Maybe.maybe(Data_Maybe.Nothing.value)(go)(index(xs)(i));
-        };
-    };
-};
-module.exports = {
-    fromFoldable: fromFoldable,
-    toUnfoldable: toUnfoldable,
-    singleton: singleton,
-    some: some,
-    many: many,
-    "null": $$null,
-    insert: insert,
-    insertBy: insertBy,
-    head: head,
-    last: last,
-    tail: tail,
-    init: init,
-    uncons: uncons,
-    unsnoc: unsnoc,
-    index: index,
-    elemIndex: elemIndex,
-    elemLastIndex: elemLastIndex,
-    findIndex: findIndex,
-    findLastIndex: findLastIndex,
-    insertAt: insertAt,
-    deleteAt: deleteAt,
-    updateAt: updateAt,
-    updateAtIndices: updateAtIndices,
-    modifyAt: modifyAt,
-    modifyAtIndices: modifyAtIndices,
-    alterAt: alterAt,
-    concatMap: concatMap,
-    filterA: filterA,
-    mapMaybe: mapMaybe,
-    catMaybes: catMaybes,
-    mapWithIndex: mapWithIndex,
-    sort: sort,
-    sortBy: sortBy,
-    sortWith: sortWith,
-    takeEnd: takeEnd,
-    takeWhile: takeWhile,
-    dropEnd: dropEnd,
-    dropWhile: dropWhile,
-    span: span,
-    group: group,
-    "group'": group$prime,
-    groupBy: groupBy,
-    nub: nub,
-    nubEq: nubEq,
-    nubBy: nubBy,
-    nubByEq: nubByEq,
-    union: union,
-    unionBy: unionBy,
-    "delete": $$delete,
-    deleteBy: deleteBy,
-    difference: difference,
-    intersect: intersect,
-    intersectBy: intersectBy,
-    zipWithA: zipWithA,
-    zip: zip,
-    unzip: unzip,
-    foldM: foldM,
-    foldRecM: foldRecM,
-    unsafeIndex: unsafeIndex,
-    range: $foreign.range,
-    replicate: $foreign.replicate,
-    length: $foreign.length,
-    cons: $foreign.cons,
-    snoc: $foreign.snoc,
-    reverse: $foreign.reverse,
-    concat: $foreign.concat,
-    filter: $foreign.filter,
-    partition: $foreign.partition,
-    slice: $foreign.slice,
-    take: $foreign.take,
-    drop: $foreign.drop,
-    zipWith: $foreign.zipWith
-};
-
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Lazy/index.js":16,"../Control.Monad.Rec.Class/index.js":23,"../Control.Monad.ST.Internal/index.js":25,"../Control.Monad.ST/index.js":27,"../Control.Semigroupoid/index.js":35,"../Data.Array.NonEmpty.Internal/index.js":37,"../Data.Array.ST.Iterator/index.js":38,"../Data.Array.ST/index.js":40,"../Data.Boolean/index.js":51,"../Data.Eq/index.js":69,"../Data.Foldable/index.js":74,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Traversable/index.js":144,"../Data.Tuple/index.js":146,"../Data.Unfoldable/index.js":148,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"./foreign.js":41}],43:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -3912,7 +2369,7 @@ module.exports = {
     bifoldableWrap: bifoldableWrap
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":35,"../Data.Bifunctor.Clown/index.js":44,"../Data.Bifunctor.Flip/index.js":45,"../Data.Bifunctor.Joker/index.js":46,"../Data.Bifunctor.Product/index.js":47,"../Data.Bifunctor.Wrap/index.js":48,"../Data.Foldable/index.js":74,"../Data.Function/index.js":78,"../Data.Monoid.Conj/index.js":101,"../Data.Monoid.Disj/index.js":102,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Endo/index.js":104,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Semigroup/index.js":126,"../Data.Unit/index.js":152,"../Prelude/index.js":177}],44:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":31,"../Data.Bifunctor.Clown/index.js":33,"../Data.Bifunctor.Flip/index.js":34,"../Data.Bifunctor.Joker/index.js":35,"../Data.Bifunctor.Product/index.js":36,"../Data.Bifunctor.Wrap/index.js":37,"../Data.Foldable/index.js":63,"../Data.Function/index.js":67,"../Data.Monoid.Conj/index.js":90,"../Data.Monoid.Disj/index.js":91,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Endo/index.js":93,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Semigroup/index.js":115,"../Data.Unit/index.js":141,"../Prelude/index.js":166}],33:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -3988,7 +2445,7 @@ module.exports = {
     biapplicativeClown: biapplicativeClown
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":49,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],45:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":38,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],34:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Biapplicative = require("../Control.Biapplicative/index.js");
@@ -4064,7 +2521,7 @@ module.exports = {
     biapplicativeFlip: biapplicativeFlip
 };
 
-},{"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":49,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],46:[function(require,module,exports){
+},{"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":38,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],35:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -4142,7 +2599,7 @@ module.exports = {
     biapplicativeJoker: biapplicativeJoker
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":49,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],47:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":38,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],36:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Biapplicative = require("../Control.Biapplicative/index.js");
@@ -4244,7 +2701,7 @@ module.exports = {
     biapplicativeProduct: biapplicativeProduct
 };
 
-},{"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":49,"../Data.Eq/index.js":69,"../Data.HeytingAlgebra/index.js":85,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],48:[function(require,module,exports){
+},{"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":38,"../Data.Eq/index.js":58,"../Data.HeytingAlgebra/index.js":74,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],37:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Biapplicative = require("../Control.Biapplicative/index.js");
@@ -4320,7 +2777,7 @@ module.exports = {
     biapplicativeWrap: biapplicativeWrap
 };
 
-},{"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":49,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],49:[function(require,module,exports){
+},{"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Data.Bifunctor/index.js":38,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],38:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Category = require("../Control.Category/index.js");
@@ -4345,7 +2802,7 @@ module.exports = {
     rmap: rmap
 };
 
-},{"../Control.Category/index.js":12}],50:[function(require,module,exports){
+},{"../Control.Category/index.js":12}],39:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -4545,7 +3002,7 @@ module.exports = {
     bitraversableWrap: bitraversableWrap
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Data.Bifoldable/index.js":43,"../Data.Bifunctor.Clown/index.js":44,"../Data.Bifunctor.Flip/index.js":45,"../Data.Bifunctor.Joker/index.js":46,"../Data.Bifunctor.Product/index.js":47,"../Data.Bifunctor.Wrap/index.js":48,"../Data.Bifunctor/index.js":49,"../Data.Functor/index.js":81,"../Data.Traversable/index.js":144,"../Prelude/index.js":177}],51:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Data.Bifoldable/index.js":32,"../Data.Bifunctor.Clown/index.js":33,"../Data.Bifunctor.Flip/index.js":34,"../Data.Bifunctor.Joker/index.js":35,"../Data.Bifunctor.Product/index.js":36,"../Data.Bifunctor.Wrap/index.js":37,"../Data.Bifunctor/index.js":38,"../Data.Functor/index.js":70,"../Data.Traversable/index.js":133,"../Prelude/index.js":166}],40:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var otherwise = true;
@@ -4553,7 +3010,7 @@ module.exports = {
     otherwise: otherwise
 };
 
-},{}],52:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_HeytingAlgebra = require("../Data.HeytingAlgebra/index.js");
@@ -4608,7 +3065,7 @@ module.exports = {
     booleanAlgebraRecordCons: booleanAlgebraRecordCons
 };
 
-},{"../Data.HeytingAlgebra/index.js":85,"../Data.Symbol/index.js":137,"../Data.Unit/index.js":152}],53:[function(require,module,exports){
+},{"../Data.HeytingAlgebra/index.js":74,"../Data.Symbol/index.js":126,"../Data.Unit/index.js":141}],42:[function(require,module,exports){
 "use strict";
 
 exports.topInt = 2147483647;
@@ -4620,7 +3077,7 @@ exports.bottomChar = String.fromCharCode(0);
 exports.topNumber = Number.POSITIVE_INFINITY;
 exports.bottomNumber = Number.NEGATIVE_INFINITY;
 
-},{}],54:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -4668,7 +3125,7 @@ module.exports = {
     boundedNumber: boundedNumber
 };
 
-},{"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Unit/index.js":152,"./foreign.js":53}],55:[function(require,module,exports){
+},{"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Unit/index.js":141,"./foreign.js":42}],44:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Ring = require("../Data.Ring/index.js");
@@ -4728,7 +3185,7 @@ module.exports = {
     commutativeRingRecordCons: commutativeRingRecordCons
 };
 
-},{"../Data.Ring/index.js":120,"../Data.Semiring/index.js":128,"../Data.Symbol/index.js":137,"../Data.Unit/index.js":152}],56:[function(require,module,exports){
+},{"../Data.Ring/index.js":109,"../Data.Semiring/index.js":117,"../Data.Symbol/index.js":126,"../Data.Unit/index.js":141}],45:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Semigroupoid = require("../Control.Semigroupoid/index.js");
@@ -5461,7 +3918,7 @@ module.exports = {
     showWeekday: showWeekday
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Boolean/index.js":51,"../Data.Bounded/index.js":54,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Prelude/index.js":177}],57:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Boolean/index.js":40,"../Data.Bounded/index.js":43,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Prelude/index.js":166}],46:[function(require,module,exports){
 "use strict";
 
 var createDate = function (y, m, d) {
@@ -5487,7 +3944,7 @@ exports.calcDiff = function (y1, m1, d1, y2, m2, d2) {
   return dt1.getTime() - dt2.getTime();
 };
 
-},{}],58:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -5792,7 +4249,7 @@ module.exports = {
     enumDate: enumDate
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Semigroupoid/index.js":35,"../Data.Boolean/index.js":51,"../Data.Bounded/index.js":54,"../Data.Date.Component/index.js":56,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.EuclideanRing/index.js":71,"../Data.Function.Uncurried/index.js":77,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Int/index.js":90,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Data.Time.Duration/index.js":139,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177,"./foreign.js":57}],59:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Semigroupoid/index.js":31,"../Data.Boolean/index.js":40,"../Data.Bounded/index.js":43,"../Data.Date.Component/index.js":45,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.EuclideanRing/index.js":60,"../Data.Function.Uncurried/index.js":66,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.HeytingAlgebra/index.js":74,"../Data.Int/index.js":79,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Data.Time.Duration/index.js":128,"../Partial.Unsafe/index.js":163,"../Prelude/index.js":166,"./foreign.js":46}],48:[function(require,module,exports){
 "use strict";
 
 var createDateTime = function (y, m, d, h, mi, s, ms) {
@@ -5814,7 +4271,7 @@ exports.toDateTimeImpl = function (ctor) {
   };
 };
 
-},{}],60:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -5896,7 +4353,7 @@ module.exports = {
     showInstant: showInstant
 };
 
-},{"../Data.Boolean/index.js":51,"../Data.Bounded/index.js":54,"../Data.Date.Component/index.js":56,"../Data.Date/index.js":58,"../Data.DateTime/index.js":62,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.Function.Uncurried/index.js":77,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Data.Time.Component/index.js":138,"../Data.Time.Duration/index.js":139,"../Data.Time/index.js":140,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177,"./foreign.js":59}],61:[function(require,module,exports){
+},{"../Data.Boolean/index.js":40,"../Data.Bounded/index.js":43,"../Data.Date.Component/index.js":45,"../Data.Date/index.js":47,"../Data.DateTime/index.js":51,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.Function.Uncurried/index.js":66,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Data.Time.Component/index.js":127,"../Data.Time.Duration/index.js":128,"../Data.Time/index.js":129,"../Partial.Unsafe/index.js":163,"../Prelude/index.js":166,"./foreign.js":48}],50:[function(require,module,exports){
 "use strict";
 
 var createUTC = function (y, mo, d, h, m, s, ms) {
@@ -5933,7 +4390,7 @@ exports.adjustImpl = function (just) {
   };
 };
 
-},{}],62:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -6067,7 +4524,7 @@ module.exports = {
     showDateTime: showDateTime
 };
 
-},{"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Data.Bounded/index.js":54,"../Data.Date.Component/index.js":56,"../Data.Date/index.js":58,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.Function.Uncurried/index.js":77,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Data.Time.Component/index.js":138,"../Data.Time.Duration/index.js":139,"../Data.Time/index.js":140,"../Prelude/index.js":177,"./foreign.js":61}],63:[function(require,module,exports){
+},{"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Data.Bounded/index.js":43,"../Data.Date.Component/index.js":45,"../Data.Date/index.js":47,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.Function.Uncurried/index.js":66,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Data.Time.Component/index.js":127,"../Data.Time.Duration/index.js":128,"../Data.Time/index.js":129,"../Prelude/index.js":166,"./foreign.js":50}],52:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Category = require("../Control.Category/index.js");
@@ -6154,7 +4611,7 @@ module.exports = {
     distributiveFunction: distributiveFunction
 };
 
-},{"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":35,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Identity/index.js":86,"../Data.Newtype/index.js":108,"../Prelude/index.js":177}],64:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":31,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Identity/index.js":75,"../Data.Newtype/index.js":97,"../Prelude/index.js":166}],53:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_EuclideanRing = require("../Data.EuclideanRing/index.js");
@@ -6194,7 +4651,7 @@ module.exports = {
     divisionringNumber: divisionringNumber
 };
 
-},{"../Data.EuclideanRing/index.js":71,"../Data.Ring/index.js":120,"../Data.Semiring/index.js":128}],65:[function(require,module,exports){
+},{"../Data.EuclideanRing/index.js":60,"../Data.Ring/index.js":109,"../Data.Semiring/index.js":117}],54:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -6694,7 +5151,7 @@ module.exports = {
     semigroupEither: semigroupEither
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Extend/index.js":15,"../Control.Monad/index.js":31,"../Control.Semigroupoid/index.js":35,"../Data.Bifoldable/index.js":43,"../Data.Bifunctor/index.js":49,"../Data.Bitraversable/index.js":50,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Foldable/index.js":74,"../Data.FoldableWithIndex/index.js":75,"../Data.Function/index.js":78,"../Data.Functor.Invariant/index.js":79,"../Data.Functor/index.js":81,"../Data.FunctorWithIndex/index.js":83,"../Data.Maybe/index.js":98,"../Data.Monoid/index.js":106,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Data.Traversable/index.js":144,"../Data.TraversableWithIndex/index.js":145,"../Data.Unit/index.js":152,"../Prelude/index.js":177}],66:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Extend/index.js":15,"../Control.Monad/index.js":27,"../Control.Semigroupoid/index.js":31,"../Data.Bifoldable/index.js":32,"../Data.Bifunctor/index.js":38,"../Data.Bitraversable/index.js":39,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Foldable/index.js":63,"../Data.FoldableWithIndex/index.js":64,"../Data.Function/index.js":67,"../Data.Functor.Invariant/index.js":68,"../Data.Functor/index.js":70,"../Data.FunctorWithIndex/index.js":72,"../Data.Maybe/index.js":87,"../Data.Monoid/index.js":95,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Data.Traversable/index.js":133,"../Data.TraversableWithIndex/index.js":134,"../Data.Unit/index.js":141,"../Prelude/index.js":166}],55:[function(require,module,exports){
 "use strict";
 
 exports.toCharCode = function (c) {
@@ -6705,7 +5162,7 @@ exports.fromCharCode = function (c) {
   return String.fromCharCode(c);
 };
 
-},{}],67:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -7224,7 +5681,7 @@ module.exports = {
     showCardinality: showCardinality
 };
 
-},{"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.MonadPlus/index.js":32,"../Control.MonadZero/index.js":33,"../Control.Semigroupoid/index.js":35,"../Data.Boolean/index.js":51,"../Data.Bounded/index.js":54,"../Data.Either/index.js":65,"../Data.Eq/index.js":69,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Data.Tuple/index.js":146,"../Data.Unfoldable/index.js":148,"../Data.Unfoldable1/index.js":150,"../Data.Unit/index.js":152,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177,"./foreign.js":66}],68:[function(require,module,exports){
+},{"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.MonadPlus/index.js":28,"../Control.MonadZero/index.js":29,"../Control.Semigroupoid/index.js":31,"../Data.Boolean/index.js":40,"../Data.Bounded/index.js":43,"../Data.Either/index.js":54,"../Data.Eq/index.js":58,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe/index.js":87,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Data.Tuple/index.js":135,"../Data.Unfoldable/index.js":137,"../Data.Unfoldable1/index.js":139,"../Data.Unit/index.js":141,"../Partial.Unsafe/index.js":163,"../Prelude/index.js":166,"./foreign.js":55}],57:[function(require,module,exports){
 "use strict";
 
 exports.refEq = function (r1) {
@@ -7246,7 +5703,7 @@ exports.eqArrayImpl = function (f) {
   };
 };
 
-},{}],69:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -7364,7 +5821,7 @@ module.exports = {
     eqRowCons: eqRowCons
 };
 
-},{"../Data.HeytingAlgebra/index.js":85,"../Data.Symbol/index.js":137,"../Data.Unit/index.js":152,"../Data.Void/index.js":153,"../Record.Unsafe/index.js":179,"../Type.Data.RowList/index.js":181,"./foreign.js":68}],70:[function(require,module,exports){
+},{"../Data.HeytingAlgebra/index.js":74,"../Data.Symbol/index.js":126,"../Data.Unit/index.js":141,"../Data.Void/index.js":142,"../Record.Unsafe/index.js":168,"../Type.Data.RowList/index.js":170,"./foreign.js":57}],59:[function(require,module,exports){
 "use strict";
 
 exports.intDegree = function (x) {
@@ -7394,7 +5851,7 @@ exports.numDiv = function (n1) {
   };
 };
 
-},{}],71:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -7484,7 +5941,7 @@ module.exports = {
     euclideanRingNumber: euclideanRingNumber
 };
 
-},{"../Data.BooleanAlgebra/index.js":52,"../Data.CommutativeRing/index.js":55,"../Data.Eq/index.js":69,"../Data.HeytingAlgebra/index.js":85,"../Data.Ring/index.js":120,"../Data.Semiring/index.js":128,"./foreign.js":70}],72:[function(require,module,exports){
+},{"../Data.BooleanAlgebra/index.js":41,"../Data.CommutativeRing/index.js":44,"../Data.Eq/index.js":58,"../Data.HeytingAlgebra/index.js":74,"../Data.Ring/index.js":109,"../Data.Semiring/index.js":117,"./foreign.js":59}],61:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_CommutativeRing = require("../Data.CommutativeRing/index.js");
@@ -7510,7 +5967,7 @@ module.exports = {
     field: field
 };
 
-},{"../Data.CommutativeRing/index.js":55,"../Data.DivisionRing/index.js":64,"../Data.EuclideanRing/index.js":71,"../Data.Ring/index.js":120,"../Data.Semiring/index.js":128}],73:[function(require,module,exports){
+},{"../Data.CommutativeRing/index.js":44,"../Data.DivisionRing/index.js":53,"../Data.EuclideanRing/index.js":60,"../Data.Ring/index.js":109,"../Data.Semiring/index.js":117}],62:[function(require,module,exports){
 "use strict";
 
 exports.foldrArray = function (f) {
@@ -7539,7 +5996,7 @@ exports.foldlArray = function (f) {
   };
 };
 
-},{}],74:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -8152,7 +6609,7 @@ module.exports = {
     foldableMultiplicative: foldableMultiplicative
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Plus/index.js":34,"../Control.Semigroupoid/index.js":35,"../Data.Eq/index.js":69,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe.First/index.js":96,"../Data.Maybe.Last/index.js":97,"../Data.Maybe/index.js":98,"../Data.Monoid.Additive/index.js":100,"../Data.Monoid.Conj/index.js":101,"../Data.Monoid.Disj/index.js":102,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Endo/index.js":104,"../Data.Monoid.Multiplicative/index.js":105,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Unit/index.js":152,"../Prelude/index.js":177,"./foreign.js":73}],75:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Plus/index.js":30,"../Control.Semigroupoid/index.js":31,"../Data.Eq/index.js":58,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe.First/index.js":85,"../Data.Maybe.Last/index.js":86,"../Data.Maybe/index.js":87,"../Data.Monoid.Additive/index.js":89,"../Data.Monoid.Conj/index.js":90,"../Data.Monoid.Disj/index.js":91,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Endo/index.js":93,"../Data.Monoid.Multiplicative/index.js":94,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Unit/index.js":141,"../Prelude/index.js":166,"./foreign.js":62}],64:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -8509,7 +6966,7 @@ module.exports = {
     foldableWithIndexMultiplicative: foldableWithIndexMultiplicative
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":35,"../Data.Foldable/index.js":74,"../Data.Function/index.js":78,"../Data.FunctorWithIndex/index.js":83,"../Data.Maybe.First/index.js":96,"../Data.Maybe.Last/index.js":97,"../Data.Maybe/index.js":98,"../Data.Monoid.Additive/index.js":100,"../Data.Monoid.Conj/index.js":101,"../Data.Monoid.Disj/index.js":102,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Endo/index.js":104,"../Data.Monoid.Multiplicative/index.js":105,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Semigroup/index.js":126,"../Data.Unit/index.js":152,"../Prelude/index.js":177}],76:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":31,"../Data.Foldable/index.js":63,"../Data.Function/index.js":67,"../Data.FunctorWithIndex/index.js":72,"../Data.Maybe.First/index.js":85,"../Data.Maybe.Last/index.js":86,"../Data.Maybe/index.js":87,"../Data.Monoid.Additive/index.js":89,"../Data.Monoid.Conj/index.js":90,"../Data.Monoid.Disj/index.js":91,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Endo/index.js":93,"../Data.Monoid.Multiplicative/index.js":94,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Semigroup/index.js":115,"../Data.Unit/index.js":141,"../Prelude/index.js":166}],65:[function(require,module,exports){
 "use strict";
 
 // module Data.Function.Uncurried
@@ -8731,7 +7188,7 @@ exports.runFn10 = function (fn) {
   };
 };
 
-},{}],77:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -8767,7 +7224,7 @@ module.exports = {
     runFn10: $foreign.runFn10
 };
 
-},{"../Data.Unit/index.js":152,"./foreign.js":76}],78:[function(require,module,exports){
+},{"../Data.Unit/index.js":141,"./foreign.js":65}],67:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Category = require("../Control.Category/index.js");
@@ -8840,7 +7297,7 @@ module.exports = {
     on: on
 };
 
-},{"../Control.Category/index.js":12,"../Data.Boolean/index.js":51,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120}],79:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Data.Boolean/index.js":40,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109}],68:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Semigroupoid = require("../Control.Semigroupoid/index.js");
@@ -8924,7 +7381,7 @@ module.exports = {
     invariantMultiplicative: invariantMultiplicative
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Monoid.Additive/index.js":100,"../Data.Monoid.Conj/index.js":101,"../Data.Monoid.Disj/index.js":102,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Endo/index.js":104,"../Data.Monoid.Multiplicative/index.js":105}],80:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Monoid.Additive/index.js":89,"../Data.Monoid.Conj/index.js":90,"../Data.Monoid.Disj/index.js":91,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Endo/index.js":93,"../Data.Monoid.Multiplicative/index.js":94}],69:[function(require,module,exports){
 "use strict";
 
 exports.arrayMap = function (f) {
@@ -8938,7 +7395,7 @@ exports.arrayMap = function (f) {
   };
 };
 
-},{}],81:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -8996,7 +7453,7 @@ module.exports = {
     functorArray: functorArray
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Function/index.js":78,"../Data.Unit/index.js":152,"./foreign.js":80}],82:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Function/index.js":67,"../Data.Unit/index.js":141,"./foreign.js":69}],71:[function(require,module,exports){
 "use strict";
 
 exports.mapWithIndexArray = function (f) {
@@ -9010,7 +7467,7 @@ exports.mapWithIndexArray = function (f) {
   };
 };
 
-},{}],83:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -9096,7 +7553,7 @@ module.exports = {
     functorWithIndexMultiplicative: functorWithIndexMultiplicative
 };
 
-},{"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Maybe.First/index.js":96,"../Data.Maybe.Last/index.js":97,"../Data.Maybe/index.js":98,"../Data.Monoid.Additive/index.js":100,"../Data.Monoid.Conj/index.js":101,"../Data.Monoid.Disj/index.js":102,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Multiplicative/index.js":105,"../Data.Unit/index.js":152,"../Prelude/index.js":177,"./foreign.js":82}],84:[function(require,module,exports){
+},{"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Maybe.First/index.js":85,"../Data.Maybe.Last/index.js":86,"../Data.Maybe/index.js":87,"../Data.Monoid.Additive/index.js":89,"../Data.Monoid.Conj/index.js":90,"../Data.Monoid.Disj/index.js":91,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Multiplicative/index.js":94,"../Data.Unit/index.js":141,"../Prelude/index.js":166,"./foreign.js":71}],73:[function(require,module,exports){
 "use strict";
 
 exports.boolConj = function (b1) {
@@ -9115,7 +7572,7 @@ exports.boolNot = function (b) {
   return !b;
 };
 
-},{}],85:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -9345,7 +7802,7 @@ module.exports = {
     heytingAlgebraRecordCons: heytingAlgebraRecordCons
 };
 
-},{"../Data.Symbol/index.js":137,"../Data.Unit/index.js":152,"../Record.Unsafe/index.js":179,"../Type.Data.Row/index.js":180,"../Type.Data.RowList/index.js":181,"./foreign.js":84}],86:[function(require,module,exports){
+},{"../Data.Symbol/index.js":126,"../Data.Unit/index.js":141,"../Record.Unsafe/index.js":168,"../Type.Data.Row/index.js":169,"../Type.Data.RowList/index.js":170,"./foreign.js":73}],75:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -9621,7 +8078,7 @@ module.exports = {
     traversableWithIndexIdentity: traversableWithIndexIdentity
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Comonad/index.js":13,"../Control.Extend/index.js":15,"../Control.Lazy/index.js":16,"../Control.Monad/index.js":31,"../Data.BooleanAlgebra/index.js":52,"../Data.Bounded/index.js":54,"../Data.CommutativeRing/index.js":55,"../Data.Eq/index.js":69,"../Data.EuclideanRing/index.js":71,"../Data.Foldable/index.js":74,"../Data.FoldableWithIndex/index.js":75,"../Data.Functor.Invariant/index.js":79,"../Data.Functor/index.js":81,"../Data.FunctorWithIndex/index.js":83,"../Data.HeytingAlgebra/index.js":85,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120,"../Data.Semigroup.Foldable/index.js":122,"../Data.Semigroup.Traversable/index.js":124,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Data.Traversable/index.js":144,"../Data.TraversableWithIndex/index.js":145,"../Data.Unit/index.js":152,"../Prelude/index.js":177}],87:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Comonad/index.js":13,"../Control.Extend/index.js":15,"../Control.Lazy/index.js":16,"../Control.Monad/index.js":27,"../Data.BooleanAlgebra/index.js":41,"../Data.Bounded/index.js":43,"../Data.CommutativeRing/index.js":44,"../Data.Eq/index.js":58,"../Data.EuclideanRing/index.js":60,"../Data.Foldable/index.js":63,"../Data.FoldableWithIndex/index.js":64,"../Data.Functor.Invariant/index.js":68,"../Data.Functor/index.js":70,"../Data.FunctorWithIndex/index.js":72,"../Data.HeytingAlgebra/index.js":74,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109,"../Data.Semigroup.Foldable/index.js":111,"../Data.Semigroup.Traversable/index.js":113,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Data.Traversable/index.js":133,"../Data.TraversableWithIndex/index.js":134,"../Data.Unit/index.js":141,"../Prelude/index.js":166}],76:[function(require,module,exports){
 "use strict";
 
 // module Data.Int.Bits
@@ -9673,7 +8130,7 @@ exports.complement = function (n) {
   return ~n;
 };
 
-},{}],88:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -9687,7 +8144,7 @@ module.exports = {
     complement: $foreign.complement
 };
 
-},{"./foreign.js":87}],89:[function(require,module,exports){
+},{"./foreign.js":76}],78:[function(require,module,exports){
 "use strict";
 
 exports.fromNumberImpl = function (just) {
@@ -9756,7 +8213,7 @@ exports.pow = function (x) {
   };
 };
 
-},{}],90:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -9973,7 +8430,7 @@ module.exports = {
     pow: $foreign.pow
 };
 
-},{"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":35,"../Data.Boolean/index.js":51,"../Data.Bounded/index.js":54,"../Data.CommutativeRing/index.js":55,"../Data.DivisionRing/index.js":64,"../Data.Eq/index.js":69,"../Data.EuclideanRing/index.js":71,"../Data.HeytingAlgebra/index.js":85,"../Data.Int.Bits/index.js":88,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Global/index.js":170,"../Math/index.js":172,"../Prelude/index.js":177,"./foreign.js":89}],91:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":31,"../Data.Boolean/index.js":40,"../Data.Bounded/index.js":43,"../Data.CommutativeRing/index.js":44,"../Data.DivisionRing/index.js":53,"../Data.Eq/index.js":58,"../Data.EuclideanRing/index.js":60,"../Data.HeytingAlgebra/index.js":74,"../Data.Int.Bits/index.js":77,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Global/index.js":159,"../Math/index.js":161,"../Prelude/index.js":166,"./foreign.js":78}],80:[function(require,module,exports){
 /* global exports */
 "use strict";
 
@@ -10044,7 +8501,7 @@ exports.fromTime = function (time) {
   return new Date(time);
 };
 
-},{}],92:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -10212,7 +8669,7 @@ module.exports = {
     fromTime: $foreign.fromTime
 };
 
-},{"../Control.Bind/index.js":11,"../Control.Semigroupoid/index.js":35,"../Data.Date.Component/index.js":56,"../Data.Date/index.js":58,"../Data.DateTime.Instant/index.js":60,"../Data.DateTime/index.js":62,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.Function.Uncurried/index.js":77,"../Data.Functor/index.js":81,"../Data.Int/index.js":90,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Data.Time.Component/index.js":138,"../Data.Time.Duration/index.js":139,"../Data.Time/index.js":140,"../Effect/index.js":166,"../Foreign/index.js":168,"../Prelude/index.js":177,"./foreign.js":91}],93:[function(require,module,exports){
+},{"../Control.Bind/index.js":11,"../Control.Semigroupoid/index.js":31,"../Data.Date.Component/index.js":45,"../Data.Date/index.js":47,"../Data.DateTime.Instant/index.js":49,"../Data.DateTime/index.js":51,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.Function.Uncurried/index.js":66,"../Data.Functor/index.js":70,"../Data.Int/index.js":79,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Data.Time.Component/index.js":127,"../Data.Time.Duration/index.js":128,"../Data.Time/index.js":129,"../Effect/index.js":155,"../Foreign/index.js":157,"../Prelude/index.js":166,"./foreign.js":80}],82:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Bind = require("../Control.Bind/index.js");
@@ -10641,7 +9098,7 @@ module.exports = {
     foldM: foldM
 };
 
-},{"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":35,"../Data.Boolean/index.js":51,"../Data.Eq/index.js":69,"../Data.Foldable/index.js":74,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.FunctorWithIndex/index.js":83,"../Data.List.Types/index.js":94,"../Data.List/index.js":95,"../Data.Maybe/index.js":98,"../Data.NonEmpty/index.js":109,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120,"../Data.Semigroup.Foldable/index.js":122,"../Data.Semigroup.Traversable/index.js":124,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Traversable/index.js":144,"../Data.Tuple/index.js":146,"../Data.Unfoldable/index.js":148,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177}],94:[function(require,module,exports){
+},{"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":31,"../Data.Boolean/index.js":40,"../Data.Eq/index.js":58,"../Data.Foldable/index.js":63,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.FunctorWithIndex/index.js":72,"../Data.List.Types/index.js":83,"../Data.List/index.js":84,"../Data.Maybe/index.js":87,"../Data.NonEmpty/index.js":98,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109,"../Data.Semigroup.Foldable/index.js":111,"../Data.Semigroup.Traversable/index.js":113,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Traversable/index.js":133,"../Data.Tuple/index.js":135,"../Data.Unfoldable/index.js":137,"../Partial.Unsafe/index.js":163,"../Prelude/index.js":166}],83:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -11298,7 +9755,7 @@ module.exports = {
     traversable1NonEmptyList: traversable1NonEmptyList
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Comonad/index.js":13,"../Control.Extend/index.js":15,"../Control.Monad/index.js":31,"../Control.MonadPlus/index.js":32,"../Control.MonadZero/index.js":33,"../Control.Plus/index.js":34,"../Control.Semigroupoid/index.js":35,"../Data.Eq/index.js":69,"../Data.Foldable/index.js":74,"../Data.FoldableWithIndex/index.js":75,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.FunctorWithIndex/index.js":83,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.NonEmpty/index.js":109,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semigroup.Foldable/index.js":122,"../Data.Semigroup.Traversable/index.js":124,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Data.Traversable/index.js":144,"../Data.TraversableWithIndex/index.js":145,"../Data.Tuple/index.js":146,"../Data.Unfoldable/index.js":148,"../Data.Unfoldable1/index.js":150,"../Prelude/index.js":177}],95:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Comonad/index.js":13,"../Control.Extend/index.js":15,"../Control.Monad/index.js":27,"../Control.MonadPlus/index.js":28,"../Control.MonadZero/index.js":29,"../Control.Plus/index.js":30,"../Control.Semigroupoid/index.js":31,"../Data.Eq/index.js":58,"../Data.Foldable/index.js":63,"../Data.FoldableWithIndex/index.js":64,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.FunctorWithIndex/index.js":72,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe/index.js":87,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.NonEmpty/index.js":98,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semigroup.Foldable/index.js":111,"../Data.Semigroup.Traversable/index.js":113,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Data.Traversable/index.js":133,"../Data.TraversableWithIndex/index.js":134,"../Data.Tuple/index.js":135,"../Data.Unfoldable/index.js":137,"../Data.Unfoldable1/index.js":139,"../Prelude/index.js":166}],84:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -12410,7 +10867,7 @@ module.exports = {
     showPattern: showPattern
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Lazy/index.js":16,"../Control.Monad.Rec.Class/index.js":23,"../Control.Semigroupoid/index.js":35,"../Data.Bifunctor/index.js":49,"../Data.Boolean/index.js":51,"../Data.Eq/index.js":69,"../Data.Foldable/index.js":74,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.FunctorWithIndex/index.js":83,"../Data.HeytingAlgebra/index.js":85,"../Data.List.Types/index.js":94,"../Data.Maybe/index.js":98,"../Data.Newtype/index.js":108,"../Data.NonEmpty/index.js":109,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Data.Traversable/index.js":144,"../Data.Tuple/index.js":146,"../Data.Unfoldable/index.js":148,"../Data.Unit/index.js":152,"../Prelude/index.js":177}],96:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Lazy/index.js":16,"../Control.Monad.Rec.Class/index.js":23,"../Control.Semigroupoid/index.js":31,"../Data.Bifunctor/index.js":38,"../Data.Boolean/index.js":40,"../Data.Eq/index.js":58,"../Data.Foldable/index.js":63,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.FunctorWithIndex/index.js":72,"../Data.HeytingAlgebra/index.js":74,"../Data.List.Types/index.js":83,"../Data.Maybe/index.js":87,"../Data.Newtype/index.js":97,"../Data.NonEmpty/index.js":98,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Data.Traversable/index.js":133,"../Data.Tuple/index.js":135,"../Data.Unfoldable/index.js":137,"../Data.Unit/index.js":141,"../Prelude/index.js":166}],85:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -12513,7 +10970,7 @@ module.exports = {
     monadZeroFirst: monadZeroFirst
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Extend/index.js":15,"../Control.Monad/index.js":31,"../Control.MonadZero/index.js":33,"../Control.Plus/index.js":34,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Functor.Invariant/index.js":79,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],97:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Extend/index.js":15,"../Control.Monad/index.js":27,"../Control.MonadZero/index.js":29,"../Control.Plus/index.js":30,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Functor.Invariant/index.js":68,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],86:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -12619,7 +11076,7 @@ module.exports = {
     monadZeroLast: monadZeroLast
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Extend/index.js":15,"../Control.Monad/index.js":31,"../Control.MonadZero/index.js":33,"../Control.Plus/index.js":34,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Functor.Invariant/index.js":79,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],98:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Extend/index.js":15,"../Control.Monad/index.js":27,"../Control.MonadZero/index.js":29,"../Control.Plus/index.js":30,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Functor.Invariant/index.js":68,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],87:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -12901,7 +11358,7 @@ module.exports = {
     showMaybe: showMaybe
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Extend/index.js":15,"../Control.Monad/index.js":31,"../Control.MonadZero/index.js":33,"../Control.Plus/index.js":34,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Function/index.js":78,"../Data.Functor.Invariant/index.js":79,"../Data.Functor/index.js":81,"../Data.Monoid/index.js":106,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Data.Unit/index.js":152,"../Prelude/index.js":177}],99:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Extend/index.js":15,"../Control.Monad/index.js":27,"../Control.MonadZero/index.js":29,"../Control.Plus/index.js":30,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Function/index.js":67,"../Data.Functor.Invariant/index.js":68,"../Data.Functor/index.js":70,"../Data.Monoid/index.js":95,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Data.Unit/index.js":141,"../Prelude/index.js":166}],88:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Eq = require("../Data.Eq/index.js");
@@ -12939,7 +11396,7 @@ module.exports = {
     showMediaType: showMediaType
 };
 
-},{"../Data.Eq/index.js":69,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],100:[function(require,module,exports){
+},{"../Data.Eq/index.js":58,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],89:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -13036,7 +11493,7 @@ module.exports = {
     monoidAdditive: monoidAdditive
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Monoid/index.js":106,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Prelude/index.js":177}],101:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Monoid/index.js":95,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Prelude/index.js":166}],90:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -13146,7 +11603,7 @@ module.exports = {
     semiringConj: semiringConj
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Monoid/index.js":106,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Prelude/index.js":177}],102:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.HeytingAlgebra/index.js":74,"../Data.Monoid/index.js":95,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Prelude/index.js":166}],91:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -13256,7 +11713,7 @@ module.exports = {
     semiringDisj: semiringDisj
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Monoid/index.js":106,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Prelude/index.js":177}],103:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.HeytingAlgebra/index.js":74,"../Data.Monoid/index.js":95,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Prelude/index.js":166}],92:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -13352,7 +11809,7 @@ module.exports = {
     monoidDual: monoidDual
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Monoid/index.js":106,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],104:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Monoid/index.js":95,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],93:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Category = require("../Control.Category/index.js");
@@ -13403,7 +11860,7 @@ module.exports = {
     monoidEndo: monoidEndo
 };
 
-},{"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":35,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Monoid/index.js":106,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],105:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":31,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Monoid/index.js":95,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],94:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -13500,7 +11957,7 @@ module.exports = {
     monoidMultiplicative: monoidMultiplicative
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Monoid/index.js":106,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Prelude/index.js":177}],106:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Monoid/index.js":95,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Prelude/index.js":166}],95:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Boolean = require("../Data.Boolean/index.js");
@@ -13626,12 +12083,12 @@ module.exports = {
     monoidRecordCons: monoidRecordCons
 };
 
-},{"../Data.Boolean/index.js":51,"../Data.Eq/index.js":69,"../Data.EuclideanRing/index.js":71,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Semigroup/index.js":126,"../Data.Symbol/index.js":137,"../Data.Unit/index.js":152,"../Record.Unsafe/index.js":179,"../Type.Data.RowList/index.js":181}],107:[function(require,module,exports){
+},{"../Data.Boolean/index.js":40,"../Data.Eq/index.js":58,"../Data.EuclideanRing/index.js":60,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Semigroup/index.js":115,"../Data.Symbol/index.js":126,"../Data.Unit/index.js":141,"../Record.Unsafe/index.js":168,"../Type.Data.RowList/index.js":170}],96:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 module.exports = {};
 
-},{}],108:[function(require,module,exports){
+},{}],97:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Semigroupoid = require("../Control.Semigroupoid/index.js");
@@ -13876,7 +12333,7 @@ module.exports = {
     newtypeLast: newtypeLast
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Monoid.Additive/index.js":100,"../Data.Monoid.Conj/index.js":101,"../Data.Monoid.Disj/index.js":102,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Endo/index.js":104,"../Data.Monoid.Multiplicative/index.js":105,"../Data.Semigroup.First/index.js":121,"../Data.Semigroup.Last/index.js":123,"../Prelude/index.js":177}],109:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Monoid.Additive/index.js":89,"../Data.Monoid.Conj/index.js":90,"../Data.Monoid.Disj/index.js":91,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Endo/index.js":93,"../Data.Monoid.Multiplicative/index.js":94,"../Data.Semigroup.First/index.js":110,"../Data.Semigroup.Last/index.js":112,"../Prelude/index.js":166}],98:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Alt = require("../Control.Alt/index.js");
@@ -14140,7 +12597,7 @@ module.exports = {
     unfoldable1NonEmpty: unfoldable1NonEmpty
 };
 
-},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Control.Plus/index.js":34,"../Control.Semigroupoid/index.js":35,"../Data.Eq/index.js":69,"../Data.Foldable/index.js":74,"../Data.FoldableWithIndex/index.js":75,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.FunctorWithIndex/index.js":83,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Semigroup.Foldable/index.js":122,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Data.Traversable/index.js":144,"../Data.TraversableWithIndex/index.js":145,"../Data.Tuple/index.js":146,"../Data.Unfoldable/index.js":148,"../Data.Unfoldable1/index.js":150,"../Prelude/index.js":177}],110:[function(require,module,exports){
+},{"../Control.Alt/index.js":3,"../Control.Alternative/index.js":4,"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Control.Plus/index.js":30,"../Control.Semigroupoid/index.js":31,"../Data.Eq/index.js":58,"../Data.Foldable/index.js":63,"../Data.FoldableWithIndex/index.js":64,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.FunctorWithIndex/index.js":72,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Semigroup.Foldable/index.js":111,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Data.Traversable/index.js":133,"../Data.TraversableWithIndex/index.js":134,"../Data.Tuple/index.js":135,"../Data.Unfoldable/index.js":137,"../Data.Unfoldable1/index.js":139,"../Prelude/index.js":166}],99:[function(require,module,exports){
 "use strict";
 
 exports["null"] = null;
@@ -14153,7 +12610,7 @@ exports.notNull = function (x) {
   return x;
 };
 
-},{}],111:[function(require,module,exports){
+},{}],100:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -14202,7 +12659,7 @@ module.exports = {
     notNull: $foreign.notNull
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Eq/index.js":69,"../Data.Function.Uncurried/index.js":77,"../Data.Function/index.js":78,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Show/index.js":130,"../Prelude/index.js":177,"./foreign.js":110}],112:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Eq/index.js":58,"../Data.Function.Uncurried/index.js":66,"../Data.Function/index.js":67,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Show/index.js":119,"../Prelude/index.js":166,"./foreign.js":99}],101:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Bounded = require("../Data.Bounded/index.js");
@@ -14258,7 +12715,7 @@ module.exports = {
     showMax: showMax
 };
 
-},{"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],113:[function(require,module,exports){
+},{"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],102:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Bounded = require("../Data.Bounded/index.js");
@@ -14314,7 +12771,7 @@ module.exports = {
     showMin: showMin
 };
 
-},{"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],114:[function(require,module,exports){
+},{"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],103:[function(require,module,exports){
 "use strict";
 
 exports.unsafeCompareImpl = function (lt) {
@@ -14329,7 +12786,7 @@ exports.unsafeCompareImpl = function (lt) {
   };
 };
 
-},{}],115:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -14339,7 +12796,7 @@ module.exports = {
     unsafeCompare: unsafeCompare
 };
 
-},{"../Data.Ordering/index.js":118,"./foreign.js":114}],116:[function(require,module,exports){
+},{"../Data.Ordering/index.js":107,"./foreign.js":103}],105:[function(require,module,exports){
 "use strict";
 
 exports.ordArrayImpl = function (f) {
@@ -14368,7 +12825,7 @@ exports.ordArrayImpl = function (f) {
   };
 };
 
-},{}],117:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -14696,7 +13153,7 @@ module.exports = {
     ordRecord: ordRecord
 };
 
-},{"../Data.Eq/index.js":69,"../Data.Ord.Unsafe/index.js":115,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semiring/index.js":128,"../Data.Symbol/index.js":137,"../Data.Unit/index.js":152,"../Data.Void/index.js":153,"../Record.Unsafe/index.js":179,"../Type.Data.RowList/index.js":181,"./foreign.js":116}],118:[function(require,module,exports){
+},{"../Data.Eq/index.js":58,"../Data.Ord.Unsafe/index.js":104,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semiring/index.js":117,"../Data.Symbol/index.js":126,"../Data.Unit/index.js":141,"../Data.Void/index.js":142,"../Record.Unsafe/index.js":168,"../Type.Data.RowList/index.js":170,"./foreign.js":105}],107:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Eq = require("../Data.Eq/index.js");
@@ -14785,7 +13242,7 @@ module.exports = {
     showOrdering: showOrdering
 };
 
-},{"../Data.Eq/index.js":69,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130}],119:[function(require,module,exports){
+},{"../Data.Eq/index.js":58,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119}],108:[function(require,module,exports){
 "use strict";
 
 exports.intSub = function (x) {
@@ -14801,7 +13258,7 @@ exports.numSub = function (n1) {
   };
 };
 
-},{}],120:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -14905,7 +13362,7 @@ module.exports = {
     ringRecordCons: ringRecordCons
 };
 
-},{"../Data.Semiring/index.js":128,"../Data.Symbol/index.js":137,"../Data.Unit/index.js":152,"../Record.Unsafe/index.js":179,"../Type.Data.RowList/index.js":181,"./foreign.js":119}],121:[function(require,module,exports){
+},{"../Data.Semiring/index.js":117,"../Data.Symbol/index.js":126,"../Data.Unit/index.js":141,"../Record.Unsafe/index.js":168,"../Type.Data.RowList/index.js":170,"./foreign.js":108}],110:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -14992,7 +13449,7 @@ module.exports = {
     semigroupFirst: semigroupFirst
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],122:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],111:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Apply = require("../Control.Apply/index.js");
@@ -15152,7 +13609,7 @@ module.exports = {
     foldableMultiplicative: foldableMultiplicative
 };
 
-},{"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":35,"../Data.Foldable/index.js":74,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Multiplicative/index.js":105,"../Data.Newtype/index.js":108,"../Data.Ord.Max/index.js":112,"../Data.Ord.Min/index.js":113,"../Data.Semigroup/index.js":126,"../Data.Unit/index.js":152,"../Prelude/index.js":177}],123:[function(require,module,exports){
+},{"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":31,"../Data.Foldable/index.js":63,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Multiplicative/index.js":94,"../Data.Newtype/index.js":97,"../Data.Ord.Max/index.js":101,"../Data.Ord.Min/index.js":102,"../Data.Semigroup/index.js":115,"../Data.Unit/index.js":141,"../Prelude/index.js":166}],112:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -15239,7 +13696,7 @@ module.exports = {
     semigroupLast: semigroupLast
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Data.Bounded/index.js":54,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],124:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Data.Bounded/index.js":43,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],113:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Category = require("../Control.Category/index.js");
@@ -15311,7 +13768,7 @@ module.exports = {
     traversableMultiplicative: traversableMultiplicative
 };
 
-},{"../Control.Category/index.js":12,"../Data.Functor/index.js":81,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Multiplicative/index.js":105,"../Data.Semigroup.Foldable/index.js":122,"../Data.Traversable/index.js":144,"../Prelude/index.js":177}],125:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Data.Functor/index.js":70,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Multiplicative/index.js":94,"../Data.Semigroup.Foldable/index.js":111,"../Data.Traversable/index.js":133,"../Prelude/index.js":166}],114:[function(require,module,exports){
 "use strict";
 
 exports.concatString = function (s1) {
@@ -15328,7 +13785,7 @@ exports.concatArray = function (xs) {
   };
 };
 
-},{}],126:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -15414,7 +13871,7 @@ module.exports = {
     semigroupRecordCons: semigroupRecordCons
 };
 
-},{"../Data.Symbol/index.js":137,"../Data.Unit/index.js":152,"../Data.Void/index.js":153,"../Record.Unsafe/index.js":179,"../Type.Data.RowList/index.js":181,"./foreign.js":125}],127:[function(require,module,exports){
+},{"../Data.Symbol/index.js":126,"../Data.Unit/index.js":141,"../Data.Void/index.js":142,"../Record.Unsafe/index.js":168,"../Type.Data.RowList/index.js":170,"./foreign.js":114}],116:[function(require,module,exports){
 "use strict";
 
 exports.intAdd = function (x) {
@@ -15443,7 +13900,7 @@ exports.numMul = function (n1) {
   };
 };
 
-},{}],128:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -15607,7 +14064,7 @@ module.exports = {
     semiringRecordCons: semiringRecordCons
 };
 
-},{"../Data.Symbol/index.js":137,"../Data.Unit/index.js":152,"../Record.Unsafe/index.js":179,"../Type.Data.Row/index.js":180,"../Type.Data.RowList/index.js":181,"./foreign.js":127}],129:[function(require,module,exports){
+},{"../Data.Symbol/index.js":126,"../Data.Unit/index.js":141,"../Record.Unsafe/index.js":168,"../Type.Data.Row/index.js":169,"../Type.Data.RowList/index.js":170,"./foreign.js":116}],118:[function(require,module,exports){
 "use strict";
 
 exports.showIntImpl = function (n) {
@@ -15682,7 +14139,7 @@ exports.join = function (separator) {
   };
 };
 
-},{}],130:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -15763,7 +14220,7 @@ module.exports = {
     showRecordFieldsCons: showRecordFieldsCons
 };
 
-},{"../Data.Symbol/index.js":137,"../Record.Unsafe/index.js":179,"../Type.Data.RowList/index.js":181,"./foreign.js":129}],131:[function(require,module,exports){
+},{"../Data.Symbol/index.js":126,"../Record.Unsafe/index.js":168,"../Type.Data.RowList/index.js":170,"./foreign.js":118}],120:[function(require,module,exports){
 "use strict";
 
 exports.fromCharArray = function (a) {
@@ -15884,7 +14341,7 @@ exports.splitAt = function (i) {
   };
 };
 
-},{}],132:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -16007,7 +14464,7 @@ module.exports = {
     splitAt: $foreign.splitAt
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Boolean/index.js":51,"../Data.Eq/index.js":69,"../Data.Function/index.js":78,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120,"../Data.Semiring/index.js":128,"../Data.String.Pattern/index.js":133,"../Data.String.Unsafe/index.js":135,"../Prelude/index.js":177,"./foreign.js":131}],133:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Boolean/index.js":40,"../Data.Eq/index.js":58,"../Data.Function/index.js":67,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109,"../Data.Semiring/index.js":117,"../Data.String.Pattern/index.js":122,"../Data.String.Unsafe/index.js":124,"../Prelude/index.js":166,"./foreign.js":120}],122:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Eq = require("../Data.Eq/index.js");
@@ -16071,7 +14528,7 @@ module.exports = {
     showReplacement: showReplacement
 };
 
-},{"../Data.Eq/index.js":69,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Prelude/index.js":177}],134:[function(require,module,exports){
+},{"../Data.Eq/index.js":58,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Prelude/index.js":166}],123:[function(require,module,exports){
 "use strict";
 
 exports.charAt = function (i) {
@@ -16086,7 +14543,7 @@ exports.char = function (s) {
   throw new Error("Data.String.Unsafe.char: Expected string of length 1.");
 };
 
-},{}],135:[function(require,module,exports){
+},{}],124:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -16095,7 +14552,7 @@ module.exports = {
     charAt: $foreign.charAt
 };
 
-},{"./foreign.js":134}],136:[function(require,module,exports){
+},{"./foreign.js":123}],125:[function(require,module,exports){
 "use strict";
 
 // module Data.Symbol
@@ -16105,7 +14562,7 @@ exports.unsafeCoerce = function (arg) {
 };
 
 
-},{}],137:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -16140,7 +14597,7 @@ module.exports = {
     SProxy: SProxy
 };
 
-},{"./foreign.js":136}],138:[function(require,module,exports){
+},{"./foreign.js":125}],127:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Semigroupoid = require("../Control.Semigroupoid/index.js");
@@ -16331,7 +14788,7 @@ module.exports = {
     showMillisecond: showMillisecond
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Boolean/index.js":51,"../Data.Bounded/index.js":54,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Prelude/index.js":177}],139:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Boolean/index.js":40,"../Data.Bounded/index.js":43,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Prelude/index.js":166}],128:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Category = require("../Control.Category/index.js");
@@ -16532,7 +14989,7 @@ module.exports = {
     durationDays: durationDays
 };
 
-},{"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":35,"../Data.Eq/index.js":69,"../Data.EuclideanRing/index.js":71,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Prelude/index.js":177}],140:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Control.Semigroupoid/index.js":31,"../Data.Eq/index.js":58,"../Data.EuclideanRing/index.js":60,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Prelude/index.js":166}],129:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Apply = require("../Control.Apply/index.js");
@@ -16707,7 +15164,7 @@ module.exports = {
     showTime: showTime
 };
 
-},{"../Control.Apply/index.js":7,"../Data.Bounded/index.js":54,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.EuclideanRing/index.js":71,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Int/index.js":90,"../Data.Maybe/index.js":98,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Data.Time.Component/index.js":138,"../Data.Time.Duration/index.js":139,"../Data.Tuple/index.js":146,"../Math/index.js":172,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177}],141:[function(require,module,exports){
+},{"../Control.Apply/index.js":7,"../Data.Bounded/index.js":43,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.EuclideanRing/index.js":60,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.HeytingAlgebra/index.js":74,"../Data.Int/index.js":79,"../Data.Maybe/index.js":87,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Data.Time.Component/index.js":127,"../Data.Time.Duration/index.js":128,"../Data.Tuple/index.js":135,"../Math/index.js":161,"../Partial.Unsafe/index.js":163,"../Prelude/index.js":166}],130:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -16810,9 +15267,9 @@ module.exports = {
     applicativeStateR: applicativeStateR
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Data.Functor/index.js":81,"../Data.Traversable.Accum/index.js":142,"../Prelude/index.js":177}],142:[function(require,module,exports){
-arguments[4][107][0].apply(exports,arguments)
-},{"dup":107}],143:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Data.Functor/index.js":70,"../Data.Traversable.Accum/index.js":131,"../Prelude/index.js":166}],131:[function(require,module,exports){
+arguments[4][96][0].apply(exports,arguments)
+},{"dup":96}],132:[function(require,module,exports){
 "use strict";
 
 // jshint maxparams: 3
@@ -16868,7 +15325,7 @@ exports.traverseArrayImpl = function () {
   };
 }();
 
-},{}],144:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -17146,7 +15603,7 @@ module.exports = {
     traversableMultiplicative: traversableMultiplicative
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Data.Foldable/index.js":74,"../Data.Functor/index.js":81,"../Data.Maybe.First/index.js":96,"../Data.Maybe.Last/index.js":97,"../Data.Maybe/index.js":98,"../Data.Monoid.Additive/index.js":100,"../Data.Monoid.Conj/index.js":101,"../Data.Monoid.Disj/index.js":102,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Multiplicative/index.js":105,"../Data.Traversable.Accum.Internal/index.js":141,"../Data.Traversable.Accum/index.js":142,"../Prelude/index.js":177,"./foreign.js":143}],145:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Category/index.js":12,"../Data.Foldable/index.js":63,"../Data.Functor/index.js":70,"../Data.Maybe.First/index.js":85,"../Data.Maybe.Last/index.js":86,"../Data.Maybe/index.js":87,"../Data.Monoid.Additive/index.js":89,"../Data.Monoid.Conj/index.js":90,"../Data.Monoid.Disj/index.js":91,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Multiplicative/index.js":94,"../Data.Traversable.Accum.Internal/index.js":130,"../Data.Traversable.Accum/index.js":131,"../Prelude/index.js":166,"./foreign.js":132}],134:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Semigroupoid = require("../Control.Semigroupoid/index.js");
@@ -17382,7 +15839,7 @@ module.exports = {
     traversableWithIndexMultiplicative: traversableWithIndexMultiplicative
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.FoldableWithIndex/index.js":75,"../Data.Function/index.js":78,"../Data.FunctorWithIndex/index.js":83,"../Data.Maybe.First/index.js":96,"../Data.Maybe.Last/index.js":97,"../Data.Maybe/index.js":98,"../Data.Monoid.Additive/index.js":100,"../Data.Monoid.Conj/index.js":101,"../Data.Monoid.Disj/index.js":102,"../Data.Monoid.Dual/index.js":103,"../Data.Monoid.Multiplicative/index.js":105,"../Data.Traversable.Accum.Internal/index.js":141,"../Data.Traversable.Accum/index.js":142,"../Data.Traversable/index.js":144,"../Data.Unit/index.js":152,"../Prelude/index.js":177}],146:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.FoldableWithIndex/index.js":64,"../Data.Function/index.js":67,"../Data.FunctorWithIndex/index.js":72,"../Data.Maybe.First/index.js":85,"../Data.Maybe.Last/index.js":86,"../Data.Maybe/index.js":87,"../Data.Monoid.Additive/index.js":89,"../Data.Monoid.Conj/index.js":90,"../Data.Monoid.Disj/index.js":91,"../Data.Monoid.Dual/index.js":92,"../Data.Monoid.Multiplicative/index.js":94,"../Data.Traversable.Accum.Internal/index.js":130,"../Data.Traversable.Accum/index.js":131,"../Data.Traversable/index.js":133,"../Data.Unit/index.js":141,"../Prelude/index.js":166}],135:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -17881,7 +16338,7 @@ module.exports = {
     distributiveTuple: distributiveTuple
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Control.Bind/index.js":11,"../Control.Comonad/index.js":13,"../Control.Extend/index.js":15,"../Control.Lazy/index.js":16,"../Control.Monad/index.js":31,"../Control.Semigroupoid/index.js":35,"../Data.Bifoldable/index.js":43,"../Data.Bifunctor/index.js":49,"../Data.Bitraversable/index.js":50,"../Data.BooleanAlgebra/index.js":52,"../Data.Bounded/index.js":54,"../Data.CommutativeRing/index.js":55,"../Data.Distributive/index.js":63,"../Data.Eq/index.js":69,"../Data.Foldable/index.js":74,"../Data.FoldableWithIndex/index.js":75,"../Data.Function/index.js":78,"../Data.Functor.Invariant/index.js":79,"../Data.Functor/index.js":81,"../Data.FunctorWithIndex/index.js":83,"../Data.HeytingAlgebra/index.js":85,"../Data.Maybe.First/index.js":96,"../Data.Maybe/index.js":98,"../Data.Monoid/index.js":106,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semigroup.Foldable/index.js":122,"../Data.Semigroup.Traversable/index.js":124,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Data.Traversable/index.js":144,"../Data.TraversableWithIndex/index.js":145,"../Data.Unit/index.js":152,"../Prelude/index.js":177,"../Type.Equality/index.js":182}],147:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Biapplicative/index.js":8,"../Control.Biapply/index.js":9,"../Control.Bind/index.js":11,"../Control.Comonad/index.js":13,"../Control.Extend/index.js":15,"../Control.Lazy/index.js":16,"../Control.Monad/index.js":27,"../Control.Semigroupoid/index.js":31,"../Data.Bifoldable/index.js":32,"../Data.Bifunctor/index.js":38,"../Data.Bitraversable/index.js":39,"../Data.BooleanAlgebra/index.js":41,"../Data.Bounded/index.js":43,"../Data.CommutativeRing/index.js":44,"../Data.Distributive/index.js":52,"../Data.Eq/index.js":58,"../Data.Foldable/index.js":63,"../Data.FoldableWithIndex/index.js":64,"../Data.Function/index.js":67,"../Data.Functor.Invariant/index.js":68,"../Data.Functor/index.js":70,"../Data.FunctorWithIndex/index.js":72,"../Data.HeytingAlgebra/index.js":74,"../Data.Maybe.First/index.js":85,"../Data.Maybe/index.js":87,"../Data.Monoid/index.js":95,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semigroup.Foldable/index.js":111,"../Data.Semigroup.Traversable/index.js":113,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Data.Traversable/index.js":133,"../Data.TraversableWithIndex/index.js":134,"../Data.Unit/index.js":141,"../Prelude/index.js":166,"../Type.Equality/index.js":171}],136:[function(require,module,exports){
 "use strict";
 
 exports.unfoldrArrayImpl = function (isNothing) {
@@ -17906,7 +16363,7 @@ exports.unfoldrArrayImpl = function (isNothing) {
   };
 };
 
-},{}],148:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -17974,7 +16431,7 @@ module.exports = {
     unfoldableArray: unfoldableArray
 };
 
-},{"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120,"../Data.Traversable/index.js":144,"../Data.Tuple/index.js":146,"../Data.Unfoldable1/index.js":150,"../Data.Unit/index.js":152,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177,"./foreign.js":147}],149:[function(require,module,exports){
+},{"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109,"../Data.Traversable/index.js":133,"../Data.Tuple/index.js":135,"../Data.Unfoldable1/index.js":139,"../Data.Unit/index.js":141,"../Partial.Unsafe/index.js":163,"../Prelude/index.js":166,"./foreign.js":136}],138:[function(require,module,exports){
 "use strict";
 
 exports.unfoldr1ArrayImpl = function (isNothing) {
@@ -17999,7 +16456,7 @@ exports.unfoldr1ArrayImpl = function (isNothing) {
   };
 };
 
-},{}],150:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -18086,12 +16543,12 @@ module.exports = {
     unfoldable1Array: unfoldable1Array
 };
 
-},{"../Data.Boolean/index.js":51,"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ring/index.js":120,"../Data.Semigroup.Traversable/index.js":124,"../Data.Semiring/index.js":128,"../Data.Tuple/index.js":146,"../Partial.Unsafe/index.js":174,"../Prelude/index.js":177,"./foreign.js":149}],151:[function(require,module,exports){
+},{"../Data.Boolean/index.js":40,"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ring/index.js":109,"../Data.Semigroup.Traversable/index.js":113,"../Data.Semiring/index.js":117,"../Data.Tuple/index.js":135,"../Partial.Unsafe/index.js":163,"../Prelude/index.js":166,"./foreign.js":138}],140:[function(require,module,exports){
 "use strict";
 
 exports.unit = {};
 
-},{}],152:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -18104,7 +16561,7 @@ module.exports = {
     unit: $foreign.unit
 };
 
-},{"../Data.Show/index.js":130,"./foreign.js":151}],153:[function(require,module,exports){
+},{"../Data.Show/index.js":119,"./foreign.js":140}],142:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Show = require("../Data.Show/index.js");
@@ -18131,7 +16588,7 @@ module.exports = {
     showVoid: showVoid
 };
 
-},{"../Data.Show/index.js":130}],154:[function(require,module,exports){
+},{"../Data.Show/index.js":119}],143:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Category = require("../Control.Category/index.js");
@@ -18153,7 +16610,7 @@ module.exports = {
     monadEffectEffect: monadEffectEffect
 };
 
-},{"../Control.Category/index.js":12,"../Control.Monad/index.js":31,"../Effect/index.js":166}],155:[function(require,module,exports){
+},{"../Control.Category/index.js":12,"../Control.Monad/index.js":27,"../Effect/index.js":155}],144:[function(require,module,exports){
 "use strict";
 
 exports.log = function (s) {
@@ -18198,7 +16655,7 @@ exports.timeEnd = function (s) {
   };
 };
 
-},{}],156:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -18238,7 +16695,7 @@ module.exports = {
     timeEnd: $foreign.timeEnd
 };
 
-},{"../Data.Show/index.js":130,"../Data.Unit/index.js":152,"../Effect/index.js":166,"./foreign.js":155}],157:[function(require,module,exports){
+},{"../Data.Show/index.js":119,"../Data.Unit/index.js":141,"../Effect/index.js":155,"./foreign.js":144}],146:[function(require,module,exports){
 "use strict";
 
 exports.showErrorImpl = function (err) {
@@ -18287,7 +16744,7 @@ exports.catchException = function (c) {
   };
 };
 
-},{}],158:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -18321,7 +16778,7 @@ module.exports = {
     catchException: $foreign.catchException
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Semigroupoid/index.js":35,"../Data.Either/index.js":65,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Show/index.js":130,"../Effect/index.js":166,"../Prelude/index.js":177,"./foreign.js":157}],159:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Semigroupoid/index.js":31,"../Data.Either/index.js":54,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Show/index.js":119,"../Effect/index.js":155,"../Prelude/index.js":166,"./foreign.js":146}],148:[function(require,module,exports){
 "use strict";
 
 exports.new = function (val) {
@@ -18355,7 +16812,7 @@ exports.write = function (val) {
   };
 };
 
-},{}],160:[function(require,module,exports){
+},{}],149:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -18386,7 +16843,7 @@ module.exports = {
     write: $foreign.write
 };
 
-},{"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Effect/index.js":166,"../Prelude/index.js":177,"./foreign.js":159}],161:[function(require,module,exports){
+},{"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Effect/index.js":155,"../Prelude/index.js":166,"./foreign.js":148}],150:[function(require,module,exports){
 /* global exports */
 "use strict";
 
@@ -18418,7 +16875,7 @@ exports.clearInterval = function (id) {
   };
 };
 
-},{}],162:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -18467,7 +16924,7 @@ module.exports = {
     clearInterval: $foreign.clearInterval
 };
 
-},{"../Data.Eq/index.js":69,"../Data.Ord/index.js":117,"../Effect/index.js":166,"../Prelude/index.js":177,"./foreign.js":161}],163:[function(require,module,exports){
+},{"../Data.Eq/index.js":58,"../Data.Ord/index.js":106,"../Effect/index.js":155,"../Prelude/index.js":166,"./foreign.js":150}],152:[function(require,module,exports){
 "use strict";
 
 exports.mkEffectFn1 = function mkEffectFn1(fn) {
@@ -18700,7 +17157,7 @@ exports.runEffectFn10 = function runEffectFn10(fn) {
   };
 };
 
-},{}],164:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -18728,7 +17185,7 @@ module.exports = {
     runEffectFn10: $foreign.runEffectFn10
 };
 
-},{"../Effect/index.js":166,"./foreign.js":163}],165:[function(require,module,exports){
+},{"../Effect/index.js":155,"./foreign.js":152}],154:[function(require,module,exports){
 "use strict";
 
 exports.pureE = function (a) {
@@ -18785,7 +17242,7 @@ exports.foreachE = function (as) {
   };
 };
 
-},{}],166:[function(require,module,exports){
+},{}],155:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -18834,7 +17291,7 @@ module.exports = {
     foreachE: $foreign.foreachE
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":31,"../Data.Functor/index.js":81,"../Data.Monoid/index.js":106,"../Data.Semigroup/index.js":126,"../Prelude/index.js":177,"./foreign.js":165}],167:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Monad/index.js":27,"../Data.Functor/index.js":70,"../Data.Monoid/index.js":95,"../Data.Semigroup/index.js":115,"../Prelude/index.js":166,"./foreign.js":154}],156:[function(require,module,exports){
 "use strict";
 
 exports.unsafeToForeign = function (value) {
@@ -18865,7 +17322,7 @@ exports.isArray = Array.isArray || function (value) {
   return Object.prototype.toString.call(value) === "[object Array]";
 };
 
-},{}],168:[function(require,module,exports){
+},{}],157:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19135,7 +17592,7 @@ module.exports = {
     isArray: $foreign.isArray
 };
 
-},{"../Control.Applicative/index.js":5,"../Control.Monad.Error.Class/index.js":18,"../Control.Monad.Except.Trans/index.js":19,"../Control.Monad.Except/index.js":20,"../Control.Semigroupoid/index.js":35,"../Data.Boolean/index.js":51,"../Data.Either/index.js":65,"../Data.Eq/index.js":69,"../Data.Function/index.js":78,"../Data.HeytingAlgebra/index.js":85,"../Data.Identity/index.js":86,"../Data.Int/index.js":90,"../Data.List.NonEmpty/index.js":93,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Semigroup/index.js":126,"../Data.Show/index.js":130,"../Data.String.CodeUnits/index.js":132,"../Prelude/index.js":177,"./foreign.js":167}],169:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Monad.Error.Class/index.js":18,"../Control.Monad.Except.Trans/index.js":19,"../Control.Monad.Except/index.js":20,"../Control.Semigroupoid/index.js":31,"../Data.Boolean/index.js":40,"../Data.Either/index.js":54,"../Data.Eq/index.js":58,"../Data.Function/index.js":67,"../Data.HeytingAlgebra/index.js":74,"../Data.Identity/index.js":75,"../Data.Int/index.js":79,"../Data.List.NonEmpty/index.js":82,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Semigroup/index.js":115,"../Data.Show/index.js":119,"../Data.String.CodeUnits/index.js":121,"../Prelude/index.js":166,"./foreign.js":156}],158:[function(require,module,exports){
 /* globals exports */
 "use strict";
 
@@ -19155,7 +17612,7 @@ exports.readInt = function (radix) {
 
 exports.readFloat = parseFloat;
 
-},{}],170:[function(require,module,exports){
+},{}],159:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19168,7 +17625,7 @@ module.exports = {
     readFloat: $foreign.readFloat
 };
 
-},{"./foreign.js":169}],171:[function(require,module,exports){
+},{"./foreign.js":158}],160:[function(require,module,exports){
 "use strict";
 
 // module Math
@@ -19251,7 +17708,7 @@ exports.sqrt1_2 = Math.SQRT1_2;
 
 exports.sqrt2 = Math.SQRT2;
 
-},{}],172:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19286,7 +17743,7 @@ module.exports = {
     sqrt2: $foreign.sqrt2
 };
 
-},{"./foreign.js":171}],173:[function(require,module,exports){
+},{"./foreign.js":160}],162:[function(require,module,exports){
 "use strict";
 
 // module Partial.Unsafe
@@ -19295,7 +17752,7 @@ exports.unsafePartial = function (f) {
   return f();
 };
 
-},{}],174:[function(require,module,exports){
+},{}],163:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19318,7 +17775,7 @@ module.exports = {
     unsafePartial: $foreign.unsafePartial
 };
 
-},{"../Partial/index.js":176,"./foreign.js":173}],175:[function(require,module,exports){
+},{"../Partial/index.js":165,"./foreign.js":162}],164:[function(require,module,exports){
 "use strict";
 
 // module Partial
@@ -19329,7 +17786,7 @@ exports.crashWith = function () {
   };
 };
 
-},{}],176:[function(require,module,exports){
+},{}],165:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19341,7 +17798,7 @@ module.exports = {
     crashWith: $foreign.crashWith
 };
 
-},{"./foreign.js":175}],177:[function(require,module,exports){
+},{"./foreign.js":164}],166:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -19373,7 +17830,7 @@ var Data_Unit = require("../Data.Unit/index.js");
 var Data_Void = require("../Data.Void/index.js");
 module.exports = {};
 
-},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Monad/index.js":31,"../Control.Semigroupoid/index.js":35,"../Data.Boolean/index.js":51,"../Data.BooleanAlgebra/index.js":52,"../Data.Bounded/index.js":54,"../Data.CommutativeRing/index.js":55,"../Data.DivisionRing/index.js":64,"../Data.Eq/index.js":69,"../Data.EuclideanRing/index.js":71,"../Data.Field/index.js":72,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.HeytingAlgebra/index.js":85,"../Data.Monoid/index.js":106,"../Data.NaturalTransformation/index.js":107,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Ring/index.js":120,"../Data.Semigroup/index.js":126,"../Data.Semiring/index.js":128,"../Data.Show/index.js":130,"../Data.Unit/index.js":152,"../Data.Void/index.js":153}],178:[function(require,module,exports){
+},{"../Control.Applicative/index.js":5,"../Control.Apply/index.js":7,"../Control.Bind/index.js":11,"../Control.Category/index.js":12,"../Control.Monad/index.js":27,"../Control.Semigroupoid/index.js":31,"../Data.Boolean/index.js":40,"../Data.BooleanAlgebra/index.js":41,"../Data.Bounded/index.js":43,"../Data.CommutativeRing/index.js":44,"../Data.DivisionRing/index.js":53,"../Data.Eq/index.js":58,"../Data.EuclideanRing/index.js":60,"../Data.Field/index.js":61,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.HeytingAlgebra/index.js":74,"../Data.Monoid/index.js":95,"../Data.NaturalTransformation/index.js":96,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Ring/index.js":109,"../Data.Semigroup/index.js":115,"../Data.Semiring/index.js":117,"../Data.Show/index.js":119,"../Data.Unit/index.js":141,"../Data.Void/index.js":142}],167:[function(require,module,exports){
 "use strict";
 
 exports.unsafeHas = function (label) {
@@ -19415,7 +17872,7 @@ exports.unsafeDelete = function (label) {
   };
 };
 
-},{}],179:[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19426,7 +17883,7 @@ module.exports = {
     unsafeDelete: $foreign.unsafeDelete
 };
 
-},{"./foreign.js":178}],180:[function(require,module,exports){
+},{"./foreign.js":167}],169:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var RProxy = (function () {
@@ -19440,7 +17897,7 @@ module.exports = {
     RProxy: RProxy
 };
 
-},{}],181:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var RLProxy = (function () {
@@ -19454,7 +17911,7 @@ module.exports = {
     RLProxy: RLProxy
 };
 
-},{}],182:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var TypeEquals = function (from, to) {
@@ -19479,7 +17936,7 @@ module.exports = {
     refl: refl
 };
 
-},{}],183:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 "use strict";
 
 // module Unsafe.Coerce
@@ -19488,7 +17945,7 @@ exports.unsafeCoerce = function (x) {
   return x;
 };
 
-},{}],184:[function(require,module,exports){
+},{}],173:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19496,7 +17953,7 @@ module.exports = {
     unsafeCoerce: $foreign.unsafeCoerce
 };
 
-},{"./foreign.js":183}],185:[function(require,module,exports){
+},{"./foreign.js":172}],174:[function(require,module,exports){
 "use strict";
 
 exports.data_ = function (t) {
@@ -19561,7 +18018,7 @@ exports.replaceData = function (offset) {
   };
 };
 
-},{}],186:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19600,7 +18057,7 @@ module.exports = {
     replaceData: $foreign.replaceData
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.ChildNode/index.js":188,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NonDocumentTypeChildNode/index.js":208,"../Web.Event.EventTarget/index.js":222,"../Web.Internal.FFI/index.js":361,"./foreign.js":185}],187:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.ChildNode/index.js":177,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NonDocumentTypeChildNode/index.js":197,"../Web.Event.EventTarget/index.js":211,"../Web.Internal.FFI/index.js":350,"./foreign.js":174}],176:[function(require,module,exports){
 "use strict";
 
 exports.remove = function (node) {
@@ -19609,7 +18066,7 @@ exports.remove = function (node) {
   };
 };
 
-},{}],188:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19619,7 +18076,7 @@ module.exports = {
     remove: $foreign.remove
 };
 
-},{"../Effect/index.js":166,"../Prelude/index.js":177,"./foreign.js":187}],189:[function(require,module,exports){
+},{"../Effect/index.js":155,"../Prelude/index.js":166,"./foreign.js":176}],178:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -19653,7 +18110,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM.CharacterData/index.js":186,"../Web.DOM.ChildNode/index.js":188,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NonDocumentTypeChildNode/index.js":208,"../Web.Event.EventTarget/index.js":222,"../Web.Internal.FFI/index.js":361}],190:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM.CharacterData/index.js":175,"../Web.DOM.ChildNode/index.js":177,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NonDocumentTypeChildNode/index.js":197,"../Web.Event.EventTarget/index.js":211,"../Web.Internal.FFI/index.js":350}],179:[function(require,module,exports){
 "use strict";
 
 exports.add = function(list) {
@@ -19706,7 +18163,7 @@ exports._item = function(list) {
   };
 };
 
-},{}],191:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19730,7 +18187,7 @@ module.exports = {
     toggleForce: $foreign.toggleForce
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"./foreign.js":190}],192:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"./foreign.js":179}],181:[function(require,module,exports){
 "use strict";
 
 var getEffProp = function (name) {
@@ -19845,7 +18302,7 @@ exports.adoptNode = function (node) {
   };
 };
 
-},{}],193:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19918,7 +18375,7 @@ module.exports = {
     adoptNode: $foreign.adoptNode
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.Comment/index.js":189,"../Web.DOM.DocumentFragment/index.js":194,"../Web.DOM.DocumentType/index.js":196,"../Web.DOM.Element/index.js":198,"../Web.DOM.HTMLCollection/index.js":200,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NonElementParentNode/index.js":210,"../Web.DOM.ParentNode/index.js":212,"../Web.DOM.ProcessingInstruction/index.js":214,"../Web.DOM.Text/index.js":216,"../Web.Event.EventTarget/index.js":222,"../Web.Internal.FFI/index.js":361,"./foreign.js":192}],194:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.Comment/index.js":178,"../Web.DOM.DocumentFragment/index.js":183,"../Web.DOM.DocumentType/index.js":185,"../Web.DOM.Element/index.js":187,"../Web.DOM.HTMLCollection/index.js":189,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NonElementParentNode/index.js":199,"../Web.DOM.ParentNode/index.js":201,"../Web.DOM.ProcessingInstruction/index.js":203,"../Web.DOM.Text/index.js":205,"../Web.Event.EventTarget/index.js":211,"../Web.Internal.FFI/index.js":350,"./foreign.js":181}],183:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -19952,7 +18409,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM.ChildNode/index.js":188,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NonElementParentNode/index.js":210,"../Web.DOM.ParentNode/index.js":212,"../Web.Event.EventTarget/index.js":222,"../Web.Internal.FFI/index.js":361}],195:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM.ChildNode/index.js":177,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NonElementParentNode/index.js":199,"../Web.DOM.ParentNode/index.js":201,"../Web.Event.EventTarget/index.js":211,"../Web.Internal.FFI/index.js":350}],184:[function(require,module,exports){
 "use strict";
 
 var getProp = function (name) {
@@ -19965,7 +18422,7 @@ exports.name = getProp("name");
 exports.publicId = getProp("publicId");
 exports.systemId = getProp("systemId");
 
-},{}],196:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -19993,7 +18450,7 @@ module.exports = {
     systemId: $foreign.systemId
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM.ChildNode/index.js":188,"../Web.DOM.Internal.Types/index.js":201,"../Web.Event.EventTarget/index.js":222,"../Web.Internal.FFI/index.js":361,"./foreign.js":195}],197:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM.ChildNode/index.js":177,"../Web.DOM.Internal.Types/index.js":190,"../Web.Event.EventTarget/index.js":211,"../Web.Internal.FFI/index.js":350,"./foreign.js":184}],186:[function(require,module,exports){
 "use strict";
 
 var getProp = function (name) {
@@ -20165,7 +18622,7 @@ exports.clientHeight = function (el) {
   };
 };
 
-},{}],198:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -20244,7 +18701,7 @@ module.exports = {
     clientHeight: $foreign.clientHeight
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.ChildNode/index.js":188,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NonDocumentTypeChildNode/index.js":208,"../Web.DOM.ParentNode/index.js":212,"../Web.Event.EventTarget/index.js":222,"../Web.Internal.FFI/index.js":361,"./foreign.js":197}],199:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.ChildNode/index.js":177,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NonDocumentTypeChildNode/index.js":197,"../Web.DOM.ParentNode/index.js":201,"../Web.Event.EventTarget/index.js":211,"../Web.Internal.FFI/index.js":350,"./foreign.js":186}],188:[function(require,module,exports){
 "use strict";
 
 exports.length = function (list) {
@@ -20275,7 +18732,7 @@ exports._namedItem = function (name) {
   };
 };
 
-},{}],200:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -20303,9 +18760,9 @@ module.exports = {
     toArray: $foreign.toArray
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Web.DOM.Internal.Types/index.js":201,"./foreign.js":199}],201:[function(require,module,exports){
-arguments[4][107][0].apply(exports,arguments)
-},{"dup":107}],202:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Web.DOM.Internal.Types/index.js":190,"./foreign.js":188}],190:[function(require,module,exports){
+arguments[4][96][0].apply(exports,arguments)
+},{"dup":96}],191:[function(require,module,exports){
 "use strict";
 
 var getEffProp = function (name) {
@@ -20473,7 +18930,7 @@ exports.removeChild = function (node) {
   };
 };
 
-},{}],203:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -20564,7 +19021,7 @@ module.exports = {
     removeChild: $foreign.removeChild
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Enum/index.js":67,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.Document/index.js":193,"../Web.DOM.Element/index.js":198,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NodeType/index.js":206,"../Web.Event.EventTarget/index.js":222,"../Web.Internal.FFI/index.js":361,"./foreign.js":202}],204:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Enum/index.js":56,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.Document/index.js":182,"../Web.DOM.Element/index.js":187,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NodeType/index.js":195,"../Web.Event.EventTarget/index.js":211,"../Web.Internal.FFI/index.js":350,"./foreign.js":191}],193:[function(require,module,exports){
 "use strict";
 
 exports.length = function (list) {
@@ -20587,7 +19044,7 @@ exports._item = function (index) {
   };
 };
 
-},{}],205:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -20609,7 +19066,7 @@ module.exports = {
     toArray: $foreign.toArray
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Web.DOM.Internal.Types/index.js":201,"./foreign.js":204}],206:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Web.DOM.Internal.Types/index.js":190,"./foreign.js":193}],195:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Bounded = require("../Data.Bounded/index.js");
@@ -20859,7 +19316,7 @@ module.exports = {
     boundedEnumNodeType: boundedEnumNodeType
 };
 
-},{"../Data.Bounded/index.js":54,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Prelude/index.js":177}],207:[function(require,module,exports){
+},{"../Data.Bounded/index.js":43,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Prelude/index.js":166}],196:[function(require,module,exports){
 "use strict";
 
 exports._previousElementSibling = function (node) {
@@ -20874,7 +19331,7 @@ exports._nextElementSibling = function (node) {
   };
 };
 
-},{}],208:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -20896,7 +19353,7 @@ module.exports = {
     nextElementSibling: nextElementSibling
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Web.DOM.Internal.Types/index.js":201,"./foreign.js":207}],209:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Web.DOM.Internal.Types/index.js":190,"./foreign.js":196}],198:[function(require,module,exports){
 "use strict";
 
 exports._getElementById = function (id) {
@@ -20907,7 +19364,7 @@ exports._getElementById = function (id) {
   };
 };
 
-},{}],210:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -20927,7 +19384,7 @@ module.exports = {
     getElementById: getElementById
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Web.DOM.Element/index.js":198,"./foreign.js":209}],211:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Web.DOM.Element/index.js":187,"./foreign.js":198}],200:[function(require,module,exports){
 "use strict";
 
 var getEffProp = function (name) {
@@ -20962,7 +19419,7 @@ exports.querySelectorAll = function (selector) {
   };
 };
 
-},{}],212:[function(require,module,exports){
+},{}],201:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21010,7 +19467,7 @@ module.exports = {
     querySelectorAll: $foreign.querySelectorAll
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Newtype/index.js":108,"../Data.Nullable/index.js":111,"../Data.Ord/index.js":117,"../Effect/index.js":166,"../Prelude/index.js":177,"../Web.DOM.HTMLCollection/index.js":200,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NodeList/index.js":205,"./foreign.js":211}],213:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Newtype/index.js":97,"../Data.Nullable/index.js":100,"../Data.Ord/index.js":106,"../Effect/index.js":155,"../Prelude/index.js":166,"../Web.DOM.HTMLCollection/index.js":189,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NodeList/index.js":194,"./foreign.js":200}],202:[function(require,module,exports){
 "use strict";
 
 exports.target = function (pi) {
@@ -21019,7 +19476,7 @@ exports.target = function (pi) {
   };
 };
 
-},{}],214:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21056,7 +19513,7 @@ module.exports = {
     target: $foreign.target
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Unsafe.Coerce/index.js":184,"../Web.DOM.CharacterData/index.js":186,"../Web.DOM.ChildNode/index.js":188,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NonDocumentTypeChildNode/index.js":208,"../Web.Event.EventTarget/index.js":222,"../Web.Internal.FFI/index.js":361,"./foreign.js":213}],215:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Unsafe.Coerce/index.js":173,"../Web.DOM.CharacterData/index.js":175,"../Web.DOM.ChildNode/index.js":177,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NonDocumentTypeChildNode/index.js":197,"../Web.Event.EventTarget/index.js":211,"../Web.Internal.FFI/index.js":350,"./foreign.js":202}],204:[function(require,module,exports){
 "use strict";
 
 exports.splitText = function (offset) {
@@ -21073,7 +19530,7 @@ exports.wholeText = function (t) {
   };
 };
 
-},{}],216:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21111,7 +19568,7 @@ module.exports = {
     wholeText: $foreign.wholeText
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Unsafe.Coerce/index.js":184,"../Web.DOM.CharacterData/index.js":186,"../Web.DOM.ChildNode/index.js":188,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NonDocumentTypeChildNode/index.js":208,"../Web.Event.EventTarget/index.js":222,"../Web.Internal.FFI/index.js":361,"./foreign.js":215}],217:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Unsafe.Coerce/index.js":173,"../Web.DOM.CharacterData/index.js":175,"../Web.DOM.ChildNode/index.js":177,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NonDocumentTypeChildNode/index.js":197,"../Web.Event.EventTarget/index.js":211,"../Web.Internal.FFI/index.js":350,"./foreign.js":204}],206:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Web_DOM_CharacterData = require("../Web.DOM.CharacterData/index.js");
@@ -21133,7 +19590,7 @@ var Web_DOM_ProcessingInstruction = require("../Web.DOM.ProcessingInstruction/in
 var Web_DOM_Text = require("../Web.DOM.Text/index.js");
 module.exports = {};
 
-},{"../Web.DOM.CharacterData/index.js":186,"../Web.DOM.ChildNode/index.js":188,"../Web.DOM.Comment/index.js":189,"../Web.DOM.DOMTokenList/index.js":191,"../Web.DOM.Document/index.js":193,"../Web.DOM.DocumentFragment/index.js":194,"../Web.DOM.DocumentType/index.js":196,"../Web.DOM.Element/index.js":198,"../Web.DOM.HTMLCollection/index.js":200,"../Web.DOM.Node/index.js":203,"../Web.DOM.NodeList/index.js":205,"../Web.DOM.NodeType/index.js":206,"../Web.DOM.NonDocumentTypeChildNode/index.js":208,"../Web.DOM.NonElementParentNode/index.js":210,"../Web.DOM.ParentNode/index.js":212,"../Web.DOM.ProcessingInstruction/index.js":214,"../Web.DOM.Text/index.js":216}],218:[function(require,module,exports){
+},{"../Web.DOM.CharacterData/index.js":175,"../Web.DOM.ChildNode/index.js":177,"../Web.DOM.Comment/index.js":178,"../Web.DOM.DOMTokenList/index.js":180,"../Web.DOM.Document/index.js":182,"../Web.DOM.DocumentFragment/index.js":183,"../Web.DOM.DocumentType/index.js":185,"../Web.DOM.Element/index.js":187,"../Web.DOM.HTMLCollection/index.js":189,"../Web.DOM.Node/index.js":192,"../Web.DOM.NodeList/index.js":194,"../Web.DOM.NodeType/index.js":195,"../Web.DOM.NonDocumentTypeChildNode/index.js":197,"../Web.DOM.NonElementParentNode/index.js":199,"../Web.DOM.ParentNode/index.js":201,"../Web.DOM.ProcessingInstruction/index.js":203,"../Web.DOM.Text/index.js":205}],207:[function(require,module,exports){
 "use strict";
 
 exports.bubbles = function (e) {
@@ -21188,7 +19645,7 @@ exports.stopPropagation = function (e) {
   };
 };
 
-},{}],219:[function(require,module,exports){
+},{}],208:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21241,7 +19698,7 @@ module.exports = {
     timeStamp: $foreign.timeStamp
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.DateTime.Instant/index.js":60,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Newtype/index.js":108,"../Data.Nullable/index.js":111,"../Data.Ord/index.js":117,"../Effect/index.js":166,"../Prelude/index.js":177,"../Web.Event.EventPhase/index.js":220,"../Web.Event.Internal.Types/index.js":223,"./foreign.js":218}],220:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.DateTime.Instant/index.js":49,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Newtype/index.js":97,"../Data.Nullable/index.js":100,"../Data.Ord/index.js":106,"../Effect/index.js":155,"../Prelude/index.js":166,"../Web.Event.EventPhase/index.js":209,"../Web.Event.Internal.Types/index.js":212,"./foreign.js":207}],209:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Bounded = require("../Data.Bounded/index.js");
@@ -21388,7 +19845,7 @@ module.exports = {
     boundedEnumEventPhase: boundedEnumEventPhase
 };
 
-},{"../Data.Bounded/index.js":54,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Prelude/index.js":177}],221:[function(require,module,exports){
+},{"../Data.Bounded/index.js":43,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Prelude/index.js":166}],210:[function(require,module,exports){
 "use strict";
 
 exports.eventListener = function (fn) {
@@ -21431,7 +19888,7 @@ exports.dispatchEvent = function (event) {
   };
 };
 
-},{}],222:[function(require,module,exports){
+},{}],211:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21446,9 +19903,9 @@ module.exports = {
     dispatchEvent: $foreign.dispatchEvent
 };
 
-},{"../Effect/index.js":166,"../Prelude/index.js":177,"../Web.Event.Event/index.js":219,"../Web.Event.Internal.Types/index.js":223,"./foreign.js":221}],223:[function(require,module,exports){
-arguments[4][107][0].apply(exports,arguments)
-},{"dup":107}],224:[function(require,module,exports){
+},{"../Effect/index.js":155,"../Prelude/index.js":166,"../Web.Event.Event/index.js":208,"../Web.Event.Internal.Types/index.js":212,"./foreign.js":210}],212:[function(require,module,exports){
+arguments[4][96][0].apply(exports,arguments)
+},{"dup":96}],213:[function(require,module,exports){
 "use strict";
 
 exports.typeImpl = function (blob) { return blob.type; };
@@ -21471,7 +19928,7 @@ exports.slice = function (contentType) {
   };
 };
 
-},{}],225:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21527,12 +19984,12 @@ module.exports = {
     slice: $foreign.slice
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Eq/index.js":69,"../Data.Int/index.js":90,"../Data.Maybe/index.js":98,"../Data.MediaType/index.js":99,"../Math/index.js":172,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"./foreign.js":224}],226:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Eq/index.js":58,"../Data.Int/index.js":79,"../Data.Maybe/index.js":87,"../Data.MediaType/index.js":88,"../Math/index.js":161,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"./foreign.js":213}],215:[function(require,module,exports){
 "use strict";
 
 exports.name = function (file) { return file.name; };
 
-},{}],227:[function(require,module,exports){
+},{}],216:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21556,7 +20013,7 @@ module.exports = {
     name: $foreign.name
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Maybe/index.js":98,"../Data.MediaType/index.js":99,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.File.Blob/index.js":225,"./foreign.js":226}],228:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Maybe/index.js":87,"../Data.MediaType/index.js":88,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.File.Blob/index.js":214,"./foreign.js":215}],217:[function(require,module,exports){
 "use strict";
 
 exports.length = function (fileList) { return fileList.length; };
@@ -21567,7 +20024,7 @@ exports._item = function (index) {
   };
 };
 
-},{}],229:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21586,7 +20043,7 @@ module.exports = {
     length: $foreign.length
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Prelude/index.js":177,"../Web.File.File/index.js":227,"./foreign.js":228}],230:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Prelude/index.js":166,"../Web.File.File/index.js":216,"./foreign.js":217}],219:[function(require,module,exports){
 "use strict";
 
 exports.target = function (a) {
@@ -21707,7 +20164,7 @@ exports.setText = function (text) {
   };
 };
 
-},{}],231:[function(require,module,exports){
+},{}],220:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21766,7 +20223,7 @@ module.exports = {
     setText: $foreign.setText
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.DOMTokenList/index.js":191,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":230}],232:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.DOMTokenList/index.js":180,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":219}],221:[function(require,module,exports){
 "use strict";
 
 exports.alt = function (area) {
@@ -21903,7 +20360,7 @@ exports.setType = function (type) {
   };
 };
 
-},{}],233:[function(require,module,exports){
+},{}],222:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -21964,7 +20421,7 @@ module.exports = {
     setType: $foreign.setType
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.DOMTokenList/index.js":191,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":232}],234:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.DOMTokenList/index.js":180,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":221}],223:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -22009,7 +20466,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLMediaElement/index.js":285,"../Web.Internal.FFI/index.js":361}],235:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLMediaElement/index.js":274,"../Web.Internal.FFI/index.js":350}],224:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -22049,7 +20506,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],236:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],225:[function(require,module,exports){
 "use strict";
 
 exports.href = function (base) {
@@ -22082,7 +20539,7 @@ exports.setTarget = function (target) {
   };
 };
 
-},{}],237:[function(require,module,exports){
+},{}],226:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -22129,7 +20586,7 @@ module.exports = {
     setTarget: $foreign.setTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":236}],238:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":225}],227:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -22169,7 +20626,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],239:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],228:[function(require,module,exports){
 "use strict";
 
 exports.autofocus = function (button) {
@@ -22388,7 +20845,7 @@ exports.labels = function (button) {
   };
 };
 
-},{}],240:[function(require,module,exports){
+},{}],229:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -22467,7 +20924,7 @@ module.exports = {
     labels: $foreign.labels
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.NodeList/index.js":205,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.HTML.ValidityState/index.js":355,"../Web.Internal.FFI/index.js":361,"./foreign.js":239}],241:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.NodeList/index.js":194,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.HTML.ValidityState/index.js":344,"../Web.Internal.FFI/index.js":350,"./foreign.js":228}],230:[function(require,module,exports){
 "use strict";
 
 exports.width = function (canvas) {
@@ -22500,7 +20957,7 @@ exports.setHeight = function (height) {
   };
 };
 
-},{}],242:[function(require,module,exports){
+},{}],231:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -22547,7 +21004,7 @@ module.exports = {
     setHeight: $foreign.setHeight
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":241}],243:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":230}],232:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -22587,7 +21044,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],244:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],233:[function(require,module,exports){
 "use strict";
 
 exports.value = function (data) {
@@ -22604,7 +21061,7 @@ exports.setValue = function (value) {
   };
 };
 
-},{}],245:[function(require,module,exports){
+},{}],234:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -22649,7 +21106,7 @@ module.exports = {
     setValue: $foreign.setValue
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":244}],246:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":233}],235:[function(require,module,exports){
 "use strict";
 
 exports.options = function (dle) {
@@ -22658,7 +21115,7 @@ exports.options = function (dle) {
   };
 };
 
-},{}],247:[function(require,module,exports){
+},{}],236:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -22702,7 +21159,7 @@ module.exports = {
     options: $foreign.options
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Unsafe.Coerce/index.js":184,"../Web.DOM.HTMLCollection/index.js":200,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":246}],248:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Unsafe.Coerce/index.js":173,"../Web.DOM.HTMLCollection/index.js":189,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":235}],237:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -22742,7 +21199,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],249:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],238:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Eq = require("../Data.Eq/index.js");
@@ -22861,7 +21318,7 @@ module.exports = {
     showReadyState: showReadyState
 };
 
-},{"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Show/index.js":130,"../Prelude/index.js":177}],250:[function(require,module,exports){
+},{"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Show/index.js":119,"../Prelude/index.js":166}],239:[function(require,module,exports){
 "use strict";
 
 exports._body = function (doc) {
@@ -22908,7 +21365,7 @@ exports.setTitle = function (title) {
     };
   };
 };
-},{}],251:[function(require,module,exports){
+},{}],240:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -22972,7 +21429,7 @@ module.exports = {
     setTitle: $foreign.setTitle
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.Document/index.js":193,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NonElementParentNode/index.js":210,"../Web.DOM.ParentNode/index.js":212,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLDocument.ReadyState/index.js":249,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLScriptElement/index.js":311,"../Web.Internal.FFI/index.js":361,"./foreign.js":250}],252:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.Document/index.js":182,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NonElementParentNode/index.js":199,"../Web.DOM.ParentNode/index.js":201,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLDocument.ReadyState/index.js":238,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLScriptElement/index.js":300,"../Web.Internal.FFI/index.js":350,"./foreign.js":239}],241:[function(require,module,exports){
 "use strict";
 
 exports._read = function (nothing, just, value) {
@@ -23215,7 +21672,7 @@ exports.offsetHeight = function (el) {
   };
 };
 
-},{}],253:[function(require,module,exports){
+},{}],242:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -23305,7 +21762,7 @@ module.exports = {
     offsetHeight: $foreign.offsetHeight
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Function.Uncurried/index.js":77,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.DOMTokenList/index.js":191,"../Web.DOM.Element/index.js":198,"../Web.DOM.Internal.Types/index.js":201,"../Web.DOM.NonDocumentTypeChildNode/index.js":208,"../Web.DOM.ParentNode/index.js":212,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"./foreign.js":252}],254:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Function.Uncurried/index.js":66,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.DOMTokenList/index.js":180,"../Web.DOM.Element/index.js":187,"../Web.DOM.Internal.Types/index.js":190,"../Web.DOM.NonDocumentTypeChildNode/index.js":197,"../Web.DOM.ParentNode/index.js":201,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"./foreign.js":241}],243:[function(require,module,exports){
 "use strict";
 
 exports.src = function (embed) {
@@ -23370,7 +21827,7 @@ exports.setHeight = function (height) {
   };
 };
 
-},{}],255:[function(require,module,exports){
+},{}],244:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -23421,7 +21878,7 @@ module.exports = {
     setHeight: $foreign.setHeight
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":254}],256:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":243}],245:[function(require,module,exports){
 "use strict";
 
 exports.disabled = function (fieldset) {
@@ -23520,7 +21977,7 @@ exports.setCustomValidity = function (value) {
   };
 };
 
-},{}],257:[function(require,module,exports){
+},{}],246:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -23583,7 +22040,7 @@ module.exports = {
     setCustomValidity: $foreign.setCustomValidity
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.HTML.ValidityState/index.js":355,"../Web.Internal.FFI/index.js":361,"./foreign.js":256}],258:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.HTML.ValidityState/index.js":344,"../Web.Internal.FFI/index.js":350,"./foreign.js":245}],247:[function(require,module,exports){
 "use strict";
 
 exports.acceptCharset = function (form) {
@@ -23760,7 +22217,7 @@ exports.checkValidity = function (form) {
   };
 };
 
-},{}],259:[function(require,module,exports){
+},{}],248:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -23825,7 +22282,7 @@ module.exports = {
     checkValidity: $foreign.checkValidity
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":258}],260:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":247}],249:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -23865,7 +22322,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],261:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],250:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -23905,7 +22362,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],262:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],251:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -23945,7 +22402,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],263:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],252:[function(require,module,exports){
 "use strict";
 
 exports.src = function (iframe) {
@@ -24040,7 +22497,7 @@ exports._contentWindow = function (iframe) {
   };
 };
 
-},{}],264:[function(require,module,exports){
+},{}],253:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -24106,7 +22563,7 @@ module.exports = {
     setHeight: $foreign.setHeight
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.Document/index.js":193,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.Window/index.js":357,"../Web.Internal.FFI/index.js":361,"./foreign.js":263}],265:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.Document/index.js":182,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.Window/index.js":346,"../Web.Internal.FFI/index.js":350,"./foreign.js":252}],254:[function(require,module,exports){
 /* global Image */
 "use strict";
 
@@ -24258,7 +22715,7 @@ exports.complete = function (image) {
   };
 };
 
-},{}],266:[function(require,module,exports){
+},{}],255:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -24320,7 +22777,7 @@ module.exports = {
     complete: $foreign.complete
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":265}],267:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":254}],256:[function(require,module,exports){
 "use strict";
 
 exports.accept = function (input) {
@@ -25042,7 +23499,7 @@ exports.setSelectionRange = function (start) {
   };
 };
 
-},{}],268:[function(require,module,exports){
+},{}],257:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -25208,7 +23665,7 @@ module.exports = {
     setSelectionRange: $foreign.setSelectionRange
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.JSDate/index.js":92,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect.Uncurried/index.js":164,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.NodeList/index.js":205,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.File.FileList/index.js":229,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.HTML.SelectionMode/index.js":353,"../Web.HTML.ValidityState/index.js":355,"../Web.Internal.FFI/index.js":361,"./foreign.js":267}],269:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.JSDate/index.js":81,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect.Uncurried/index.js":153,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.NodeList/index.js":194,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.File.FileList/index.js":218,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.HTML.SelectionMode/index.js":342,"../Web.HTML.ValidityState/index.js":344,"../Web.Internal.FFI/index.js":350,"./foreign.js":256}],258:[function(require,module,exports){
 "use strict";
 
 exports.autofocus = function (keygen) {
@@ -25355,7 +23812,7 @@ exports.labels = function (keygen) {
   };
 };
 
-},{}],270:[function(require,module,exports){
+},{}],259:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -25425,7 +23882,7 @@ module.exports = {
     labels: $foreign.labels
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.NodeList/index.js":205,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.HTML.ValidityState/index.js":355,"../Web.Internal.FFI/index.js":361,"./foreign.js":269}],271:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.NodeList/index.js":194,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.HTML.ValidityState/index.js":344,"../Web.Internal.FFI/index.js":350,"./foreign.js":258}],260:[function(require,module,exports){
 "use strict";
 
 exports.value = function (li) {
@@ -25442,7 +23899,7 @@ exports.setValue = function (value) {
   };
 };
 
-},{}],272:[function(require,module,exports){
+},{}],261:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -25487,7 +23944,7 @@ module.exports = {
     setValue: $foreign.setValue
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":271}],273:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":260}],262:[function(require,module,exports){
 "use strict";
 
 exports._form = function (label) {
@@ -25520,7 +23977,7 @@ exports._control = function (label) {
   };
 };
 
-},{}],274:[function(require,module,exports){
+},{}],263:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -25577,7 +24034,7 @@ module.exports = {
     setHtmlFor: $foreign.setHtmlFor
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.Internal.FFI/index.js":361,"./foreign.js":273}],275:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.Internal.FFI/index.js":350,"./foreign.js":262}],264:[function(require,module,exports){
 "use strict";
 
 exports._form = function (le) {
@@ -25586,7 +24043,7 @@ exports._form = function (le) {
   };
 };
 
-},{}],276:[function(require,module,exports){
+},{}],265:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -25637,7 +24094,7 @@ module.exports = {
     form: form
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.Internal.FFI/index.js":361,"./foreign.js":275}],277:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.Internal.FFI/index.js":350,"./foreign.js":264}],266:[function(require,module,exports){
 "use strict";
 
 exports.disabled = function (link) {
@@ -25774,7 +24231,7 @@ exports.setType = function (type) {
   };
 };
 
-},{}],278:[function(require,module,exports){
+},{}],267:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -25835,7 +24292,7 @@ module.exports = {
     setType: $foreign.setType
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.DOMTokenList/index.js":191,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":277}],279:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.DOMTokenList/index.js":180,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":266}],268:[function(require,module,exports){
 "use strict";
 
 exports.name = function (map) {
@@ -25868,7 +24325,7 @@ exports.images = function (map) {
   };
 };
 
-},{}],280:[function(require,module,exports){
+},{}],269:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -25916,7 +24373,7 @@ module.exports = {
     images: $foreign.images
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.HTMLCollection/index.js":200,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":279}],281:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.HTMLCollection/index.js":189,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":268}],270:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Eq = require("../Data.Eq/index.js");
@@ -26035,7 +24492,7 @@ module.exports = {
     showCanPlayType: showCanPlayType
 };
 
-},{"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Show/index.js":130,"../Prelude/index.js":177}],282:[function(require,module,exports){
+},{"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Show/index.js":119,"../Prelude/index.js":166}],271:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Bounded = require("../Data.Bounded/index.js");
@@ -26197,7 +24654,7 @@ module.exports = {
     showNetworkState: showNetworkState
 };
 
-},{"../Data.Bounded/index.js":54,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Show/index.js":130,"../Prelude/index.js":177}],283:[function(require,module,exports){
+},{"../Data.Bounded/index.js":43,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Show/index.js":119,"../Prelude/index.js":166}],272:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Bounded = require("../Data.Bounded/index.js");
@@ -26388,7 +24845,7 @@ module.exports = {
     showReadyState: showReadyState
 };
 
-},{"../Data.Bounded/index.js":54,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Show/index.js":130,"../Prelude/index.js":177}],284:[function(require,module,exports){
+},{"../Data.Bounded/index.js":43,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Show/index.js":119,"../Prelude/index.js":166}],273:[function(require,module,exports){
 "use strict";
 
 exports.src = function (media) {
@@ -26687,7 +25144,7 @@ exports.setDefaultMuted = function (defaultMuted) {
   };
 };
 
-},{}],285:[function(require,module,exports){
+},{}],274:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -26800,7 +25257,7 @@ module.exports = {
     setDefaultMuted: $foreign.setDefaultMuted
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Enum/index.js":67,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.JSDate/index.js":92,"../Data.Maybe/index.js":98,"../Effect.Uncurried/index.js":164,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLMediaElement.CanPlayType/index.js":281,"../Web.HTML.HTMLMediaElement.NetworkState/index.js":282,"../Web.HTML.HTMLMediaElement.ReadyState/index.js":283,"../Web.Internal.FFI/index.js":361,"./foreign.js":284}],286:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Enum/index.js":56,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.JSDate/index.js":81,"../Data.Maybe/index.js":87,"../Effect.Uncurried/index.js":153,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLMediaElement.CanPlayType/index.js":270,"../Web.HTML.HTMLMediaElement.NetworkState/index.js":271,"../Web.HTML.HTMLMediaElement.ReadyState/index.js":272,"../Web.Internal.FFI/index.js":350,"./foreign.js":273}],275:[function(require,module,exports){
 "use strict";
 
 exports.name = function (meta) {
@@ -26849,7 +25306,7 @@ exports.setContent = function (content) {
   };
 };
 
-},{}],287:[function(require,module,exports){
+},{}],276:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -26898,7 +25355,7 @@ module.exports = {
     setContent: $foreign.setContent
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":286}],288:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":275}],277:[function(require,module,exports){
 "use strict";
 
 exports.value = function (meter) {
@@ -27003,7 +25460,7 @@ exports.labels = function (meter) {
   };
 };
 
-},{}],289:[function(require,module,exports){
+},{}],278:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -27060,7 +25517,7 @@ module.exports = {
     labels: $foreign.labels
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.NodeList/index.js":205,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":288}],290:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.NodeList/index.js":194,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":277}],279:[function(require,module,exports){
 "use strict";
 
 exports.cite = function (mod) {
@@ -27093,7 +25550,7 @@ exports.setDateTime = function (dateTime) {
   };
 };
 
-},{}],291:[function(require,module,exports){
+},{}],280:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -27140,7 +25597,7 @@ module.exports = {
     setDateTime: $foreign.setDateTime
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":290}],292:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":279}],281:[function(require,module,exports){
 "use strict";
 
 exports.reversed = function (ol) {
@@ -27189,7 +25646,7 @@ exports.setType = function (type) {
   };
 };
 
-},{}],293:[function(require,module,exports){
+},{}],282:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -27238,7 +25695,7 @@ module.exports = {
     setType: $foreign.setType
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":292}],294:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":281}],283:[function(require,module,exports){
 "use strict";
 
 exports.data_ = function (object) {
@@ -27401,7 +25858,7 @@ exports.setCustomValidity = function (value) {
   };
 };
 
-},{}],295:[function(require,module,exports){
+},{}],284:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -27476,7 +25933,7 @@ module.exports = {
     setCustomValidity: $foreign.setCustomValidity
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.Document/index.js":193,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.HTML.ValidityState/index.js":355,"../Web.Internal.FFI/index.js":361,"./foreign.js":294}],296:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.Document/index.js":182,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.HTML.ValidityState/index.js":344,"../Web.Internal.FFI/index.js":350,"./foreign.js":283}],285:[function(require,module,exports){
 "use strict";
 
 exports.disabled = function (optgroup) {
@@ -27509,7 +25966,7 @@ exports.setLabel = function (label) {
   };
 };
 
-},{}],297:[function(require,module,exports){
+},{}],286:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -27556,7 +26013,7 @@ module.exports = {
     setLabel: $foreign.setLabel
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":296}],298:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":285}],287:[function(require,module,exports){
 "use strict";
 
 exports.disabled = function (option) {
@@ -27669,7 +26126,7 @@ exports.index = function (option) {
   };
 };
 
-},{}],299:[function(require,module,exports){
+},{}],288:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -27733,7 +26190,7 @@ module.exports = {
     index: $foreign.index
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.Internal.FFI/index.js":361,"./foreign.js":298}],300:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.Internal.FFI/index.js":350,"./foreign.js":287}],289:[function(require,module,exports){
 "use strict";
 
 exports._form = function (output) {
@@ -27848,7 +26305,7 @@ exports.labels = function (output) {
   };
 };
 
-},{}],301:[function(require,module,exports){
+},{}],290:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -27914,7 +26371,7 @@ module.exports = {
     labels: $foreign.labels
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.NodeList/index.js":205,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.HTML.ValidityState/index.js":355,"../Web.Internal.FFI/index.js":361,"./foreign.js":300}],302:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.NodeList/index.js":194,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.HTML.ValidityState/index.js":344,"../Web.Internal.FFI/index.js":350,"./foreign.js":289}],291:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -27954,7 +26411,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],303:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],292:[function(require,module,exports){
 "use strict";
 
 exports.name = function (param) {
@@ -27987,7 +26444,7 @@ exports.setValue = function (value) {
   };
 };
 
-},{}],304:[function(require,module,exports){
+},{}],293:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -28034,7 +26491,7 @@ module.exports = {
     setValue: $foreign.setValue
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":303}],305:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":292}],294:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -28074,7 +26531,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],306:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],295:[function(require,module,exports){
 "use strict";
 
 exports.value = function (progress) {
@@ -28123,7 +26580,7 @@ exports.labels = function (progress) {
   };
 };
 
-},{}],307:[function(require,module,exports){
+},{}],296:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -28173,7 +26630,7 @@ module.exports = {
     labels: $foreign.labels
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.NodeList/index.js":205,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":306}],308:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.NodeList/index.js":194,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":295}],297:[function(require,module,exports){
 "use strict";
 
 exports.cite = function (quote) {
@@ -28190,7 +26647,7 @@ exports.setCite = function (cite) {
   };
 };
 
-},{}],309:[function(require,module,exports){
+},{}],298:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -28235,7 +26692,7 @@ module.exports = {
     setCite: $foreign.setCite
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":308}],310:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":297}],299:[function(require,module,exports){
 "use strict";
 
 exports.src = function (script) {
@@ -28348,7 +26805,7 @@ exports.setText = function (text) {
   };
 };
 
-},{}],311:[function(require,module,exports){
+},{}],300:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -28405,7 +26862,7 @@ module.exports = {
     setText: $foreign.setText
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":310}],312:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":299}],301:[function(require,module,exports){
 "use strict";
 
 exports.autofocus = function (select) {
@@ -28624,7 +27081,7 @@ exports.labels = function (select) {
   };
 };
 
-},{}],313:[function(require,module,exports){
+},{}],302:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -28704,7 +27161,7 @@ module.exports = {
     labels: $foreign.labels
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.HTMLCollection/index.js":200,"../Web.DOM.NodeList/index.js":205,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.HTML.ValidityState/index.js":355,"../Web.Internal.FFI/index.js":361,"./foreign.js":312}],314:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.HTMLCollection/index.js":189,"../Web.DOM.NodeList/index.js":194,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.HTML.ValidityState/index.js":344,"../Web.Internal.FFI/index.js":350,"./foreign.js":301}],303:[function(require,module,exports){
 "use strict";
 
 exports.src = function (source) {
@@ -28753,7 +27210,7 @@ exports.setMedia = function (media) {
   };
 };
 
-},{}],315:[function(require,module,exports){
+},{}],304:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -28802,7 +27259,7 @@ module.exports = {
     setMedia: $foreign.setMedia
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":314}],316:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":303}],305:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -28842,7 +27299,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],317:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],306:[function(require,module,exports){
 "use strict";
 
 exports.media = function (style) {
@@ -28875,7 +27332,7 @@ exports.setType = function (type) {
   };
 };
 
-},{}],318:[function(require,module,exports){
+},{}],307:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -28922,7 +27379,7 @@ module.exports = {
     setType: $foreign.setType
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":317}],319:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":306}],308:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -28962,7 +27419,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],320:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],309:[function(require,module,exports){
 "use strict";
 
 exports.colSpan = function (cell) {
@@ -29003,7 +27460,7 @@ exports.cellIndex = function (cell) {
   };
 };
 
-},{}],321:[function(require,module,exports){
+},{}],310:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -29051,7 +27508,7 @@ module.exports = {
     cellIndex: $foreign.cellIndex
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":320}],322:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":309}],311:[function(require,module,exports){
 "use strict";
 
 exports.span = function (col) {
@@ -29068,7 +27525,7 @@ exports.setSpan = function (span) {
   };
 };
 
-},{}],323:[function(require,module,exports){
+},{}],312:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -29113,7 +27570,7 @@ module.exports = {
     setSpan: $foreign.setSpan
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":322}],324:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":311}],313:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -29158,7 +27615,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLTableCellElement/index.js":321,"../Web.Internal.FFI/index.js":361}],325:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLTableCellElement/index.js":310,"../Web.Internal.FFI/index.js":350}],314:[function(require,module,exports){
 "use strict";
 
 exports._caption = function (table) {
@@ -29315,7 +27772,7 @@ exports.setBorder = function (border) {
   };
 };
 
-},{}],326:[function(require,module,exports){
+},{}],315:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -29404,7 +27861,7 @@ module.exports = {
     setBorder: $foreign.setBorder
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Data.Ring/index.js":120,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.HTMLCollection/index.js":200,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLTableCaptionElement/index.js":319,"../Web.HTML.HTMLTableSectionElement/index.js":332,"../Web.Internal.FFI/index.js":361,"./foreign.js":325}],327:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Data.Ring/index.js":109,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.HTMLCollection/index.js":189,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLTableCaptionElement/index.js":308,"../Web.HTML.HTMLTableSectionElement/index.js":321,"../Web.Internal.FFI/index.js":350,"./foreign.js":314}],316:[function(require,module,exports){
 "use strict";
 
 exports.scope = function (cell) {
@@ -29437,7 +27894,7 @@ exports.setAbbr = function (abbr) {
   };
 };
 
-},{}],328:[function(require,module,exports){
+},{}],317:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -29489,7 +27946,7 @@ module.exports = {
     setAbbr: $foreign.setAbbr
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLTableCellElement/index.js":321,"../Web.Internal.FFI/index.js":361,"./foreign.js":327}],329:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLTableCellElement/index.js":310,"../Web.Internal.FFI/index.js":350,"./foreign.js":316}],318:[function(require,module,exports){
 "use strict";
 
 exports.rowIndex = function (row) {
@@ -29542,7 +27999,7 @@ exports.deleteCell = function (index) {
   };
 };
 
-},{}],330:[function(require,module,exports){
+},{}],319:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -29594,7 +28051,7 @@ module.exports = {
     deleteCell: $foreign.deleteCell
 };
 
-},{"../Data.Maybe/index.js":98,"../Data.Ring/index.js":120,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.HTMLCollection/index.js":200,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":329}],331:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Data.Ring/index.js":109,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.HTMLCollection/index.js":189,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":318}],320:[function(require,module,exports){
 "use strict";
 
 exports.rows = function (section) {
@@ -29623,7 +28080,7 @@ exports.deleteRow = function (index) {
   };
 };
 
-},{}],332:[function(require,module,exports){
+},{}],321:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -29673,7 +28130,7 @@ module.exports = {
     deleteRow: $foreign.deleteRow
 };
 
-},{"../Data.Maybe/index.js":98,"../Data.Ring/index.js":120,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.HTMLCollection/index.js":200,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":331}],333:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Data.Ring/index.js":109,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.HTMLCollection/index.js":189,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":320}],322:[function(require,module,exports){
 "use strict";
 
 exports.content = function (template) {
@@ -29682,7 +28139,7 @@ exports.content = function (template) {
   };
 };
 
-},{}],334:[function(require,module,exports){
+},{}],323:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -29726,7 +28183,7 @@ module.exports = {
     content: $foreign.content
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Unsafe.Coerce/index.js":184,"../Web.DOM.DocumentFragment/index.js":194,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":333}],335:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Unsafe.Coerce/index.js":173,"../Web.DOM.DocumentFragment/index.js":183,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":322}],324:[function(require,module,exports){
 "use strict";
 
 exports.autocomplete = function (textarea) {
@@ -30125,7 +28582,7 @@ exports.setSelectionRange = function (start) {
   };
 };
 
-},{}],336:[function(require,module,exports){
+},{}],325:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -30241,7 +28698,7 @@ module.exports = {
     setSelectionRange: $foreign.setSelectionRange
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect.Uncurried/index.js":164,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM.NodeList/index.js":205,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.HTML.SelectionMode/index.js":353,"../Web.HTML.ValidityState/index.js":355,"../Web.Internal.FFI/index.js":361,"./foreign.js":335}],337:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect.Uncurried/index.js":153,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM.NodeList/index.js":194,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.HTML.SelectionMode/index.js":342,"../Web.HTML.ValidityState/index.js":344,"../Web.Internal.FFI/index.js":350,"./foreign.js":324}],326:[function(require,module,exports){
 "use strict";
 
 exports.dateTime = function (time) {
@@ -30258,7 +28715,7 @@ exports.setDateTime = function (dateTime) {
   };
 };
 
-},{}],338:[function(require,module,exports){
+},{}],327:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -30303,7 +28760,7 @@ module.exports = {
     setDateTime: $foreign.setDateTime
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":337}],339:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":326}],328:[function(require,module,exports){
 "use strict";
 
 exports.text = function (title) {
@@ -30320,7 +28777,7 @@ exports.setText = function (text) {
   };
 };
 
-},{}],340:[function(require,module,exports){
+},{}],329:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -30365,7 +28822,7 @@ module.exports = {
     setText: $foreign.setText
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361,"./foreign.js":339}],341:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350,"./foreign.js":328}],330:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Bounded = require("../Data.Bounded/index.js");
@@ -30529,7 +28986,7 @@ module.exports = {
     showReadyState: showReadyState
 };
 
-},{"../Data.Bounded/index.js":54,"../Data.Enum/index.js":67,"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Show/index.js":130,"../Prelude/index.js":177}],342:[function(require,module,exports){
+},{"../Data.Bounded/index.js":43,"../Data.Enum/index.js":56,"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Show/index.js":119,"../Prelude/index.js":166}],331:[function(require,module,exports){
 "use strict";
 
 exports.kind = function (track) {
@@ -30616,7 +29073,7 @@ exports._readyState = function (track) {
   return track.readyState;
 };
 
-},{}],343:[function(require,module,exports){
+},{}],332:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -30683,7 +29140,7 @@ module.exports = {
     setDefault: $foreign.setDefault
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Enum/index.js":67,"../Data.Function/index.js":78,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Effect.Uncurried/index.js":164,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLTrackElement.ReadyState/index.js":341,"../Web.Internal.FFI/index.js":361,"./foreign.js":342}],344:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Enum/index.js":56,"../Data.Function/index.js":67,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Effect.Uncurried/index.js":153,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLTrackElement.ReadyState/index.js":330,"../Web.Internal.FFI/index.js":350,"./foreign.js":331}],333:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -30723,7 +29180,7 @@ module.exports = {
     toEventTarget: toEventTarget
 };
 
-},{"../Data.Maybe/index.js":98,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.Internal.FFI/index.js":361}],345:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.Internal.FFI/index.js":350}],334:[function(require,module,exports){
 "use strict";
 
 // ----------------------------------------------------------------------------
@@ -30790,7 +29247,7 @@ exports.setPoster = function (poster) {
   };
 };
 
-},{}],346:[function(require,module,exports){
+},{}],335:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -30846,7 +29303,7 @@ module.exports = {
     setPoster: $foreign.setPoster
 };
 
-},{"../Data.Maybe/index.js":98,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.DOM/index.js":217,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLMediaElement/index.js":285,"../Web.Internal.FFI/index.js":361,"./foreign.js":345}],347:[function(require,module,exports){
+},{"../Data.Maybe/index.js":87,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.DOM/index.js":206,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLMediaElement/index.js":274,"../Web.Internal.FFI/index.js":350,"./foreign.js":334}],336:[function(require,module,exports){
 "use strict";
 
 exports.back = function(history) {
@@ -30894,7 +29351,7 @@ exports.state = function(history) {
   };
 };
 
-},{}],348:[function(require,module,exports){
+},{}],337:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -30979,7 +29436,7 @@ module.exports = {
     state: $foreign.state
 };
 
-},{"../Data.Eq/index.js":69,"../Data.Newtype/index.js":108,"../Data.Ord/index.js":117,"../Effect/index.js":166,"../Foreign/index.js":168,"../Prelude/index.js":177,"./foreign.js":347}],349:[function(require,module,exports){
+},{"../Data.Eq/index.js":58,"../Data.Newtype/index.js":97,"../Data.Ord/index.js":106,"../Effect/index.js":155,"../Foreign/index.js":157,"../Prelude/index.js":166,"./foreign.js":336}],338:[function(require,module,exports){
 "use strict";
 
 exports.hash = function (location) {
@@ -31152,7 +29609,7 @@ exports.reload = function (location) {
   };
 };
 
-},{}],350:[function(require,module,exports){
+},{}],339:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -31182,7 +29639,7 @@ module.exports = {
     reload: $foreign.reload
 };
 
-},{"../Effect/index.js":166,"../Prelude/index.js":177,"./foreign.js":349}],351:[function(require,module,exports){
+},{"../Effect/index.js":155,"../Prelude/index.js":166,"./foreign.js":338}],340:[function(require,module,exports){
 "use strict";
 
 exports.language = function (navigator) {
@@ -31202,7 +29659,7 @@ exports.userAgent = function (navigator) {
     return navigator.userAgent;
   };
 };
-},{}],352:[function(require,module,exports){
+},{}],341:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -31213,7 +29670,7 @@ module.exports = {
     userAgent: $foreign.userAgent
 };
 
-},{"../Effect/index.js":166,"./foreign.js":351}],353:[function(require,module,exports){
+},{"../Effect/index.js":155,"./foreign.js":340}],342:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var Data_Eq = require("../Data.Eq/index.js");
@@ -31361,14 +29818,14 @@ module.exports = {
     showSelectionMode: showSelectionMode
 };
 
-},{"../Data.Eq/index.js":69,"../Data.Maybe/index.js":98,"../Data.Ord/index.js":117,"../Data.Ordering/index.js":118,"../Data.Show/index.js":130,"../Prelude/index.js":177}],354:[function(require,module,exports){
+},{"../Data.Eq/index.js":58,"../Data.Maybe/index.js":87,"../Data.Ord/index.js":106,"../Data.Ordering/index.js":107,"../Data.Show/index.js":119,"../Prelude/index.js":166}],343:[function(require,module,exports){
 "use strict";
 
 exports.readProp = function (prop, vs) {
   return vs[prop];
 };
 
-},{}],355:[function(require,module,exports){
+},{}],344:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -31399,7 +29856,7 @@ module.exports = {
     valid: valid
 };
 
-},{"../Effect.Uncurried/index.js":164,"../Effect/index.js":166,"./foreign.js":354}],356:[function(require,module,exports){
+},{"../Effect.Uncurried/index.js":153,"../Effect/index.js":155,"./foreign.js":343}],345:[function(require,module,exports){
 "use strict";
 
 exports.document = function (window) {
@@ -31632,7 +30089,7 @@ exports._cancelIdleCallback = function(id) {
   };
 };
 
-},{}],357:[function(require,module,exports){
+},{}],346:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -31768,7 +30225,7 @@ module.exports = {
     sessionStorage: $foreign.sessionStorage
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Eq/index.js":69,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Newtype/index.js":108,"../Data.Nullable/index.js":111,"../Data.Ord/index.js":117,"../Effect/index.js":166,"../Prelude/index.js":177,"../Unsafe.Coerce/index.js":184,"../Web.Event.EventTarget/index.js":222,"../Web.HTML.HTMLDocument/index.js":251,"../Web.HTML.History/index.js":348,"../Web.HTML.Location/index.js":350,"../Web.HTML.Navigator/index.js":352,"../Web.Storage.Storage/index.js":363,"./foreign.js":356}],358:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Eq/index.js":58,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Newtype/index.js":97,"../Data.Nullable/index.js":100,"../Data.Ord/index.js":106,"../Effect/index.js":155,"../Prelude/index.js":166,"../Unsafe.Coerce/index.js":173,"../Web.Event.EventTarget/index.js":211,"../Web.HTML.HTMLDocument/index.js":240,"../Web.HTML.History/index.js":337,"../Web.HTML.Location/index.js":339,"../Web.HTML.Navigator/index.js":341,"../Web.Storage.Storage/index.js":352,"./foreign.js":345}],347:[function(require,module,exports){
 /* global window */
 "use strict";
 
@@ -31776,7 +30233,7 @@ exports.window = function () {
   return window;
 };
 
-},{}],359:[function(require,module,exports){
+},{}],348:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -31852,7 +30309,7 @@ module.exports = {
     window: $foreign.window
 };
 
-},{"../Effect/index.js":166,"../Web.HTML.HTMLAnchorElement/index.js":231,"../Web.HTML.HTMLAreaElement/index.js":233,"../Web.HTML.HTMLAudioElement/index.js":234,"../Web.HTML.HTMLBRElement/index.js":235,"../Web.HTML.HTMLBaseElement/index.js":237,"../Web.HTML.HTMLBodyElement/index.js":238,"../Web.HTML.HTMLButtonElement/index.js":240,"../Web.HTML.HTMLCanvasElement/index.js":242,"../Web.HTML.HTMLDListElement/index.js":243,"../Web.HTML.HTMLDataElement/index.js":245,"../Web.HTML.HTMLDataListElement/index.js":247,"../Web.HTML.HTMLDivElement/index.js":248,"../Web.HTML.HTMLDocument/index.js":251,"../Web.HTML.HTMLElement/index.js":253,"../Web.HTML.HTMLEmbedElement/index.js":255,"../Web.HTML.HTMLFieldSetElement/index.js":257,"../Web.HTML.HTMLFormElement/index.js":259,"../Web.HTML.HTMLHRElement/index.js":260,"../Web.HTML.HTMLHeadElement/index.js":261,"../Web.HTML.HTMLHeadingElement/index.js":262,"../Web.HTML.HTMLIFrameElement/index.js":264,"../Web.HTML.HTMLImageElement/index.js":266,"../Web.HTML.HTMLInputElement/index.js":268,"../Web.HTML.HTMLKeygenElement/index.js":270,"../Web.HTML.HTMLLIElement/index.js":272,"../Web.HTML.HTMLLabelElement/index.js":274,"../Web.HTML.HTMLLegendElement/index.js":276,"../Web.HTML.HTMLLinkElement/index.js":278,"../Web.HTML.HTMLMapElement/index.js":280,"../Web.HTML.HTMLMediaElement/index.js":285,"../Web.HTML.HTMLMetaElement/index.js":287,"../Web.HTML.HTMLMeterElement/index.js":289,"../Web.HTML.HTMLModElement/index.js":291,"../Web.HTML.HTMLOListElement/index.js":293,"../Web.HTML.HTMLObjectElement/index.js":295,"../Web.HTML.HTMLOptGroupElement/index.js":297,"../Web.HTML.HTMLOptionElement/index.js":299,"../Web.HTML.HTMLOutputElement/index.js":301,"../Web.HTML.HTMLParagraphElement/index.js":302,"../Web.HTML.HTMLParamElement/index.js":304,"../Web.HTML.HTMLPreElement/index.js":305,"../Web.HTML.HTMLProgressElement/index.js":307,"../Web.HTML.HTMLQuoteElement/index.js":309,"../Web.HTML.HTMLScriptElement/index.js":311,"../Web.HTML.HTMLSelectElement/index.js":313,"../Web.HTML.HTMLSourceElement/index.js":315,"../Web.HTML.HTMLSpanElement/index.js":316,"../Web.HTML.HTMLStyleElement/index.js":318,"../Web.HTML.HTMLTableCaptionElement/index.js":319,"../Web.HTML.HTMLTableCellElement/index.js":321,"../Web.HTML.HTMLTableColElement/index.js":323,"../Web.HTML.HTMLTableDataCellElement/index.js":324,"../Web.HTML.HTMLTableElement/index.js":326,"../Web.HTML.HTMLTableHeaderCellElement/index.js":328,"../Web.HTML.HTMLTableRowElement/index.js":330,"../Web.HTML.HTMLTableSectionElement/index.js":332,"../Web.HTML.HTMLTemplateElement/index.js":334,"../Web.HTML.HTMLTextAreaElement/index.js":336,"../Web.HTML.HTMLTimeElement/index.js":338,"../Web.HTML.HTMLTitleElement/index.js":340,"../Web.HTML.HTMLTrackElement/index.js":343,"../Web.HTML.HTMLUListElement/index.js":344,"../Web.HTML.HTMLVideoElement/index.js":346,"../Web.HTML.History/index.js":348,"../Web.HTML.Location/index.js":350,"../Web.HTML.Navigator/index.js":352,"../Web.HTML.Window/index.js":357,"./foreign.js":358}],360:[function(require,module,exports){
+},{"../Effect/index.js":155,"../Web.HTML.HTMLAnchorElement/index.js":220,"../Web.HTML.HTMLAreaElement/index.js":222,"../Web.HTML.HTMLAudioElement/index.js":223,"../Web.HTML.HTMLBRElement/index.js":224,"../Web.HTML.HTMLBaseElement/index.js":226,"../Web.HTML.HTMLBodyElement/index.js":227,"../Web.HTML.HTMLButtonElement/index.js":229,"../Web.HTML.HTMLCanvasElement/index.js":231,"../Web.HTML.HTMLDListElement/index.js":232,"../Web.HTML.HTMLDataElement/index.js":234,"../Web.HTML.HTMLDataListElement/index.js":236,"../Web.HTML.HTMLDivElement/index.js":237,"../Web.HTML.HTMLDocument/index.js":240,"../Web.HTML.HTMLElement/index.js":242,"../Web.HTML.HTMLEmbedElement/index.js":244,"../Web.HTML.HTMLFieldSetElement/index.js":246,"../Web.HTML.HTMLFormElement/index.js":248,"../Web.HTML.HTMLHRElement/index.js":249,"../Web.HTML.HTMLHeadElement/index.js":250,"../Web.HTML.HTMLHeadingElement/index.js":251,"../Web.HTML.HTMLIFrameElement/index.js":253,"../Web.HTML.HTMLImageElement/index.js":255,"../Web.HTML.HTMLInputElement/index.js":257,"../Web.HTML.HTMLKeygenElement/index.js":259,"../Web.HTML.HTMLLIElement/index.js":261,"../Web.HTML.HTMLLabelElement/index.js":263,"../Web.HTML.HTMLLegendElement/index.js":265,"../Web.HTML.HTMLLinkElement/index.js":267,"../Web.HTML.HTMLMapElement/index.js":269,"../Web.HTML.HTMLMediaElement/index.js":274,"../Web.HTML.HTMLMetaElement/index.js":276,"../Web.HTML.HTMLMeterElement/index.js":278,"../Web.HTML.HTMLModElement/index.js":280,"../Web.HTML.HTMLOListElement/index.js":282,"../Web.HTML.HTMLObjectElement/index.js":284,"../Web.HTML.HTMLOptGroupElement/index.js":286,"../Web.HTML.HTMLOptionElement/index.js":288,"../Web.HTML.HTMLOutputElement/index.js":290,"../Web.HTML.HTMLParagraphElement/index.js":291,"../Web.HTML.HTMLParamElement/index.js":293,"../Web.HTML.HTMLPreElement/index.js":294,"../Web.HTML.HTMLProgressElement/index.js":296,"../Web.HTML.HTMLQuoteElement/index.js":298,"../Web.HTML.HTMLScriptElement/index.js":300,"../Web.HTML.HTMLSelectElement/index.js":302,"../Web.HTML.HTMLSourceElement/index.js":304,"../Web.HTML.HTMLSpanElement/index.js":305,"../Web.HTML.HTMLStyleElement/index.js":307,"../Web.HTML.HTMLTableCaptionElement/index.js":308,"../Web.HTML.HTMLTableCellElement/index.js":310,"../Web.HTML.HTMLTableColElement/index.js":312,"../Web.HTML.HTMLTableDataCellElement/index.js":313,"../Web.HTML.HTMLTableElement/index.js":315,"../Web.HTML.HTMLTableHeaderCellElement/index.js":317,"../Web.HTML.HTMLTableRowElement/index.js":319,"../Web.HTML.HTMLTableSectionElement/index.js":321,"../Web.HTML.HTMLTemplateElement/index.js":323,"../Web.HTML.HTMLTextAreaElement/index.js":325,"../Web.HTML.HTMLTimeElement/index.js":327,"../Web.HTML.HTMLTitleElement/index.js":329,"../Web.HTML.HTMLTrackElement/index.js":332,"../Web.HTML.HTMLUListElement/index.js":333,"../Web.HTML.HTMLVideoElement/index.js":335,"../Web.HTML.History/index.js":337,"../Web.HTML.Location/index.js":339,"../Web.HTML.Navigator/index.js":341,"../Web.HTML.Window/index.js":346,"./foreign.js":347}],349:[function(require,module,exports){
 "use strict";
 
 exports._unsafeReadProtoTagged = function (nothing, just, name, value) {
@@ -31877,7 +30334,7 @@ exports._unsafeReadProtoTagged = function (nothing, just, name, value) {
   return nothing;
 };
 
-},{}],361:[function(require,module,exports){
+},{}],350:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -31892,7 +30349,7 @@ module.exports = {
     unsafeReadProtoTagged: unsafeReadProtoTagged
 };
 
-},{"../Data.Function.Uncurried/index.js":77,"../Data.Maybe/index.js":98,"./foreign.js":360}],362:[function(require,module,exports){
+},{"../Data.Function.Uncurried/index.js":66,"../Data.Maybe/index.js":87,"./foreign.js":349}],351:[function(require,module,exports){
 "use strict";
 
 exports.length = function (storage) {
@@ -31941,7 +30398,7 @@ exports.clear = function (storage) {
   };
 };
 
-},{}],363:[function(require,module,exports){
+},{}],352:[function(require,module,exports){
 // Generated by purs version 0.12.1
 "use strict";
 var $foreign = require("./foreign.js");
@@ -31970,7 +30427,7 @@ module.exports = {
     clear: $foreign.clear
 };
 
-},{"../Control.Semigroupoid/index.js":35,"../Data.Functor/index.js":81,"../Data.Maybe/index.js":98,"../Data.Nullable/index.js":111,"../Effect/index.js":166,"../Prelude/index.js":177,"./foreign.js":362}],364:[function(require,module,exports){
+},{"../Control.Semigroupoid/index.js":31,"../Data.Functor/index.js":70,"../Data.Maybe/index.js":87,"../Data.Nullable/index.js":100,"../Effect/index.js":155,"../Prelude/index.js":166,"./foreign.js":351}],353:[function(require,module,exports){
 require('Clock').main();
 
-},{"Clock":2}]},{},[364]);
+},{"Clock":2}]},{},[353]);
