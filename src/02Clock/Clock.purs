@@ -78,4 +78,8 @@ main = do
           case mHourHand of
             Nothing -> logShow "Nothing"
             Just hourHand -> do
-              void $ setInterval 1000 (setDate (ClockHands { secondHand: secondHand, minuteHand: minuteHand, hourHand: hourHand }))
+              void $ setInterval 1000
+                (setDate (ClockHands { secondHand: secondHand
+                                     , minuteHand: minuteHand
+                                     , hourHand: hourHand
+                                     }))

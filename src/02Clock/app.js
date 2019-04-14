@@ -102,11 +102,11 @@ var main = function __do() {
                     hourHand: v3.value0
                 }))))();
             };
-            throw new Error("Failed pattern match at Clock line 78, column 11 - line 81, column 131: " + [ v3.constructor.name ]);
+            throw new Error("Failed pattern match at Clock line 78, column 11 - line 85, column 40: " + [ v3.constructor.name ]);
         };
-        throw new Error("Failed pattern match at Clock line 75, column 7 - line 81, column 131: " + [ v2.constructor.name ]);
+        throw new Error("Failed pattern match at Clock line 75, column 7 - line 85, column 40: " + [ v2.constructor.name ]);
     };
-    throw new Error("Failed pattern match at Clock line 72, column 3 - line 81, column 131: " + [ v1.constructor.name ]);
+    throw new Error("Failed pattern match at Clock line 72, column 3 - line 85, column 40: " + [ v1.constructor.name ]);
 };
 module.exports = {
     transform: transform,
