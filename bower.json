@@ -14,7 +14,10 @@
     "purescript-web-html": "^2.0.0",
     "purescript-web-uievents": "^2.0.0",
     "purescript-web-dom": "^2.0.0",
-    "purescript-transformers": "^4.2.0"
+    "purescript-transformers": "^4.2.0",
+    "purescript-js-timers": "^4.0.1",
+    "purescript-js-date": "^6.0.0",
+    "purescript-arrays": "^5.2.1"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0"
