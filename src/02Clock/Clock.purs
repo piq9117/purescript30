@@ -2,7 +2,7 @@ module Clock where
 
 import Prelude
 
-import Control.Monad.Reader.Trans (class MonadAsk, runReaderT, ask)
+import Control.Monad.Reader.Trans (runReaderT, ask, ReaderT)
 import Data.JSDate (getHours, getMinutes, getSeconds, now)
 import Data.Maybe (Maybe(..))
 
@@ -35,10 +35,9 @@ docNode = do
 
 getElement
   :: forall m. Bind m
-  => MonadAsk ParentNode m
   => MonadEffect m
   => String
-  -> m (Maybe Element)
+  -> ReaderT ParentNode m (Maybe Element)
 getElement className = do
   p <- ask
   mElement <-
