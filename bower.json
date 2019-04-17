@@ -17,7 +17,11 @@
     "purescript-transformers": "^4.2.0",
     "purescript-js-timers": "^4.0.1",
     "purescript-js-date": "^6.0.0",
-    "purescript-arrays": "^5.2.1"
+    "purescript-arrays": "^5.2.1",
+    "purescript-stringutils": "^0.0.8",
+    "purescript-strings": "^4.0.1",
+    "purescript-record": "^2.0.0",
+    "purescript-ordered-collections": "^1.6.1"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0"

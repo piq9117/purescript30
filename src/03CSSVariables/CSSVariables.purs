@@ -21,7 +21,7 @@ import Web.DOM.Internal.Types (NodeList, Element)
 import Web.DOM.Node as DOMNode
 import Web.DOM.NodeList as NodeList
 import Web.DOM.ParentNode (ParentNode, QuerySelector(..))
-import Web.DOM.ParentNode as WebDOM
+import Web.DOM.ParentNode as ParentNode
 import Web.Event.Event as Event
 import Web.Event.EventTarget (EventListener, EventTarget)
 import Web.Event.EventTarget as EventTarget
@@ -47,7 +47,7 @@ getElements
   => ReaderT { parentNode :: ParentNode, className :: String } m NodeList
 getElements = do
   {parentNode, className} <- ask
-  elements <- EffectClass.liftEffect $ WebDOM.querySelectorAll (QuerySelector className) parentNode
+  elements <- EffectClass.liftEffect $ ParentNode.querySelectorAll (QuerySelector className) parentNode
   pure elements
 
 effParentNode :: Effect { parentNode :: ParentNode, document :: Document }
