@@ -27,7 +27,6 @@ import Web.HTML.HTMLDocument as HTMLDocument
 import Web.DOM.NodeList as NodeList
 import Web.DOM.Node as Node
 import Web.HTML.HTMLElement as HTMLElement
--- import Web.UIEvent.MouseEvent as MouseEvent
 import Web.Event.Event (EventType(..), Event)
 import Web.Event.Event as WebEvent
 import Web.DOM.DOMTokenList as DOMTokenList
