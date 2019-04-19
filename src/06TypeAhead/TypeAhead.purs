@@ -1,0 +1,155 @@
+module TypeAhead where
+
+-- Base
+import Prelude (class Bind, Unit, bind, discard, pure, unit, void, ($), (<<<), (=<<), (>>=), (<>), class Show, show, map, (>), (||))
+import Data.Either (Either(..))
+import Control.Monad.Reader (ReaderT, ask, runReaderT)
+import Data.Maybe (Maybe(..))
+import Data.String.Regex as StrRegex
+import Data.String.Regex.Flags (RegexFlags(..))
+import Data.Array as Array
+import Data.Array.NonEmpty as NonEmptyArray
+import Data.String.Utils as StringUtils
+
+-- Effect/Aff
+import Effect (Effect)
+import Effect.Aff (Fiber)
+import Effect.Aff as Aff
+import Effect.Class (class MonadEffect)
+import Effect.Class as EffectClass
+import Effect.Class.Console (log)
+import Affjax as AX
+import Affjax.ResponseFormat as ResponseFormat
+import Effect.Uncurried (EffectFn2, runEffectFn2)
+
+-- HTTP
+import Data.HTTP.Method (Method(..))
+
+-- DOM
+import Web.DOM.ParentNode (QuerySelector(..), ParentNode)
+import Web.DOM.ParentNode as ParentNode
+import Web.DOM.Internal.Types (Element)
+import Web.HTML as HTML
+import Web.HTML.Window as Window
+import Web.HTML.HTMLDocument as HTMLDocument
+import Web.Event.EventTarget (EventListener, EventTarget)
+import Web.Event.EventTarget as EventTarget
+import Web.HTML.Event.EventTypes as EventTypes
+import Web.DOM.Element as Element
+import Web.Event.Event as Event
+import Web.UIEvent.KeyboardEvent.EventTypes as KbEventTypes
+
+-- JSON
+import Data.Argonaut.Decode (getField, decodeJson, class DecodeJson)
+
+foreign import value :: EventTarget -> String
+foreign import innerHtmlImpl :: EffectFn2 Element String Unit
+
+innerHtml :: Element -> String -> Effect Unit
+innerHtml el str = runEffectFn2 innerHtmlImpl el str
+
+newtype City = City
+  { city :: String
+  , growth_from_2000_to_2013 :: String
+  , latitude :: Number
+  , longitude :: Number
+  , population :: String
+  , rank :: String
+  , state :: String
+  }
+
+instance showCity :: Show City where
+  show (City c) = show $
+    { city: c.city
+    , growth_from_2000_to_2013 : c.growth_from_2000_to_2013
+    , latitude: c.latitude
+    , longitude : c.longitude
+    , population: c.population
+    , rank: c.rank
+    , state: c.state
+    }
+
+
+instance decodeCity :: DecodeJson City where
+  decodeJson json = do
+    obj <- decodeJson json
+    city <- getField obj "city"
+    growth_from_2000_to_2013 <- getField obj "growth_from_2000_to_2013"
+    latitude <- getField obj "latitude"
+    longitude <- getField obj "longitude"
+    population <- getField obj "population"
+    rank <- getField obj "rank"
+    state <- getField obj "state"
+    pure $ City { city
+                , growth_from_2000_to_2013
+                , latitude
+                , longitude
+                , population
+                , rank
+                , state
+                }
+
+citiesUrl :: String
+citiesUrl = "https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json"
+
+effParentNode :: Effect ParentNode
+effParentNode =
+  pure <<< HTMLDocument.toParentNode =<< Window.document =<< HTML.window
+
+getElement
+  :: forall m. Bind m
+  => MonadEffect m
+  => ReaderT { parentNode :: ParentNode, targetElement :: String } m (Maybe Element)
+getElement = do
+  { parentNode, targetElement } <- ask
+  pure =<< EffectClass.liftEffect $ ParentNode.querySelector (QuerySelector targetElement) parentNode
+
+findMatches :: String -> Array City -> Array City
+findMatches wordToMatch cities =
+  Array.filter
+    (\(City place) ->
+      case createRegex wordToMatch of
+        Left err -> false
+        Right reg ->
+          case StrRegex.match reg place.city of
+            Nothing -> false
+            -- TODO: match state or city
+            Just _ -> true
+        ) cities
+    where createRegex w =
+            StrRegex.regex w
+            (RegexFlags {global: true, ignoreCase: true, multiline: false, sticky: false, unicode: false })
+
+effDisplayMatch :: Array City -> Element -> Effect EventListener
+effDisplayMatch cities el = EventTarget.eventListener $ \e -> void do
+  case Event.target e of
+    Nothing -> innerHtml el ""
+    Just t ->
+      innerHtml el (StringUtils.fromCharArray $ map (\(City place) ->
+            "<li>" <>
+               "<span class=\"name\">" <> place.city <> ", " <> place.state <> "</span>" <>
+               "<span class=\"population\">" <> place.population <> "</span>" <>
+            "</li>"
+            )(findMatches (value t) cities))
+
+main :: Effect (Fiber Unit)
+main = Aff.launchAff $ do
+  parentNode <- EffectClass.liftEffect effParentNode
+  mSearchInput <- runReaderT getElement { parentNode: parentNode, targetElement: ".search" }
+  mSuggestions <- runReaderT getElement { parentNode: parentNode, targetElement: ".suggestions" }
+  res <- AX.request (AX.defaultRequest { url = citiesUrl, method = Left GET, responseFormat = ResponseFormat.json })
+  case res.body of
+    Left err -> log $ "Error: " <> AX.printResponseFormatError err
+    Right json ->
+      case (decodeJson json) :: Either String (Array City) of
+        Left err -> log $ "ERROR: " <> err
+        Right cities ->
+          case mSearchInput of
+            Nothing -> log "Search input not found."
+            Just searchInput -> do
+              case mSuggestions of
+                Nothing -> log "Suggestions not found."
+                Just suggestions -> do
+                  displayMatch <- EffectClass.liftEffect $ effDisplayMatch cities suggestions
+                  EffectClass.liftEffect $ EventTarget.addEventListener EventTypes.change displayMatch false (Element.toEventTarget searchInput)
+                  EffectClass.liftEffect $ EventTarget.addEventListener KbEventTypes.keyup displayMatch false (Element.toEventTarget searchInput)
