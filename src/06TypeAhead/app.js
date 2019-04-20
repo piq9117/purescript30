@@ -27541,7 +27541,6 @@ exports.value = function(eventTarget) {
 };
 
 exports.innerHtmlImpl = function (element, html) {
-  console.log(element)
   element.innerHTML = html;
 };
 
@@ -27558,6 +27557,7 @@ var Data_Argonaut_Decode_Class = require("../Data.Argonaut.Decode.Class/index.js
 var Data_Argonaut_Decode_Combinators = require("../Data.Argonaut.Decode.Combinators/index.js");
 var Data_Array = require("../Data.Array/index.js");
 var Data_Either = require("../Data.Either/index.js");
+var Data_Function = require("../Data.Function/index.js");
 var Data_Functor = require("../Data.Functor/index.js");
 var Data_HTTP_Method = require("../Data.HTTP.Method/index.js");
 var Data_Maybe = require("../Data.Maybe/index.js");
@@ -27623,39 +27623,33 @@ var getElement = function (dictBind) {
 };
 var findMatches = function (wordToMatch) {
     return function (cities) {
+        var isMatch = function (place) {
+            return function (reg) {
+                return Data_Array.length(Data_Array.catMaybes([ Data_String_Regex.match(reg)(place.city), Data_String_Regex.match(reg)(place.state) ])) > 0;
+            };
+        };
         var createRegex = function (w) {
             return Data_String_Regex.regex(w)(new Data_String_Regex_Flags.RegexFlags({
                 global: true,
                 ignoreCase: true,
-                multiline: false,
+                multiline: true,
                 sticky: false,
                 unicode: false
             }));
         };
         return Data_Array.filter(function (v) {
-            var v1 = createRegex(wordToMatch);
-            if (v1 instanceof Data_Either.Left) {
-                return false;
-            };
-            if (v1 instanceof Data_Either.Right) {
-                var v2 = Data_String_Regex.match(v1.value0)(v.city);
-                if (v2 instanceof Data_Maybe.Nothing) {
-                    return false;
-                };
-                if (v2 instanceof Data_Maybe.Just) {
-                    return true;
-                };
-                throw new Error("Failed pattern match at TypeAhead (line 114, column 11 - line 116, column 27): " + [ v2.constructor.name ]);
-            };
-            throw new Error("Failed pattern match at TypeAhead (line 111, column 7 - line 116, column 27): " + [ v1.constructor.name ]);
+            return Data_Either.either(Data_Function["const"](false))(isMatch(v))(createRegex(wordToMatch));
         })(cities);
     };
 };
-var effParentNode = Control_Bind.bindFlipped(Effect.bindEffect)(function ($60) {
-    return Control_Applicative.pure(Effect.applicativeEffect)(Web_HTML_HTMLDocument.toParentNode($60));
+var effParentNode = Control_Bind.bindFlipped(Effect.bindEffect)(function ($53) {
+    return Control_Applicative.pure(Effect.applicativeEffect)(Web_HTML_HTMLDocument.toParentNode($53));
 })(Control_Bind.bindFlipped(Effect.bindEffect)(Web_HTML_Window.document)(Web_HTML.window));
 var effDisplayMatch = function (cities) {
     return function (el) {
+        var newHtmlEls = function (place) {
+            return "<li>" + ("<span class=\"name\">" + (place.city + (", " + (place.state + ("</span>" + ("<span class=\"population\">" + (place.population + ("</span>" + "</li>"))))))));
+        };
         return Web_Event_EventTarget.eventListener(function (e) {
             return Data_Functor["void"](Effect.functorEffect)((function () {
                 var v = Web_Event_Event.target(e);
@@ -27664,10 +27658,10 @@ var effDisplayMatch = function (cities) {
                 };
                 if (v instanceof Data_Maybe.Just) {
                     return innerHtml(el)(Data_String_Utils.fromCharArray(Data_Functor.map(Data_Functor.functorArray)(function (v1) {
-                        return "<li>" + ("<span class=\"name\">" + (v1.city + (", " + (v1.state + ("</span>" + ("<span class=\"population\">" + (v1.population + ("</span>" + "</li>"))))))));
+                        return newHtmlEls(v1);
                     })(findMatches($foreign.value(v.value0))(cities))));
                 };
-                throw new Error("Failed pattern match at TypeAhead (line 129, column 3 - line 137, column 45): " + [ v.constructor.name ]);
+                throw new Error("Failed pattern match at TypeAhead (line 120, column 3 - line 123, column 108): " + [ v.constructor.name ]);
             })());
         });
     };
@@ -27700,59 +27694,68 @@ var decodeCity = new Data_Argonaut_Decode_Class.DecodeJson(function (json) {
     });
 });
 var citiesUrl = "https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json";
-var main = Effect_Aff.launchAff(Control_Bind.bind(Effect_Aff.bindAff)(Effect_Class.liftEffect(Effect_Aff.monadEffectAff)(effParentNode))(function (v) {
-    return Control_Bind.bind(Effect_Aff.bindAff)(Control_Monad_Reader_Trans.runReaderT(getElement(Effect_Aff.bindAff)(Effect_Aff.monadEffectAff))({
-        parentNode: v,
-        targetElement: ".search"
-    }))(function (v1) {
+var main = (function () {
+    var eventListener = function (evtTypes) {
+        return function (f) {
+            return function (el) {
+                return Effect_Class.liftEffect(Effect_Aff.monadEffectAff)(Web_Event_EventTarget.addEventListener(evtTypes)(f)(false)(Web_DOM_Element.toEventTarget(el)));
+            };
+        };
+    };
+    return Effect_Aff.launchAff(Control_Bind.bind(Effect_Aff.bindAff)(Effect_Class.liftEffect(Effect_Aff.monadEffectAff)(effParentNode))(function (v) {
         return Control_Bind.bind(Effect_Aff.bindAff)(Control_Monad_Reader_Trans.runReaderT(getElement(Effect_Aff.bindAff)(Effect_Aff.monadEffectAff))({
             parentNode: v,
-            targetElement: ".suggestions"
-        }))(function (v2) {
-            return Control_Bind.bind(Effect_Aff.bindAff)(Affjax.request({
-                method: new Data_Either.Left(Data_HTTP_Method.GET.value),
-                url: citiesUrl,
-                headers: Affjax.defaultRequest.headers,
-                content: Affjax.defaultRequest.content,
-                username: Affjax.defaultRequest.username,
-                password: Affjax.defaultRequest.password,
-                withCredentials: Affjax.defaultRequest.withCredentials,
-                responseFormat: Affjax_ResponseFormat.json
-            }))(function (v3) {
-                if (v3.body instanceof Data_Either.Left) {
-                    return Effect_Class_Console.log(Effect_Aff.monadEffectAff)("Error: " + Affjax_ResponseFormat.printResponseFormatError(v3.body.value0));
-                };
-                if (v3.body instanceof Data_Either.Right) {
-                    var v4 = Data_Argonaut_Decode_Class.decodeJson(Data_Argonaut_Decode_Class.decodeArray(decodeCity))(v3.body.value0);
-                    if (v4 instanceof Data_Either.Left) {
-                        return Effect_Class_Console.log(Effect_Aff.monadEffectAff)("ERROR: " + v4.value0);
+            targetElement: ".search"
+        }))(function (v1) {
+            return Control_Bind.bind(Effect_Aff.bindAff)(Control_Monad_Reader_Trans.runReaderT(getElement(Effect_Aff.bindAff)(Effect_Aff.monadEffectAff))({
+                parentNode: v,
+                targetElement: ".suggestions"
+            }))(function (v2) {
+                return Control_Bind.bind(Effect_Aff.bindAff)(Affjax.request({
+                    method: new Data_Either.Left(Data_HTTP_Method.GET.value),
+                    url: citiesUrl,
+                    headers: Affjax.defaultRequest.headers,
+                    content: Affjax.defaultRequest.content,
+                    username: Affjax.defaultRequest.username,
+                    password: Affjax.defaultRequest.password,
+                    withCredentials: Affjax.defaultRequest.withCredentials,
+                    responseFormat: Affjax_ResponseFormat.json
+                }))(function (v3) {
+                    if (v3.body instanceof Data_Either.Left) {
+                        return Effect_Class_Console.log(Effect_Aff.monadEffectAff)("Error: " + Affjax_ResponseFormat.printResponseFormatError(v3.body.value0));
                     };
-                    if (v4 instanceof Data_Either.Right) {
-                        if (v1 instanceof Data_Maybe.Nothing) {
-                            return Effect_Class_Console.log(Effect_Aff.monadEffectAff)("Search input not found.");
+                    if (v3.body instanceof Data_Either.Right) {
+                        var v4 = Data_Argonaut_Decode_Class.decodeJson(Data_Argonaut_Decode_Class.decodeArray(decodeCity))(v3.body.value0);
+                        if (v4 instanceof Data_Either.Left) {
+                            return Effect_Class_Console.log(Effect_Aff.monadEffectAff)("ERROR: " + v4.value0);
                         };
-                        if (v1 instanceof Data_Maybe.Just) {
-                            if (v2 instanceof Data_Maybe.Nothing) {
-                                return Effect_Class_Console.log(Effect_Aff.monadEffectAff)("Suggestions not found.");
+                        if (v4 instanceof Data_Either.Right) {
+                            if (v1 instanceof Data_Maybe.Nothing) {
+                                return Effect_Class_Console.log(Effect_Aff.monadEffectAff)("Search input not found.");
                             };
-                            if (v2 instanceof Data_Maybe.Just) {
-                                return Control_Bind.bind(Effect_Aff.bindAff)(Effect_Class.liftEffect(Effect_Aff.monadEffectAff)(effDisplayMatch(v4.value0)(v2.value0)))(function (v5) {
-                                    return Control_Bind.discard(Control_Bind.discardUnit)(Effect_Aff.bindAff)(Effect_Class.liftEffect(Effect_Aff.monadEffectAff)(Web_Event_EventTarget.addEventListener(Web_HTML_Event_EventTypes.change)(v5)(false)(Web_DOM_Element.toEventTarget(v1.value0))))(function () {
-                                        return Effect_Class.liftEffect(Effect_Aff.monadEffectAff)(Web_Event_EventTarget.addEventListener(Web_UIEvent_KeyboardEvent_EventTypes.keyup)(v5)(false)(Web_DOM_Element.toEventTarget(v1.value0)));
+                            if (v1 instanceof Data_Maybe.Just) {
+                                if (v2 instanceof Data_Maybe.Nothing) {
+                                    return Effect_Class_Console.log(Effect_Aff.monadEffectAff)("Suggestions not found.");
+                                };
+                                if (v2 instanceof Data_Maybe.Just) {
+                                    return Control_Bind.bind(Effect_Aff.bindAff)(Effect_Class.liftEffect(Effect_Aff.monadEffectAff)(effDisplayMatch(v4.value0)(v2.value0)))(function (v5) {
+                                        return Control_Bind.discard(Control_Bind.discardUnit)(Effect_Aff.bindAff)(eventListener(Web_HTML_Event_EventTypes.change)(v5)(v1.value0))(function () {
+                                            return eventListener(Web_UIEvent_KeyboardEvent_EventTypes.keyup)(v5)(v1.value0);
+                                        });
                                     });
-                                });
+                                };
+                                throw new Error("Failed pattern match at TypeAhead (line 145, column 15 - line 150, column 76): " + [ v2.constructor.name ]);
                             };
-                            throw new Error("Failed pattern match at TypeAhead (line 154, column 15 - line 159, column 145): " + [ v2.constructor.name ]);
+                            throw new Error("Failed pattern match at TypeAhead (line 142, column 11 - line 150, column 76): " + [ v1.constructor.name ]);
                         };
-                        throw new Error("Failed pattern match at TypeAhead (line 151, column 11 - line 159, column 145): " + [ v1.constructor.name ]);
+                        throw new Error("Failed pattern match at TypeAhead (line 139, column 7 - line 150, column 76): " + [ v4.constructor.name ]);
                     };
-                    throw new Error("Failed pattern match at TypeAhead (line 148, column 7 - line 159, column 145): " + [ v4.constructor.name ]);
-                };
-                throw new Error("Failed pattern match at TypeAhead (line 145, column 3 - line 159, column 145): " + [ v3.body.constructor.name ]);
+                    throw new Error("Failed pattern match at TypeAhead (line 136, column 3 - line 150, column 76): " + [ v3.body.constructor.name ]);
+                });
             });
         });
-    });
-}));
+    }));
+})();
 module.exports = {
     innerHtml: innerHtml,
     City: City,
@@ -27768,7 +27771,7 @@ module.exports = {
     innerHtmlImpl: $foreign.innerHtmlImpl
 };
 
-},{"../Affjax.ResponseFormat/index.js":3,"../Affjax/index.js":6,"../Control.Applicative/index.js":9,"../Control.Bind/index.js":15,"../Control.Monad.Reader.Class/index.js":27,"../Control.Monad.Reader.Trans/index.js":28,"../Data.Argonaut.Decode.Class/index.js":45,"../Data.Argonaut.Decode.Combinators/index.js":46,"../Data.Array/index.js":53,"../Data.Either/index.js":69,"../Data.Functor/index.js":87,"../Data.HTTP.Method/index.js":90,"../Data.Maybe/index.js":106,"../Data.Show/index.js":139,"../Data.String.Regex.Flags/index.js":146,"../Data.String.Regex/index.js":148,"../Data.String.Utils/index.js":152,"../Data.Symbol/index.js":154,"../Effect.Aff/index.js":170,"../Effect.Class.Console/index.js":171,"../Effect.Class/index.js":172,"../Effect/index.js":182,"../Web.DOM.Element/index.js":212,"../Web.DOM.ParentNode/index.js":214,"../Web.Event.Event/index.js":216,"../Web.Event.EventTarget/index.js":219,"../Web.HTML.Event.EventTypes/index.js":220,"../Web.HTML.HTMLDocument/index.js":223,"../Web.HTML.Window/index.js":225,"../Web.HTML/index.js":227,"../Web.UIEvent.KeyboardEvent.EventTypes/index.js":230,"./foreign.js":207}],209:[function(require,module,exports){
+},{"../Affjax.ResponseFormat/index.js":3,"../Affjax/index.js":6,"../Control.Applicative/index.js":9,"../Control.Bind/index.js":15,"../Control.Monad.Reader.Class/index.js":27,"../Control.Monad.Reader.Trans/index.js":28,"../Data.Argonaut.Decode.Class/index.js":45,"../Data.Argonaut.Decode.Combinators/index.js":46,"../Data.Array/index.js":53,"../Data.Either/index.js":69,"../Data.Function/index.js":82,"../Data.Functor/index.js":87,"../Data.HTTP.Method/index.js":90,"../Data.Maybe/index.js":106,"../Data.Show/index.js":139,"../Data.String.Regex.Flags/index.js":146,"../Data.String.Regex/index.js":148,"../Data.String.Utils/index.js":152,"../Data.Symbol/index.js":154,"../Effect.Aff/index.js":170,"../Effect.Class.Console/index.js":171,"../Effect.Class/index.js":172,"../Effect/index.js":182,"../Web.DOM.Element/index.js":212,"../Web.DOM.ParentNode/index.js":214,"../Web.Event.Event/index.js":216,"../Web.Event.EventTarget/index.js":219,"../Web.HTML.Event.EventTypes/index.js":220,"../Web.HTML.HTMLDocument/index.js":223,"../Web.HTML.Window/index.js":225,"../Web.HTML/index.js":227,"../Web.UIEvent.KeyboardEvent.EventTypes/index.js":230,"./foreign.js":207}],209:[function(require,module,exports){
 "use strict";
 
 // module Unsafe.Coerce

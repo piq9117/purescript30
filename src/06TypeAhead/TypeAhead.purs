@@ -1,15 +1,14 @@
 module TypeAhead where
 
 -- Base
-import Prelude (class Bind, Unit, bind, discard, pure, unit, void, ($), (<<<), (=<<), (>>=), (<>), class Show, show, map, (>), (||))
-import Data.Either (Either(..))
+import Prelude 
+import Data.Either (Either(..), either)
 import Control.Monad.Reader (ReaderT, ask, runReaderT)
 import Data.Maybe (Maybe(..))
 import Data.String.Regex as StrRegex
 import Data.String.Regex.Flags (RegexFlags(..))
-import Data.Array as Array
-import Data.Array.NonEmpty as NonEmptyArray
-import Data.String.Utils as StringUtils
+import Data.Array (catMaybes, length, filter)
+import Data.String.Utils (fromCharArray)
 
 -- Effect/Aff
 import Effect (Effect)
@@ -69,7 +68,6 @@ instance showCity :: Show City where
     , state: c.state
     }
 
-
 instance decodeCity :: DecodeJson City where
   decodeJson json = do
     obj <- decodeJson json
@@ -106,31 +104,28 @@ getElement = do
 
 findMatches :: String -> Array City -> Array City
 findMatches wordToMatch cities =
-  Array.filter
+  filter
     (\(City place) ->
-      case createRegex wordToMatch of
-        Left err -> false
-        Right reg ->
-          case StrRegex.match reg place.city of
-            Nothing -> false
-            -- TODO: match state or city
-            Just _ -> true
-        ) cities
+      either (const false) (isMatch place) (createRegex wordToMatch)) cities
     where createRegex w =
             StrRegex.regex w
-            (RegexFlags {global: true, ignoreCase: true, multiline: false, sticky: false, unicode: false })
+            (RegexFlags {global: true, ignoreCase: true, multiline: true, sticky: false, unicode: false })
+          isMatch place reg =
+            length
+            (catMaybes [StrRegex.match reg place.city, StrRegex.match reg place.state]) > 0
+
 
 effDisplayMatch :: Array City -> Element -> Effect EventListener
 effDisplayMatch cities el = EventTarget.eventListener $ \e -> void do
   case Event.target e of
     Nothing -> innerHtml el ""
-    Just t ->
-      innerHtml el (StringUtils.fromCharArray $ map (\(City place) ->
-            "<li>" <>
-               "<span class=\"name\">" <> place.city <> ", " <> place.state <> "</span>" <>
-               "<span class=\"population\">" <> place.population <> "</span>" <>
-            "</li>"
-            )(findMatches (value t) cities))
+    Just t -> do
+      innerHtml el (fromCharArray $ map (\(City place) -> newHtmlEls place) (findMatches (value t) cities))
+      where newHtmlEls place =
+              "<li>" <>
+                "<span class=\"name\">" <> place.city <> ", " <> place.state <> "</span>" <>
+                "<span class=\"population\">" <> place.population <> "</span>" <>
+              "</li>"
 
 main :: Effect (Fiber Unit)
 main = Aff.launchAff $ do
@@ -151,5 +146,9 @@ main = Aff.launchAff $ do
                 Nothing -> log "Suggestions not found."
                 Just suggestions -> do
                   displayMatch <- EffectClass.liftEffect $ effDisplayMatch cities suggestions
-                  EffectClass.liftEffect $ EventTarget.addEventListener EventTypes.change displayMatch false (Element.toEventTarget searchInput)
-                  EffectClass.liftEffect $ EventTarget.addEventListener KbEventTypes.keyup displayMatch false (Element.toEventTarget searchInput)
+                  eventListener EventTypes.change displayMatch searchInput
+                  eventListener KbEventTypes.keyup displayMatch searchInput
+                  where eventListener evtTypes f el =
+                          EffectClass.liftEffect $
+                          EventTarget.addEventListener evtTypes f false (Element.toEventTarget el)
+

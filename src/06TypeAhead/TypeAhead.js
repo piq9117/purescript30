@@ -3,6 +3,5 @@ exports.value = function(eventTarget) {
 };
 
 exports.innerHtmlImpl = function (element, html) {
-  console.log(element)
   element.innerHTML = html;
 };
