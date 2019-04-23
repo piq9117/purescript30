@@ -10397,7 +10397,7 @@ var effDraw = function (dictBind) {
                     if (!v1.isDrawing) {
                         return Data_Unit.unit;
                     };
-                    throw new Error("Failed pattern match at FunWithHTML5Canvas (line 62, column 5 - line 86, column 25): " + [ v1.isDrawing.constructor.name ]);
+                    throw new Error("Failed pattern match at FunWithHTML5Canvas (line 65, column 5 - line 88, column 25): " + [ v1.isDrawing.constructor.name ]);
                 };
             }));
         });
@@ -10442,7 +10442,7 @@ var main = function __do() {
         Web_Event_EventTarget.addEventListener(Web_UIEvent_MouseEvent_EventTypes.mousedown)(v4)(false)(Web_DOM_Element.toEventTarget(v1.value0))();
         return Web_Event_EventTarget.addEventListener(Web_UIEvent_MouseEvent_EventTypes.mouseup)(v3)(false)(Web_DOM_Element.toEventTarget(v1.value0))();
     };
-    throw new Error("Failed pattern match at FunWithHTML5Canvas (line 121, column 3 - line 140, column 108): " + [ v1.constructor.name ]);
+    throw new Error("Failed pattern match at FunWithHTML5Canvas (line 123, column 3 - line 142, column 108): " + [ v1.constructor.name ]);
 };
 module.exports = {
     effParentNode: effParentNode,
