@@ -2,16 +2,19 @@ module FunWithHTML5Canvas where
 
 -- Base
 import Prelude
-
 import Control.Monad.Reader (ask, ReaderT, runReaderT)
 import Data.Int (toNumber)
 import Data.Maybe (Maybe(..))
+
+-- Effect
 import Effect (Effect)
 import Effect.Class (class MonadEffect)
 import Effect.Class as EffectClass
 import Effect.Console (logShow)
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
+
+-- DOM
 import Graphics.Canvas (CanvasElement, LineJoin(..), LineCap(..), Context2D)
 import Graphics.Canvas as Canvas
 import Web.DOM.Element as Element
