@@ -75,15 +75,14 @@ effDraw = do
           (\b -> b { hue = incHue b.hue, lastX = offsetX e, lastY = offsetY e })
           drawingStateRef
         void $ if drawingState.lineWidth >= 100.0
-               then void $ Ref.modify (\b -> b { direction = true }) drawingStateRef
-               else void $ pure unit
+               then Ref.modify_ (\b -> b { direction = true }) drawingStateRef
+               else pure unit
         void $ if drawingState.lineWidth <= 1.0
-               then void $ Ref.modify (\b -> b { direction = false }) drawingStateRef
-               else void $ pure unit
-        void $ logShow drawingState.lineWidth
+               then Ref.modify_ (\b -> b { direction = false }) drawingStateRef
+               else pure unit
         void $ if drawingState.direction
-               then void $ Ref.modify (\b -> b { lineWidth = b.lineWidth - 1.0 }) drawingStateRef
-               else void $ Ref.modify (\b -> b { lineWidth = b.lineWidth + 1.0 }) drawingStateRef
+               then Ref.modify_ (\b -> b { lineWidth = b.lineWidth - 1.0 }) drawingStateRef
+               else Ref.modify_ (\b -> b { lineWidth = b.lineWidth + 1.0 }) drawingStateRef
 
       false -> pure unit
       where incHue n = if n >= 360.0 then 0.0 else n + 1.0
