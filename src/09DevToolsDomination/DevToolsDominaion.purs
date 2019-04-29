@@ -85,7 +85,7 @@ getElement
   => ReaderT { parentNode :: ParentNode, targetElement :: String } m (Maybe Element)
 getElement = do
   { parentNode, targetElement } <- ask
-  pure =<< liftEffect $ ParentNode.querySelector (QuerySelector targetElement) parentNode
+  liftEffect $ ParentNode.querySelector (QuerySelector targetElement) parentNode
 
 effMakeGreen :: Effect EventListener
 effMakeGreen = EventTarget.eventListener $ \e -> void do

@@ -40,10 +40,8 @@ getElement
   -> ReaderT ParentNode m (Maybe Element)
 getElement className = do
   p <- ask
-  mElement <-
-    EffectClass.liftEffect $
+  EffectClass.liftEffect $
     WebPNode.querySelector (QuerySelector className) p
-  pure mElement
 
 data ClockHands = ClockHands
   { secondHand :: Element

@@ -46,10 +46,8 @@ getElement
   -> m (Maybe Element)
 getElement className kcode = do
   p <- ask
-  mElement <-
-    EffClass.liftEffect $
+  EffClass.liftEffect $
     WebPNode.querySelector (QuerySelector $ className <>"[data-key='" <> kcode <>"']") p
-  pure mElement
 
 getAllKeys
   :: forall m. Bind m

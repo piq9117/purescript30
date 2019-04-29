@@ -100,7 +100,7 @@ getElement
   => ReaderT { parentNode :: ParentNode, targetElement :: String } m (Maybe Element)
 getElement = do
   { parentNode, targetElement } <- ask
-  pure =<< EffectClass.liftEffect $ ParentNode.querySelector (QuerySelector targetElement) parentNode
+  EffectClass.liftEffect $ ParentNode.querySelector (QuerySelector targetElement) parentNode
 
 findMatches :: String -> Array City -> Array City
 findMatches wordToMatch cities =

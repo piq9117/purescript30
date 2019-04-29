@@ -46,7 +46,7 @@ getElements
   => ReaderT { parentNode :: ParentNode, targetElement :: String} m NodeList
 getElements = do
   { parentNode, targetElement }<- ask
-  pure =<< EffectClass.liftEffect $ ParentNode.querySelectorAll (QuerySelector targetElement) parentNode
+  EffectClass.liftEffect $ ParentNode.querySelectorAll (QuerySelector targetElement) parentNode
 
 effToogleOpen :: Effect EventListener
 effToogleOpen = EventTarget.eventListener $ \e -> void do

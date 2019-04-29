@@ -48,7 +48,7 @@ getElement
   => ReaderT { parentNode :: ParentNode, targetElement :: String } m (Maybe Element)
 getElement = do
   { parentNode, targetElement } <- ask
-  pure =<< EffectClass.liftEffect $ ParentNode.querySelector (QuerySelector targetElement) parentNode
+  EffectClass.liftEffect $ ParentNode.querySelector (QuerySelector targetElement) parentNode
 
 getElements
   :: forall m. Bind m

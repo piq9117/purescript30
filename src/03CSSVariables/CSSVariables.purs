@@ -47,8 +47,7 @@ getElements
   => ReaderT { parentNode :: ParentNode, className :: String } m NodeList
 getElements = do
   {parentNode, className} <- ask
-  elements <- EffectClass.liftEffect $ ParentNode.querySelectorAll (QuerySelector className) parentNode
-  pure elements
+  EffectClass.liftEffect $ ParentNode.querySelectorAll (QuerySelector className) parentNode
 
 effParentNode :: Effect { parentNode :: ParentNode, document :: Document }
 effParentNode = do
