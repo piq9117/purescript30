@@ -62,6 +62,40 @@ type HandleCheckEnv =
   , nodes :: Array Node
   }
 
+type IterNodesEnv =
+  { eventTarget :: EventTarget
+  , nodes :: Array Node
+  , isChecked :: Boolean
+  , isShiftKey :: Boolean
+  }
+
+-- iterNodes'
+--   :: forall m. Monad m
+--   => MonadEffect m
+--   => ReaderT IterNodesEnv m Unit
+--   -> StateT Boolean m Unit
+  -- -> Array Node
+  -- -> Boolean
+  -- -> Boolean
+  -- -> StateT Boolean m Unit
+-- iterNodes' evtTarget nodes isChecked isShiftKey = do
+iterNode'
+  :: forall m. Monad m
+  => MonadEffect m
+  => MonadState Boolean m
+  => ReaderT IterNodesEnv m Unit
+iterNode' = do
+  { eventTarget, nodes, isChecked, isShiftKey } <- ask
+  isInBetween <- get
+  liftEffect $ logShow isChecked
+  -- case isChecked && isShiftKey of
+  --   true -> do
+  --     liftEffect $ foreachE nodes (\node ->
+  --                                   if (Target eventTarget) == (Target $ Node.toEventTarget node)
+  --                                   then logShow isInBetween
+  --                                   else logShow isInBetween)
+  --   false -> liftEffect $ logShow "test"
+
 iterNodes
   :: forall m. Monad m
   => MonadEffect m
