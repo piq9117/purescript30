@@ -1,17 +1,20 @@
 module HoldShiftAndCheckboxes where
 
 -- Base
-import Control.Monad.State.Class
-import Data.Tuple
 import Prelude
-
-import Control.Monad.Reader (ReaderT, ask, runReaderT, class MonadAsk)
-import Control.Monad.State (StateT, get, runStateT, runState)
+import Unsafe.Coerce (unsafeCoerce)
+import Control.Monad.Reader (ReaderT, ask, runReaderT)
 import Data.Maybe (Maybe(..))
+import Data.Symbol (SProxy(..))
+import Record as Record
+
+-- Effect
 import Effect (Effect, foreachE)
 import Effect.Class (class MonadEffect, liftEffect)
-import Effect.Console (logShow)
-import Unsafe.Coerce (unsafeCoerce)
+import Effect.Ref (Ref)
+import Effect.Ref as Ref
+
+-- DOM
 import Web.DOM.Internal.Types (NodeList, Node)
 import Web.DOM.Node as Node
 import Web.DOM.NodeList as NodeList
@@ -31,6 +34,9 @@ import Web.UIEvent.MouseEvent (MouseEvent)
 import Web.UIEvent.MouseEvent as MouseEvent
 
 foreign import eqEventTargetImpl :: EventTarget -> EventTarget -> Boolean
+
+nodeToHtmlInputElement :: Node -> HTMLInputElement
+nodeToHtmlInputElement = unsafeCoerce
 
 effParentNode :: Effect ParentNode
 effParentNode =
@@ -58,76 +64,61 @@ instance eventTargetEq :: Eq Target where
   eq (Target evt1) (Target evt2) = eqEventTargetImpl evt1 evt2
 
 type HandleCheckEnv =
-  { isInBetween :: Boolean
+  { isInBetween :: Ref Boolean
+  , lastChecked :: Ref (Maybe EventTarget)
   , nodes :: Array Node
   }
 
-type IterNodesEnv =
-  { eventTarget :: EventTarget
-  , nodes :: Array Node
-  , isChecked :: Boolean
-  , isShiftKey :: Boolean
+type IterNodeEnv =
+  { nodes :: Array Node
+  , eventTarget :: EventTarget
+  , isInBetween :: Ref Boolean
+  , lastChecked :: Ref (Maybe EventTarget)
   }
-
--- iterNodes'
---   :: forall m. Monad m
---   => MonadEffect m
---   => ReaderT IterNodesEnv m Unit
---   -> StateT Boolean m Unit
-  -- -> Array Node
-  -- -> Boolean
-  -- -> Boolean
-  -- -> StateT Boolean m Unit
--- iterNodes' evtTarget nodes isChecked isShiftKey = do
-iterNode'
-  :: forall m. Monad m
-  => MonadEffect m
-  => MonadState Boolean m
-  => ReaderT IterNodesEnv m Unit
-iterNode' = do
-  { eventTarget, nodes, isChecked, isShiftKey } <- ask
-  isInBetween <- get
-  liftEffect $ logShow isChecked
-  -- case isChecked && isShiftKey of
-  --   true -> do
-  --     liftEffect $ foreachE nodes (\node ->
-  --                                   if (Target eventTarget) == (Target $ Node.toEventTarget node)
-  --                                   then logShow isInBetween
-  --                                   else logShow isInBetween)
-  --   false -> liftEffect $ logShow "test"
 
 iterNodes
-  :: forall m. Monad m
+  :: forall m. Bind m
   => MonadEffect m
-  => EventTarget
-  -> Array Node
-  -> Boolean
-  -> Boolean
-  -> StateT Boolean m Unit
-iterNodes evtTarget nodes isChecked isShiftKey = do
-  isInBetween <- get
-  case isChecked && isShiftKey of
-    true -> do
-      liftEffect $ foreachE nodes (\node ->
-                                    if (Target evtTarget) == (Target $ Node.toEventTarget node)
-                                    then logShow isInBetween
-                                    else logShow isInBetween)
-    false -> liftEffect $ logShow "test"
+  => ReaderT IterNodeEnv m Unit
+iterNodes = do
+  { nodes, eventTarget, isInBetween, lastChecked } <- ask
+  liftEffect $ foreachE
+               nodes
+                (\node -> do
+                    mLastChecked <- Ref.read lastChecked
+                    case mLastChecked of
+                      Nothing -> pure unit
+                      Just lc -> do
+                        let boolFlag =
+                              (Target $ Node.toEventTarget node) == (Target $ eventTarget) ||
+                              (Target $ Node.toEventTarget node) == (Target lc)
+                        void $ if boolFlag
+                              then Ref.modify_ not isInBetween
+                              else pure unit
+                        isb <- Ref.read isInBetween
+                        void $ if isb
+                              then HTMLInputElement.setChecked true (nodeToHtmlInputElement node)
+                              else pure unit)
 
 effHandleCheck
   :: forall m. Bind m
   => Monad m
   => MonadEffect m
-  => ReaderT (Array Node) m EventListener
+  => ReaderT HandleCheckEnv m EventListener
 effHandleCheck = do
-  nodes <- ask
+  env@{ isInBetween, lastChecked, nodes } <- ask
   liftEffect $ EventTarget.eventListener $ \e -> void do
     isShiftKey <- pure <<< MouseEvent.shiftKey <<< eventToMouseEvent $ e
     case Event.target e of
       Nothing -> pure unit
       Just evtTarget -> do
         isChecked <- HTMLInputElement.checked $ eventToHtmlInputElement evtTarget
-        runStateT (iterNodes evtTarget nodes isChecked isShiftKey) false *> pure unit
+        case (isShiftKey && isChecked) of
+          true -> do
+            let evtTargetField = SProxy :: SProxy "eventTarget"
+            runReaderT iterNodes (Record.insert evtTargetField evtTarget env)
+            Ref.modify_ (const $ Just evtTarget) lastChecked
+          false -> Ref.modify_ (const Nothing) lastChecked
 
 main :: Effect Unit
 main = do
@@ -135,8 +126,12 @@ main = do
   nodeList <-
     runReaderT getAllElements { parentNode: parentNode, targetElement: ".inbox input[type='checkbox']" }
   nodeArr <- NodeList.toArray nodeList
-  handleCheck <- runStateT (runReaderT effHandleCheck nodeArr) false
+  handleCheckEnv <-
+    Ref.new false >>=
+    \bool -> Ref.new Nothing >>= \lc ->
+    pure { nodes: nodeArr, isInBetween: bool, lastChecked: lc }
+  handleCheck <- runReaderT effHandleCheck handleCheckEnv
   foreachE
     nodeArr
-    (\node -> EventTarget.addEventListener EventTypes.click (fst handleCheck) false (Node.toEventTarget node))
+    (\node -> EventTarget.addEventListener EventTypes.click handleCheck false (Node.toEventTarget node))
 
