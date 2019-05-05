@@ -8,7 +8,7 @@ import Data.Maybe (Maybe(..))
 
 -- Effect
 import Effect (Effect)
-import Effect.Console (logShow)
+-- import Effect.Console (logShow)
 
 -- DOM
 import Web.HTML as HTML
@@ -16,12 +16,17 @@ import Web.HTML.Window as Window
 import Web.DOM.ParentNode (ParentNode, QuerySelector(..))
 import Web.DOM.ParentNode as ParentNode
 import Web.DOM.Internal.Types (Element, Node)
+import Web.Event.Internal.Types (Event, EventTarget)
+import Web.Event.EventTarget as EventTarget
 import Web.DOM.NodeList as NodeList
 import Web.HTML.HTMLDocument (HTMLDocument)
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.DOM.Element as Element
 import Web.HTML.HTMLMediaElement (HTMLMediaElement)
 import Web.HTML.HTMLMediaElement as HTMLMediaElement
+import Web.HTML.Event.EventTypes as EventTypes
+import Web.Event.Event as Event
+
 class IsParentNode doc where
   toParentNode :: doc -> ParentNode
 
@@ -36,6 +41,12 @@ class IsHTMLMediaElement el where
 
 instance elementHtmlMediaElement :: IsHTMLMediaElement Element where
   fromElement = HTMLMediaElement.fromElement
+
+class IsEventTarget e where
+  toEventTarget :: e -> EventTarget
+
+instance htmlMediaElementToEventTarget :: IsEventTarget HTMLMediaElement where
+  toEventTarget = HTMLMediaElement.toEventTarget
 
 effParentNode :: Effect ParentNode
 effParentNode =
@@ -62,6 +73,28 @@ getAllElements = do
   { parentNode, targetElement } <- ask
   liftEffect $ NodeList.toArray =<< ParentNode.querySelectorAll (QuerySelector targetElement) parentNode
 
+tooglePlay :: Event -> Effect Unit
+tooglePlay e = do
+  case Event.target e of
+    Nothing -> pure unit
+    Just evtTarget ->
+      case HTMLMediaElement.fromEventTarget evtTarget of
+        Nothing -> pure unit
+        Just video -> do
+          isPaused <- HTMLMediaElement.paused video
+          void $ if isPaused
+                 then HTMLMediaElement.play video
+                 else HTMLMediaElement.pause video
+
+addEventListener'
+  :: forall target. IsEventTarget target
+  => (Event -> Effect Unit)
+  -> target
+  -> Effect Unit
+addEventListener' f e =
+  EventTarget.eventListener f >>=
+  \f' -> EventTarget.addEventListener EventTypes.click f' false (toEventTarget e)
+
 main :: Effect Unit
 main = do
   parentNode <- effParentNode
@@ -79,4 +112,4 @@ main = do
         Nothing -> pure unit
         Just video -> do
           isPaused <- HTMLMediaElement.paused video
-          logShow isPaused
+          addEventListener' tooglePlay video
