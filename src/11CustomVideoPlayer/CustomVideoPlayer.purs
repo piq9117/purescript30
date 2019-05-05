@@ -24,8 +24,10 @@ import Web.HTML.HTMLDocument as HTMLDocument
 import Web.DOM.Element as Element
 import Web.HTML.HTMLMediaElement (HTMLMediaElement)
 import Web.HTML.HTMLMediaElement as HTMLMediaElement
-import Web.HTML.Event.EventTypes as EventTypes
+import Web.HTML.Event.EventTypes as EventType
 import Web.Event.Event as Event
+import Web.Event.Event (EventType(..))
+import Web.DOM.Node as Node
 
 class IsParentNode doc where
   toParentNode :: doc -> ParentNode
@@ -83,28 +85,34 @@ tooglePlay
 tooglePlay target e = do
   isPaused <- HTMLMediaElement.paused target
   void $ if isPaused
-            then HTMLMediaElement.play target
-            else HTMLMediaElement.pause target
+         then HTMLMediaElement.play target
+         else HTMLMediaElement.pause target
 
-  -- case Event.target e of
-  --   Nothing -> pure unit
-  --   Just evtTarget ->
-  --     case HTMLMediaElement.fromEventTarget evtTarget of
-  --       Nothing -> pure unit
-  --       Just video -> do
-  --         isPaused <- HTMLMediaElement.paused video
-  --         void $ if isPaused
-  --                then HTMLMediaElement.play video
-  --                else HTMLMediaElement.pause video
+updateButton
+  :: Element
+  -> Event
+  -> Effect Unit
+updateButton el e = do
+  case Event.target e of
+    Nothing -> pure unit
+    Just t ->
+      case HTMLMediaElement.fromEventTarget t of
+        Nothing -> pure unit
+        Just medElement -> do
+          isPaused <- HTMLMediaElement.paused medElement
+          void $ if isPaused
+                 then Node.setTextContent "►" (Element.toNode el)
+                 else Node.setTextContent "❚ ❚" (Element.toNode el)
 
-clickListener
+listener
   :: forall target. IsEventTarget target
   => (Event -> Effect Unit)
   -> target
+  -> EventType
   -> Effect Unit
-clickListener f e=
+listener f e evtType =
   EventTarget.eventListener f >>=
-  \f' -> EventTarget.addEventListener EventTypes.click f' false (toEventTarget e)
+  \f' -> EventTarget.addEventListener evtType f' false (toEventTarget e)
 
 main :: Effect Unit
 main = do
@@ -124,8 +132,16 @@ main = do
         Nothing -> pure unit
         Just video -> do
           case mToggle of
-            Nothing -> do
-              pure unit
+            Nothing -> pure unit
             Just toggle -> do
-              clickListener (tooglePlay video) video
-              clickListener (tooglePlay video) toggle
+              listener (tooglePlay video) video EventType.click
+              listener (tooglePlay video) toggle EventType.click
+              listener (updateButton toggle) video (EventType "play")
+              listener (updateButton toggle) video (EventType "pause")
+
+
+
+
+
+
+
