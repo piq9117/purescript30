@@ -1555,7 +1555,6 @@ var Effect_Class = require("../Effect.Class/index.js");
 var Web_DOM_Element = require("../Web.DOM.Element/index.js");
 var Web_DOM_NodeList = require("../Web.DOM.NodeList/index.js");
 var Web_DOM_ParentNode = require("../Web.DOM.ParentNode/index.js");
-var Web_Event_Event = require("../Web.Event.Event/index.js");
 var Web_Event_EventTarget = require("../Web.Event.EventTarget/index.js");
 var Web_HTML = require("../Web.HTML/index.js");
 var Web_HTML_Event_EventTypes = require("../Web.HTML.Event.EventTypes/index.js");
@@ -1571,30 +1570,18 @@ var IsHTMLMediaElement = function (fromElement) {
 var IsEventTarget = function (toEventTarget) {
     this.toEventTarget = toEventTarget;
 };
-var tooglePlay = function (e) {
-    var v = Web_Event_Event.target(e);
-    if (v instanceof Data_Maybe.Nothing) {
-        return Control_Applicative.pure(Effect.applicativeEffect)(Data_Unit.unit);
-    };
-    if (v instanceof Data_Maybe.Just) {
-        var v1 = Web_HTML_HTMLMediaElement.fromEventTarget(v.value0);
-        if (v1 instanceof Data_Maybe.Nothing) {
-            return Control_Applicative.pure(Effect.applicativeEffect)(Data_Unit.unit);
+var tooglePlay = function (target) {
+    return function (e) {
+        return function __do() {
+            var v = Web_HTML_HTMLMediaElement.paused(target)();
+            return Data_Functor["void"](Effect.functorEffect)((function () {
+                if (v) {
+                    return Web_HTML_HTMLMediaElement.play(target);
+                };
+                return Web_HTML_HTMLMediaElement.pause(target);
+            })())();
         };
-        if (v1 instanceof Data_Maybe.Just) {
-            return function __do() {
-                var v2 = Web_HTML_HTMLMediaElement.paused(v1.value0)();
-                return Data_Functor["void"](Effect.functorEffect)((function () {
-                    if (v2) {
-                        return Web_HTML_HTMLMediaElement.play(v1.value0);
-                    };
-                    return Web_HTML_HTMLMediaElement.pause(v1.value0);
-                })())();
-            };
-        };
-        throw new Error("Failed pattern match at CustomVideoPlayer (line 87, column 7 - line 93, column 51): " + [ v1.constructor.name ]);
     };
-    throw new Error("Failed pattern match at CustomVideoPlayer (line 84, column 3 - line 93, column 51): " + [ v.constructor.name ]);
 };
 var toParentNode = function (dict) {
     return dict.toParentNode;
@@ -1621,12 +1608,13 @@ var getAllElements = function (dictBind) {
 var fromElement = function (dict) {
     return dict.fromElement;
 };
+var elementToEventTarget = new IsEventTarget(Web_DOM_Element.toEventTarget);
 var elementIsParentNode = new IsParentNode(Web_DOM_Element.toParentNode);
 var elementHtmlMediaElement = new IsHTMLMediaElement(Web_HTML_HTMLMediaElement.fromElement);
-var effParentNode = Control_Bind.bindFlipped(Effect.bindEffect)(function ($47) {
-    return Control_Applicative.pure(Effect.applicativeEffect)(toParentNode(htmldocIsParentNode)($47));
+var effParentNode = Control_Bind.bindFlipped(Effect.bindEffect)(function ($44) {
+    return Control_Applicative.pure(Effect.applicativeEffect)(toParentNode(htmldocIsParentNode)($44));
 })(Control_Bind.bindFlipped(Effect.bindEffect)(Web_HTML_Window.document)(Web_HTML.window));
-var addEventListener$prime = function (dictIsEventTarget) {
+var clickListener = function (dictIsEventTarget) {
     return function (f) {
         return function (e) {
             return function __do() {
@@ -1650,25 +1638,29 @@ var main = function __do() {
             parentNode: toParentNode(elementIsParentNode)(v1.value0),
             targetElement: ""
         };
-        var v2 = Control_Bind.bindFlipped(Effect.bindEffect)(function ($48) {
-            return Control_Applicative.pure(Effect.applicativeEffect)(Control_Bind.join(Data_Maybe.bindMaybe)(Control_Applicative.liftA1(Data_Maybe.applicativeMaybe)(fromElement(elementHtmlMediaElement))($48)));
+        var v2 = Control_Bind.bindFlipped(Effect.bindEffect)(function ($45) {
+            return Control_Applicative.pure(Effect.applicativeEffect)(Control_Bind.join(Data_Maybe.bindMaybe)(Control_Applicative.liftA1(Data_Maybe.applicativeMaybe)(fromElement(elementHtmlMediaElement))($45)));
         })(Control_Monad_Reader_Trans.runReaderT(getElement(Effect.bindEffect)(Effect_Class.monadEffectEffect))({
             parentNode: pNode.parentNode,
             targetElement: ".viewer"
         }))();
         var v3 = Control_Monad_Reader_Trans.runReaderT(getElement(Effect.bindEffect)(Effect_Class.monadEffectEffect))({
             parentNode: pNode.parentNode,
-            targetElement: ".progress"
+            targetElement: ".toggle"
         })();
         var v4 = Control_Monad_Reader_Trans.runReaderT(getElement(Effect.bindEffect)(Effect_Class.monadEffectEffect))({
             parentNode: pNode.parentNode,
+            targetElement: ".progress"
+        })();
+        var v5 = Control_Monad_Reader_Trans.runReaderT(getElement(Effect.bindEffect)(Effect_Class.monadEffectEffect))({
+            parentNode: pNode.parentNode,
             targetElement: ".progress_filled"
         })();
-        var v5 = Control_Monad_Reader_Trans.runReaderT(getAllElements(Effect.bindEffect)(Effect_Class.monadEffectEffect))({
+        var v6 = Control_Monad_Reader_Trans.runReaderT(getAllElements(Effect.bindEffect)(Effect_Class.monadEffectEffect))({
             parentNode: pNode.parentNode,
             targetElement: "[data-skip]"
         })();
-        var v6 = Control_Monad_Reader_Trans.runReaderT(getAllElements(Effect.bindEffect)(Effect_Class.monadEffectEffect))({
+        var v7 = Control_Monad_Reader_Trans.runReaderT(getAllElements(Effect.bindEffect)(Effect_Class.monadEffectEffect))({
             parentNode: pNode.parentNode,
             targetElement: ".player__slider"
         })();
@@ -1676,12 +1668,18 @@ var main = function __do() {
             return Data_Unit.unit;
         };
         if (v2 instanceof Data_Maybe.Just) {
-            var v7 = Web_HTML_HTMLMediaElement.paused(v2.value0)();
-            return addEventListener$prime(htmlMediaElementToEventTarget)(tooglePlay)(v2.value0)();
+            if (v3 instanceof Data_Maybe.Nothing) {
+                return Data_Unit.unit;
+            };
+            if (v3 instanceof Data_Maybe.Just) {
+                clickListener(htmlMediaElementToEventTarget)(tooglePlay(v2.value0))(v2.value0)();
+                return clickListener(elementToEventTarget)(tooglePlay(v2.value0))(v3.value0)();
+            };
+            throw new Error("Failed pattern match at CustomVideoPlayer (line 126, column 11 - line 131, column 48): " + [ v3.constructor.name ]);
         };
-        throw new Error("Failed pattern match at CustomVideoPlayer (line 116, column 7 - line 120, column 40): " + [ v2.constructor.name ]);
+        throw new Error("Failed pattern match at CustomVideoPlayer (line 123, column 7 - line 131, column 48): " + [ v2.constructor.name ]);
     };
-    throw new Error("Failed pattern match at CustomVideoPlayer (line 107, column 3 - line 120, column 40): " + [ v1.constructor.name ]);
+    throw new Error("Failed pattern match at CustomVideoPlayer (line 113, column 3 - line 131, column 48): " + [ v1.constructor.name ]);
 };
 module.exports = {
     fromElement: fromElement,
@@ -1694,15 +1692,16 @@ module.exports = {
     getElement: getElement,
     getAllElements: getAllElements,
     tooglePlay: tooglePlay,
-    "addEventListener'": addEventListener$prime,
+    clickListener: clickListener,
     main: main,
     htmldocIsParentNode: htmldocIsParentNode,
     elementIsParentNode: elementIsParentNode,
     elementHtmlMediaElement: elementHtmlMediaElement,
-    htmlMediaElementToEventTarget: htmlMediaElementToEventTarget
+    htmlMediaElementToEventTarget: htmlMediaElementToEventTarget,
+    elementToEventTarget: elementToEventTarget
 };
 
-},{"../Control.Applicative/index.js":3,"../Control.Bind/index.js":9,"../Control.Monad.Reader.Class/index.js":17,"../Control.Monad.Reader.Trans/index.js":18,"../Data.Functor/index.js":56,"../Data.Maybe/index.js":64,"../Data.Unit/index.js":104,"../Effect.Class/index.js":106,"../Effect/index.js":112,"../Web.DOM.Element/index.js":121,"../Web.DOM.NodeList/index.js":123,"../Web.DOM.ParentNode/index.js":125,"../Web.Event.Event/index.js":127,"../Web.Event.EventTarget/index.js":130,"../Web.HTML.Event.EventTypes/index.js":131,"../Web.HTML.HTMLDocument/index.js":134,"../Web.HTML.HTMLMediaElement/index.js":139,"../Web.HTML.Window/index.js":141,"../Web.HTML/index.js":143}],29:[function(require,module,exports){
+},{"../Control.Applicative/index.js":3,"../Control.Bind/index.js":9,"../Control.Monad.Reader.Class/index.js":17,"../Control.Monad.Reader.Trans/index.js":18,"../Data.Functor/index.js":56,"../Data.Maybe/index.js":64,"../Data.Unit/index.js":104,"../Effect.Class/index.js":106,"../Effect/index.js":112,"../Web.DOM.Element/index.js":121,"../Web.DOM.NodeList/index.js":123,"../Web.DOM.ParentNode/index.js":125,"../Web.Event.EventTarget/index.js":127,"../Web.HTML.Event.EventTypes/index.js":128,"../Web.HTML.HTMLDocument/index.js":131,"../Web.HTML.HTMLMediaElement/index.js":136,"../Web.HTML.Window/index.js":138,"../Web.HTML/index.js":140}],29:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var Control_Applicative = require("../Control.Applicative/index.js");
@@ -11023,7 +11022,7 @@ module.exports = {
     clientHeight: $foreign.clientHeight
 };
 
-},{"../Data.Functor/index.js":56,"../Data.Nullable/index.js":74,"../Effect/index.js":112,"../Unsafe.Coerce/index.js":119,"../Web.Internal.FFI/index.js":145,"./foreign.js":120}],122:[function(require,module,exports){
+},{"../Data.Functor/index.js":56,"../Data.Nullable/index.js":74,"../Effect/index.js":112,"../Unsafe.Coerce/index.js":119,"../Web.Internal.FFI/index.js":142,"./foreign.js":120}],122:[function(require,module,exports){
 "use strict";
 
 exports.length = function (list) {
@@ -11144,255 +11143,6 @@ module.exports = {
 },{"../Data.Eq/index.js":47,"../Data.Functor/index.js":56,"../Data.Newtype/index.js":72,"../Data.Nullable/index.js":74,"../Data.Ord/index.js":78,"../Effect/index.js":112,"./foreign.js":124}],126:[function(require,module,exports){
 "use strict";
 
-exports.bubbles = function (e) {
-  return e.bubbles;
-};
-
-exports.cancelable = function (e) {
-  return e.cancelable;
-};
-
-exports._currentTarget = function (e) {
-  return e.currentTarget;
-};
-
-exports.defaultPrevented = function (e) {
-  return function() {
-    return e.defaultPrevented;
-  };
-};
-
-exports.eventPhaseIndex = function (e) {
-  return e.eventPhase;
-};
-
-exports._target = function (e) {
-  return e.target;
-};
-
-exports.timeStamp = function (e) {
-  return e.timeStamp;
-};
-
-exports.type_ = function (e) {
-  return e.type;
-};
-
-exports.preventDefault = function (e) {
-  return function () {
-    return e.preventDefault();
-  };
-};
-
-exports.stopImmediatePropagation = function (e) {
-  return function () {
-    return e.stopImmediatePropagation();
-  };
-};
-
-exports.stopPropagation = function (e) {
-  return function () {
-    return e.stopPropagation();
-  };
-};
-
-},{}],127:[function(require,module,exports){
-// Generated by purs version 0.12.5
-"use strict";
-var $foreign = require("./foreign.js");
-var Data_Enum = require("../Data.Enum/index.js");
-var Data_Eq = require("../Data.Eq/index.js");
-var Data_Maybe = require("../Data.Maybe/index.js");
-var Data_Newtype = require("../Data.Newtype/index.js");
-var Data_Nullable = require("../Data.Nullable/index.js");
-var Data_Ord = require("../Data.Ord/index.js");
-var Web_Event_EventPhase = require("../Web.Event.EventPhase/index.js");
-var EventType = function (x) {
-    return x;
-};
-var target = function ($4) {
-    return Data_Nullable.toMaybe($foreign["_target"]($4));
-};
-var ordEventType = Data_Ord.ordString;
-var newtypeEventType = new Data_Newtype.Newtype(function (n) {
-    return n;
-}, EventType);
-var eventPhase = function (dictPartial) {
-    return function ($5) {
-        return Data_Maybe.fromJust(dictPartial)(Data_Enum.toEnum(Web_Event_EventPhase.boundedEnumEventPhase)($foreign.eventPhaseIndex($5)));
-    };
-};
-var eqEventType = Data_Eq.eqString;
-var currentTarget = function ($6) {
-    return Data_Nullable.toMaybe($foreign["_currentTarget"]($6));
-};
-module.exports = {
-    EventType: EventType,
-    target: target,
-    currentTarget: currentTarget,
-    eventPhase: eventPhase,
-    newtypeEventType: newtypeEventType,
-    eqEventType: eqEventType,
-    ordEventType: ordEventType,
-    type_: $foreign.type_,
-    stopPropagation: $foreign.stopPropagation,
-    stopImmediatePropagation: $foreign.stopImmediatePropagation,
-    bubbles: $foreign.bubbles,
-    cancelable: $foreign.cancelable,
-    preventDefault: $foreign.preventDefault,
-    defaultPrevented: $foreign.defaultPrevented,
-    timeStamp: $foreign.timeStamp
-};
-
-},{"../Data.Enum/index.js":45,"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Newtype/index.js":72,"../Data.Nullable/index.js":74,"../Data.Ord/index.js":78,"../Web.Event.EventPhase/index.js":128,"./foreign.js":126}],128:[function(require,module,exports){
-// Generated by purs version 0.12.5
-"use strict";
-var Data_Bounded = require("../Data.Bounded/index.js");
-var Data_Enum = require("../Data.Enum/index.js");
-var Data_Eq = require("../Data.Eq/index.js");
-var Data_Maybe = require("../Data.Maybe/index.js");
-var Data_Ord = require("../Data.Ord/index.js");
-var Data_Ordering = require("../Data.Ordering/index.js");
-var None = (function () {
-    function None() {
-
-    };
-    None.value = new None();
-    return None;
-})();
-var Capturing = (function () {
-    function Capturing() {
-
-    };
-    Capturing.value = new Capturing();
-    return Capturing;
-})();
-var AtTarget = (function () {
-    function AtTarget() {
-
-    };
-    AtTarget.value = new AtTarget();
-    return AtTarget;
-})();
-var Bubbling = (function () {
-    function Bubbling() {
-
-    };
-    Bubbling.value = new Bubbling();
-    return Bubbling;
-})();
-var toEnumEventPhase = function (v) {
-    if (v === 0) {
-        return new Data_Maybe.Just(None.value);
-    };
-    if (v === 1) {
-        return new Data_Maybe.Just(Capturing.value);
-    };
-    if (v === 2) {
-        return new Data_Maybe.Just(AtTarget.value);
-    };
-    if (v === 3) {
-        return new Data_Maybe.Just(Bubbling.value);
-    };
-    return Data_Maybe.Nothing.value;
-};
-var fromEnumEventPhase = function (v) {
-    if (v instanceof None) {
-        return 0;
-    };
-    if (v instanceof Capturing) {
-        return 1;
-    };
-    if (v instanceof AtTarget) {
-        return 2;
-    };
-    if (v instanceof Bubbling) {
-        return 3;
-    };
-    throw new Error("Failed pattern match at Web.Event.EventPhase (line 40, column 3 - line 44, column 17): " + [ v.constructor.name ]);
-};
-var eqEventPhase = new Data_Eq.Eq(function (x) {
-    return function (y) {
-        if (x instanceof None && y instanceof None) {
-            return true;
-        };
-        if (x instanceof Capturing && y instanceof Capturing) {
-            return true;
-        };
-        if (x instanceof AtTarget && y instanceof AtTarget) {
-            return true;
-        };
-        if (x instanceof Bubbling && y instanceof Bubbling) {
-            return true;
-        };
-        return false;
-    };
-});
-var ordEventPhase = new Data_Ord.Ord(function () {
-    return eqEventPhase;
-}, function (x) {
-    return function (y) {
-        if (x instanceof None && y instanceof None) {
-            return Data_Ordering.EQ.value;
-        };
-        if (x instanceof None) {
-            return Data_Ordering.LT.value;
-        };
-        if (y instanceof None) {
-            return Data_Ordering.GT.value;
-        };
-        if (x instanceof Capturing && y instanceof Capturing) {
-            return Data_Ordering.EQ.value;
-        };
-        if (x instanceof Capturing) {
-            return Data_Ordering.LT.value;
-        };
-        if (y instanceof Capturing) {
-            return Data_Ordering.GT.value;
-        };
-        if (x instanceof AtTarget && y instanceof AtTarget) {
-            return Data_Ordering.EQ.value;
-        };
-        if (x instanceof AtTarget) {
-            return Data_Ordering.LT.value;
-        };
-        if (y instanceof AtTarget) {
-            return Data_Ordering.GT.value;
-        };
-        if (x instanceof Bubbling && y instanceof Bubbling) {
-            return Data_Ordering.EQ.value;
-        };
-        throw new Error("Failed pattern match at Web.Event.EventPhase (line 14, column 8 - line 14, column 48): " + [ x.constructor.name, y.constructor.name ]);
-    };
-});
-var enumEventPhase = new Data_Enum.Enum(function () {
-    return ordEventPhase;
-}, Data_Enum.defaultPred(toEnumEventPhase)(fromEnumEventPhase), Data_Enum.defaultSucc(toEnumEventPhase)(fromEnumEventPhase));
-var boundedEventPhase = new Data_Bounded.Bounded(function () {
-    return ordEventPhase;
-}, None.value, Bubbling.value);
-var boundedEnumEventPhase = new Data_Enum.BoundedEnum(function () {
-    return boundedEventPhase;
-}, function () {
-    return enumEventPhase;
-}, 4, fromEnumEventPhase, toEnumEventPhase);
-module.exports = {
-    None: None,
-    Capturing: Capturing,
-    AtTarget: AtTarget,
-    Bubbling: Bubbling,
-    toEnumEventPhase: toEnumEventPhase,
-    fromEnumEventPhase: fromEnumEventPhase,
-    eqEventPhase: eqEventPhase,
-    ordEventPhase: ordEventPhase,
-    boundedEventPhase: boundedEventPhase,
-    enumEventPhase: enumEventPhase,
-    boundedEnumEventPhase: boundedEnumEventPhase
-};
-
-},{"../Data.Bounded/index.js":40,"../Data.Enum/index.js":45,"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Ord/index.js":78,"../Data.Ordering/index.js":79}],129:[function(require,module,exports){
-"use strict";
-
 exports.eventListener = function (fn) {
   return function () {
     return function (event) {
@@ -11433,7 +11183,7 @@ exports.dispatchEvent = function (event) {
   };
 };
 
-},{}],130:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var $foreign = require("./foreign.js");
@@ -11444,7 +11194,7 @@ module.exports = {
     dispatchEvent: $foreign.dispatchEvent
 };
 
-},{"./foreign.js":129}],131:[function(require,module,exports){
+},{"./foreign.js":126}],128:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var unload = "unload";
@@ -11516,7 +11266,7 @@ module.exports = {
     unload: unload
 };
 
-},{}],132:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var Data_Eq = require("../Data.Eq/index.js");
@@ -11634,7 +11384,7 @@ module.exports = {
     showReadyState: showReadyState
 };
 
-},{"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Ord/index.js":78,"../Data.Ordering/index.js":79,"../Data.Show/index.js":91}],133:[function(require,module,exports){
+},{"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Ord/index.js":78,"../Data.Ordering/index.js":79,"../Data.Show/index.js":91}],130:[function(require,module,exports){
 "use strict";
 
 exports._body = function (doc) {
@@ -11681,7 +11431,7 @@ exports.setTitle = function (title) {
     };
   };
 };
-},{}],134:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var $foreign = require("./foreign.js");
@@ -11736,7 +11486,7 @@ module.exports = {
     setTitle: $foreign.setTitle
 };
 
-},{"../Data.Functor/index.js":56,"../Data.Maybe/index.js":64,"../Data.Nullable/index.js":74,"../Effect/index.js":112,"../Unsafe.Coerce/index.js":119,"../Web.HTML.HTMLDocument.ReadyState/index.js":132,"../Web.Internal.FFI/index.js":145,"./foreign.js":133}],135:[function(require,module,exports){
+},{"../Data.Functor/index.js":56,"../Data.Maybe/index.js":64,"../Data.Nullable/index.js":74,"../Effect/index.js":112,"../Unsafe.Coerce/index.js":119,"../Web.HTML.HTMLDocument.ReadyState/index.js":129,"../Web.Internal.FFI/index.js":142,"./foreign.js":130}],132:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var Data_Eq = require("../Data.Eq/index.js");
@@ -11854,7 +11604,7 @@ module.exports = {
     showCanPlayType: showCanPlayType
 };
 
-},{"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Ord/index.js":78,"../Data.Ordering/index.js":79,"../Data.Show/index.js":91}],136:[function(require,module,exports){
+},{"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Ord/index.js":78,"../Data.Ordering/index.js":79,"../Data.Show/index.js":91}],133:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var Data_Bounded = require("../Data.Bounded/index.js");
@@ -12015,7 +11765,7 @@ module.exports = {
     showNetworkState: showNetworkState
 };
 
-},{"../Data.Bounded/index.js":40,"../Data.Enum/index.js":45,"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Ord/index.js":78,"../Data.Ordering/index.js":79,"../Data.Show/index.js":91}],137:[function(require,module,exports){
+},{"../Data.Bounded/index.js":40,"../Data.Enum/index.js":45,"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Ord/index.js":78,"../Data.Ordering/index.js":79,"../Data.Show/index.js":91}],134:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var Data_Bounded = require("../Data.Bounded/index.js");
@@ -12205,7 +11955,7 @@ module.exports = {
     showReadyState: showReadyState
 };
 
-},{"../Data.Bounded/index.js":40,"../Data.Enum/index.js":45,"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Ord/index.js":78,"../Data.Ordering/index.js":79,"../Data.Show/index.js":91}],138:[function(require,module,exports){
+},{"../Data.Bounded/index.js":40,"../Data.Enum/index.js":45,"../Data.Eq/index.js":47,"../Data.Maybe/index.js":64,"../Data.Ord/index.js":78,"../Data.Ordering/index.js":79,"../Data.Show/index.js":91}],135:[function(require,module,exports){
 "use strict";
 
 exports.src = function (media) {
@@ -12504,7 +12254,7 @@ exports.setDefaultMuted = function (defaultMuted) {
   };
 };
 
-},{}],139:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var $foreign = require("./foreign.js");
@@ -12609,7 +12359,7 @@ module.exports = {
     setDefaultMuted: $foreign.setDefaultMuted
 };
 
-},{"../Data.Enum/index.js":45,"../Data.Functor/index.js":56,"../Data.Maybe/index.js":64,"../Effect/index.js":112,"../Unsafe.Coerce/index.js":119,"../Web.HTML.HTMLMediaElement.CanPlayType/index.js":135,"../Web.HTML.HTMLMediaElement.NetworkState/index.js":136,"../Web.HTML.HTMLMediaElement.ReadyState/index.js":137,"../Web.Internal.FFI/index.js":145,"./foreign.js":138}],140:[function(require,module,exports){
+},{"../Data.Enum/index.js":45,"../Data.Functor/index.js":56,"../Data.Maybe/index.js":64,"../Effect/index.js":112,"../Unsafe.Coerce/index.js":119,"../Web.HTML.HTMLMediaElement.CanPlayType/index.js":132,"../Web.HTML.HTMLMediaElement.NetworkState/index.js":133,"../Web.HTML.HTMLMediaElement.ReadyState/index.js":134,"../Web.Internal.FFI/index.js":142,"./foreign.js":135}],137:[function(require,module,exports){
 "use strict";
 
 exports.document = function (window) {
@@ -12842,7 +12592,7 @@ exports._cancelIdleCallback = function(id) {
   };
 };
 
-},{}],141:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var $foreign = require("./foreign.js");
@@ -12969,7 +12719,7 @@ module.exports = {
     sessionStorage: $foreign.sessionStorage
 };
 
-},{"../Data.Eq/index.js":47,"../Data.Functor/index.js":56,"../Data.Newtype/index.js":72,"../Data.Nullable/index.js":74,"../Data.Ord/index.js":78,"../Effect/index.js":112,"../Unsafe.Coerce/index.js":119,"./foreign.js":140}],142:[function(require,module,exports){
+},{"../Data.Eq/index.js":47,"../Data.Functor/index.js":56,"../Data.Newtype/index.js":72,"../Data.Nullable/index.js":74,"../Data.Ord/index.js":78,"../Effect/index.js":112,"../Unsafe.Coerce/index.js":119,"./foreign.js":137}],139:[function(require,module,exports){
 /* global window */
 "use strict";
 
@@ -12977,7 +12727,7 @@ exports.window = function () {
   return window;
 };
 
-},{}],143:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var $foreign = require("./foreign.js");
@@ -12985,7 +12735,7 @@ module.exports = {
     window: $foreign.window
 };
 
-},{"./foreign.js":142}],144:[function(require,module,exports){
+},{"./foreign.js":139}],141:[function(require,module,exports){
 "use strict";
 
 exports._unsafeReadProtoTagged = function (nothing, just, name, value) {
@@ -13010,7 +12760,7 @@ exports._unsafeReadProtoTagged = function (nothing, just, name, value) {
   return nothing;
 };
 
-},{}],145:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 // Generated by purs version 0.12.5
 "use strict";
 var $foreign = require("./foreign.js");
@@ -13024,7 +12774,7 @@ module.exports = {
     unsafeReadProtoTagged: unsafeReadProtoTagged
 };
 
-},{"../Data.Maybe/index.js":64,"./foreign.js":144}],146:[function(require,module,exports){
+},{"../Data.Maybe/index.js":64,"./foreign.js":141}],143:[function(require,module,exports){
 require('CustomVideoPlayer').main();
 
-},{"CustomVideoPlayer":28}]},{},[146]);
+},{"CustomVideoPlayer":28}]},{},[143]);
