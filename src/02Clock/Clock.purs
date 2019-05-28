@@ -1,13 +1,13 @@
 module Clock where
 
 import Prelude
-
+import Data.Array
 import Control.Monad.Reader.Trans (runReaderT, ask, ReaderT)
 import Data.JSDate (getHours, getMinutes, getSeconds, now)
 import Data.Maybe (Maybe(..))
 
 -- Effect
-import Effect (Effect)
+import Effect (Effect, foreachE)
 import Effect.Timer (setInterval)
 import Effect.Uncurried (EffectFn2, runEffectFn2)
 import Effect.Class (class MonadEffect)
@@ -63,18 +63,20 @@ setDate (ClockHands {secondHand, minuteHand, hourHand}) = do
 main :: Effect Unit
 main = do
   parentNode <- docNode
-  mSecondHand <- runReaderT (getElement ".second-hand") parentNode
-  mMinuteHand <- runReaderT (getElement ".hour-hand") parentNode
-  mHourHand <- runReaderT (getElement ".min-hand") parentNode
-  case mSecondHand of
-    Nothing -> logShow "Nothing"
+  clockHands <- flip runReaderT parentNode $ do
+    secHand <- getElement ".second-hand"
+    hrHand <- getElement ".hour-hand"
+    minHand <- getElement ".min-hand"
+    pure { secondHand: secHand, hourHand: hrHand, minuteHand: minHand }
+  case clockHands.secondHand of
+    Nothing -> pure unit
     Just secondHand ->
-      case mMinuteHand of
-        Nothing -> logShow "Nothing"
-        Just minuteHand ->
-          case mHourHand of
-            Nothing -> logShow "Nothing"
-            Just hourHand -> do
+      case clockHands.hourHand of
+        Nothing -> pure unit
+        Just hourHand ->
+          case clockHands.minuteHand of
+            Nothing -> pure unit
+            Just minuteHand -> do
               void $ setInterval 1000
                 (setDate (ClockHands { secondHand: secondHand
                                      , minuteHand: minuteHand
