@@ -97,10 +97,10 @@ effParentNode =
 getElement
   :: forall m. Bind m
   => MonadEffect m
-  => ReaderT { parentNode :: ParentNode, targetElement :: String } m (Maybe Element)
-getElement = do
-  { parentNode, targetElement } <- ask
-  EffectClass.liftEffect $ ParentNode.querySelector (QuerySelector targetElement) parentNode
+  => String
+  -> ReaderT ParentNode m (Maybe Element)
+getElement targetElement =
+  EffectClass.liftEffect <<< ParentNode.querySelector (QuerySelector targetElement) =<< ask
 
 findMatches :: String -> Array City -> Array City
 findMatches wordToMatch cities =
@@ -130,8 +130,10 @@ effDisplayMatch cities el = EventTarget.eventListener $ \e -> void do
 main :: Effect (Fiber Unit)
 main = Aff.launchAff $ do
   parentNode <- EffectClass.liftEffect effParentNode
-  mSearchInput <- runReaderT getElement { parentNode: parentNode, targetElement: ".search" }
-  mSuggestions <- runReaderT getElement { parentNode: parentNode, targetElement: ".suggestions" }
+  typeAhead <- flip runReaderT parentNode $ do
+    searchEl <- getElement ".search"
+    suggetionEl <- getElement ".suggestions"
+    pure { searchInput: searchEl, suggestions: suggetionEl }
   res <- AX.request (AX.defaultRequest { url = citiesUrl, method = Left GET, responseFormat = ResponseFormat.json })
   case res.body of
     Left err -> log $ "Error: " <> AX.printResponseFormatError err
@@ -139,11 +141,11 @@ main = Aff.launchAff $ do
       case (decodeJson json) :: Either String (Array City) of
         Left err -> log $ "ERROR: " <> err
         Right cities ->
-          case mSearchInput of
-            Nothing -> log "Search input not found."
+          case typeAhead.searchInput of
+            Nothing -> pure unit
             Just searchInput -> do
-              case mSuggestions of
-                Nothing -> log "Suggestions not found."
+              case typeAhead.suggestions of
+                Nothing -> pure unit
                 Just suggestions -> do
                   displayMatch <- EffectClass.liftEffect $ effDisplayMatch cities suggestions
                   eventListener EventTypes.change displayMatch searchInput
