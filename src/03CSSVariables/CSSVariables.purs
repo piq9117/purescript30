@@ -19,6 +19,7 @@ import Web.DOM.Document (Document)
 import Web.DOM.Document as Document
 import Web.DOM.Internal.Types (NodeList, Element)
 import Web.DOM.Node as DOMNode
+import Web.DOM.Node (Node)
 import Web.DOM.NodeList as NodeList
 import Web.DOM.ParentNode (ParentNode, QuerySelector(..))
 import Web.DOM.ParentNode as ParentNode
@@ -28,6 +29,7 @@ import Web.Event.EventTarget as EventTarget
 import Web.HTML as HTML
 import Web.HTML.Event.EventTypes as EventTypes
 import Web.HTML.HTMLDocument as HTMLDocument
+import Web.HTML.HTMLDocument (HTMLDocument)
 import Web.HTML.Window as Window
 import Web.UIEvent.MouseEvent.EventTypes as MouseEventTypes
 
@@ -37,6 +39,24 @@ foreign import sizing :: Dataset -> String
 foreign import name :: EventTarget -> String
 foreign import setPropertyImpl :: forall a. EffectFn3 Element String a Unit
 foreign import value :: EventTarget -> String
+
+class IsParentNode doc where
+  toParentNode :: doc -> ParentNode
+
+class IsEventTarget e where
+  toEventTarget :: e -> EventTarget
+
+class IsDocument d where
+  toDocument :: d -> Document
+
+instance domNodeToEventTarget :: IsEventTarget Node where
+  toEventTarget = DOMNode.toEventTarget
+
+instance htmlDocToParentNode :: IsParentNode HTMLDocument where
+  toParentNode = HTMLDocument.toParentNode
+
+instance htmlDocToDocument :: IsDocument HTMLDocument where
+  toDocument = HTMLDocument.toDocument
 
 setProperty :: forall a. Element -> String -> a -> Effect Unit
 setProperty props el val = runEffectFn3 setPropertyImpl props el val
@@ -53,8 +73,8 @@ effParentNode :: Effect { parentNode :: ParentNode, document :: Document }
 effParentNode = do
   w <- HTML.window
   doc <- Window.document w
-  pure $ { parentNode: HTMLDocument.toParentNode doc
-         , document: HTMLDocument.toDocument doc
+  pure $ { parentNode: toParentNode doc
+         , document: toDocument doc
          }
 
 effHandleUpdate :: Document -> Effect EventListener
@@ -79,10 +99,10 @@ main = do
   nodeArr <- NodeList.toArray els
   Effect.foreachE
     nodeArr
-    (\a -> do 
-        evtListener a EventTypes.change handleUpdate 
-        evtListener a MouseEventTypes.mousemove handleUpdate 
+    (\a -> do
+        evtListener a EventTypes.change handleUpdate
+        evtListener a MouseEventTypes.mousemove handleUpdate
     )
-  where 
-    evtListener node event eListener = 
-      EventTarget.addEventListener event eListener false (DOMNode.toEventTarget node)
+  where
+    evtListener node event eListener =
+      EventTarget.addEventListener event eListener false (toEventTarget node)
