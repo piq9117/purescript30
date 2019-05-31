@@ -11,7 +11,6 @@ import Effect (Effect)
 import Effect as Effect
 import Effect.Class (class MonadEffect)
 import Effect.Class as EffectClass
-import Effect.Console (logShow)
 import Effect.Uncurried (EffectFn3, runEffectFn3)
 
 -- DOM
@@ -24,14 +23,16 @@ import Web.DOM.NodeList as NodeList
 import Web.DOM.ParentNode (ParentNode, QuerySelector(..))
 import Web.DOM.ParentNode as ParentNode
 import Web.Event.Event as Event
-import Web.Event.EventTarget (EventListener, EventTarget)
+import Web.Event.EventTarget (EventTarget)
 import Web.Event.EventTarget as EventTarget
 import Web.HTML as HTML
-import Web.HTML.Event.EventTypes as EventTypes
+import Web.HTML.Event.EventTypes as EventType
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.HTML.HTMLDocument (HTMLDocument)
 import Web.HTML.Window as Window
-import Web.UIEvent.MouseEvent.EventTypes as MouseEventTypes
+import Web.UIEvent.MouseEvent.EventTypes as MouseEventType
+import Web.Event.Internal.Types (Event)
+import Web.Event.Event (EventType)
 
 foreign import data Dataset :: Type
 foreign import dataset :: EventTarget -> Dataset
@@ -77,32 +78,41 @@ effParentNode = do
          , document: toDocument doc
          }
 
-effHandleUpdate :: Document -> Effect EventListener
-effHandleUpdate doc = EventTarget.eventListener $ \e -> void do
-  mEventTarget <- pure $ Event.target e
+handleUpdate
+  :: Document
+  -> Event
+  -> Effect Unit
+handleUpdate doc target = do
+  mEventTarget <- pure $ Event.target target
   case mEventTarget of
-    Nothing -> logShow "No event target found."
-    Just evtTarget ->  do
+    Nothing -> pure unit
+    Just evtTarget -> do
       mDocElement <- Document.documentElement doc
       case mDocElement of
-        Nothing -> logShow "No event target found."
+        Nothing -> pure unit
         Just docElement -> do
           setProperty docElement
             ("--" <> name evtTarget)
             (value evtTarget <> (sizing <<< dataset $ evtTarget))
 
+listener
+  :: forall target. IsEventTarget target
+  => (Event -> Effect Unit)
+  -> EventType
+  -> target
+  -> Effect Unit
+listener f evtType e =
+  EventTarget.eventListener f >>=
+  \f' -> EventTarget.addEventListener evtType f' false (toEventTarget e)
+
 main :: Effect Unit
 main = do
   { parentNode, document } <- effParentNode
   els <- runReaderT getElements { className: ".controls input", parentNode: parentNode }
-  handleUpdate <- (effHandleUpdate document)
   nodeArr <- NodeList.toArray els
   Effect.foreachE
     nodeArr
     (\a -> do
-        evtListener a EventTypes.change handleUpdate
-        evtListener a MouseEventTypes.mousemove handleUpdate
+        listener (handleUpdate document) EventType.change a
+        listener (handleUpdate document) MouseEventType.mousemove a
     )
-  where
-    evtListener node event eListener =
-      EventTarget.addEventListener event eListener false (toEventTarget node)
