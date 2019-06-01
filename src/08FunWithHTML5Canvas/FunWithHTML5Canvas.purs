@@ -23,7 +23,8 @@ import Web.DOM.ParentNode (QuerySelector(..), ParentNode)
 import Web.DOM.ParentNode as ParentNode
 import Web.Event.EventTarget (EventListener)
 import Web.Event.EventTarget as EventTarget
-import Web.Event.Internal.Types (Event)
+import Web.Event.Internal.Types (Event, EventTarget)
+import Web.Event.Event (EventType)
 import Web.HTML as HTML
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.HTML.Window (Window)
@@ -34,6 +35,12 @@ foreign import toCanvasElement :: Element -> CanvasElement
 foreign import offsetX :: Event -> Number
 foreign import offsetY :: Event -> Number
 foreign import lineWidth :: Context2D -> Number
+
+class IsEventTarget e where
+  toEventTarget :: e -> EventTarget
+
+instance elementToEventTarget :: IsEventTarget Element where
+  toEventTarget = Element.toEventTarget
 
 effParentNode :: Effect {parentNode :: ParentNode, window :: Window }
 effParentNode = do
@@ -54,39 +61,7 @@ type DrawEnv =
   , context2d :: Context2D
   }
 
-effDraw
-  :: forall m. Bind m
-  => MonadEffect m
-  => ReaderT DrawEnv m EventListener
-effDraw = do
-  { drawingStateRef, context2d } <- ask
-  EffectClass.liftEffect $ EventTarget.eventListener $ \e -> do
-    drawingState <- Ref.read drawingStateRef
-    case drawingState.isDrawing of
-      true -> do
-        Canvas.setStrokeStyle context2d ("hsl(" <> show drawingState.hue <> ", 100%, 50%)")
-        Canvas.setLineWidth context2d drawingState.lineWidth
-        Canvas.beginPath context2d
-        Canvas.moveTo context2d drawingState.lastX drawingState.lastY
-        Canvas.lineTo context2d (offsetX e) (offsetY e)
-        Canvas.stroke context2d
-        void $
-          Ref.modify
-          (\b -> b { hue = incHue b.hue, lastX = offsetX e, lastY = offsetY e })
-          drawingStateRef
-        void $ if drawingState.lineWidth >= 100.0
-               then Ref.modify_ (\b -> b { direction = true }) drawingStateRef
-               else pure unit
-        void $ if drawingState.lineWidth <= 1.0
-               then Ref.modify_ (\b -> b { direction = false }) drawingStateRef
-               else pure unit
-        void $ if drawingState.direction
-               then Ref.modify_ (\b -> b { lineWidth = b.lineWidth - 1.0 }) drawingStateRef
-               else Ref.modify_ (\b -> b { lineWidth = b.lineWidth + 1.0 }) drawingStateRef
 
-      false -> pure unit
-      where incHue n = if n >= 360.0 then 0.0 else n + 1.0
-            decLineWidth n = if n >= 100.0 then n - 1.0 else n
 
 type DrawingState =
   { isDrawing :: Boolean
@@ -107,13 +82,52 @@ drawingStateDefault =
   , lineWidth: 100.0
   }
 
-effDrawingMouseup :: Ref DrawingState -> Effect EventListener
-effDrawingMouseup drawingState = EventTarget.eventListener $ \e -> void do
-  Ref.modify (\b -> b { isDrawing = false }) drawingState
+listener
+  :: forall target. IsEventTarget target
+  => (Event -> Effect Unit)
+  -> EventType
+  -> target
+  -> Effect Unit
+listener f evtType e =
+  EventTarget.eventListener f >>=
+  \f' -> EventTarget.addEventListener evtType f' false (toEventTarget e)
 
-effDrawingMousedown :: Ref DrawingState -> Effect EventListener
-effDrawingMousedown drawingState = EventTarget.eventListener $ \e -> void do
-  Ref.modify (\b -> b { isDrawing = true, lastX = offsetX e, lastY = offsetY e }) drawingState
+draw :: Ref DrawingState -> Context2D -> Event -> Effect Unit
+draw drawingStateRef context2d e = do
+  drawingState <- Ref.read drawingStateRef
+  case drawingState.isDrawing of
+    true -> do
+      Canvas.setStrokeStyle context2d ("hsl(" <> show drawingState.hue <> ", 100%, 50%)")
+      Canvas.setLineWidth context2d drawingState.lineWidth
+      Canvas.beginPath context2d
+      Canvas.moveTo context2d drawingState.lastX drawingState.lastY
+      Canvas.lineTo context2d (offsetX e) (offsetY e)
+      Canvas.stroke context2d
+      void $
+        Ref.modify
+        (\b -> b { hue = incHue b.hue, lastX = offsetX e, lastY = offsetY e })
+        drawingStateRef
+      void $ if drawingState.lineWidth >= 100.0
+              then Ref.modify_ (\b -> b { direction = true }) drawingStateRef
+              else pure unit
+      void $ if drawingState.lineWidth <= 1.0
+              then Ref.modify_ (\b -> b { direction = false }) drawingStateRef
+              else pure unit
+      void $ if drawingState.direction
+              then Ref.modify_ (\b -> b { lineWidth = b.lineWidth - 1.0 }) drawingStateRef
+              else Ref.modify_ (\b -> b { lineWidth = b.lineWidth + 1.0 }) drawingStateRef
+
+    false -> pure unit
+    where incHue n = if n >= 360.0 then 0.0 else n + 1.0
+          decLineWidth n = if n >= 100.0 then n - 1.0 else n
+
+drawingMouseDown :: Ref DrawingState -> Event -> Effect Unit
+drawingMouseDown drawingState e =
+  Ref.modify_ (\b -> b { isDrawing = true, lastX = offsetX e, lastY = offsetY e }) drawingState
+
+drawingMouseUp :: Ref DrawingState -> Event -> Effect Unit
+drawingMouseUp drawingState e =
+  Ref.modify_ (\b -> b { isDrawing = false }) drawingState
 
 main :: Effect Unit
 main = do
@@ -136,6 +150,6 @@ main = do
       Canvas.setLineJoin context2d RoundJoin
       Canvas.setLineCap context2d Round
       Canvas.setLineWidth context2d drawingState.lineWidth
-      EventTarget.addEventListener MouseEvtTypes.mousemove draw false (Element.toEventTarget canvas)
-      EventTarget.addEventListener MouseEvtTypes.mousedown drawingMousedown false (Element.toEventTarget canvas)
-      EventTarget.addEventListener MouseEvtTypes.mouseup drawingMouseup false (Element.toEventTarget canvas)
+      listener (drawingMouseDown drawingStateRef) MouseEvtTypes.mousedown canvas
+      listener (drawingMouseUp drawingStateRef) MouseEvtTypes.mouseup canvas
+      listener (draw drawingStateRef context2d) MouseEvtTypes.mousemove canvas
