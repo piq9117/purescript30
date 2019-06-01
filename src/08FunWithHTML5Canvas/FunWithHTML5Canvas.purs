@@ -21,7 +21,6 @@ import Web.DOM.Element as Element
 import Web.DOM.Internal.Types (Element)
 import Web.DOM.ParentNode (QuerySelector(..), ParentNode)
 import Web.DOM.ParentNode as ParentNode
-import Web.Event.EventTarget (EventListener)
 import Web.Event.EventTarget as EventTarget
 import Web.Event.Internal.Types (Event, EventTarget)
 import Web.Event.Event (EventType)
@@ -137,10 +136,7 @@ main = do
     Nothing -> pure unit
     Just canvas -> do
       drawingStateRef <- Ref.new drawingStateDefault
-      drawingMouseup <- effDrawingMouseup drawingStateRef
-      drawingMousedown <- effDrawingMousedown drawingStateRef
       context2d <- Canvas.getContext2D (toCanvasElement canvas)
-      draw <- runReaderT effDraw { drawingStateRef: drawingStateRef, context2d: context2d }
       windowWidth <- Window.innerWidth window
       windowHeight <- Window.innerHeight window
       drawingState <- Ref.read drawingStateRef

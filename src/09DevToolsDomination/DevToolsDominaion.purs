@@ -16,11 +16,12 @@ import Web.DOM.Internal.Types (Element)
 import Web.DOM.ParentNode (ParentNode, QuerySelector(..))
 import Web.DOM.ParentNode as ParentNode
 import Web.Event.Event as Event
+import Web.Event.Event (Event, EventType)
 import Web.Event.EventTarget (EventListener)
 import Web.Event.EventTarget as EventTarget
 import Web.Event.Internal.Types (EventTarget)
 import Web.HTML as HTML
-import Web.HTML.Event.EventTypes as EventTypes
+import Web.HTML.Event.EventTypes as EventType
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.HTML.HTMLElement (HTMLElement)
 import Web.HTML.HTMLElement as HTMLElement
@@ -36,6 +37,12 @@ foreign import logDirImpl :: forall a. EffectFn1 a Unit
 foreign import groupImpl :: forall a.  EffectFn1 a Unit
 foreign import groupEndImpl :: forall a. EffectFn1 a Unit
 foreign import logCountImpl :: forall a. EffectFn1 a Unit
+
+class IsEventTarget e where
+  toEventTarget :: e -> EventTarget
+
+instance elementToEventTarget :: IsEventTarget Element where
+  toEventTarget = Element.toEventTarget
 
 logCount :: forall a. a -> Effect Unit
 logCount = runEffectFn1 logCountImpl
@@ -98,15 +105,35 @@ effMakeGreen = EventTarget.eventListener $ \e -> void do
       bool <- DOMTokenList.contains domTokens "ouch"
       assert bool "That is wrong"
 
+makeGreen' :: Event -> Effect Unit
+makeGreen' e =
+  case Event.target e of
+    Nothing -> pure unit
+    Just t -> do
+      setColor t "#BADA55"
+      setFontSize t "50px"
+      domTokens <- HTMLElement.classList (toHTMLElement t)
+      bool <- DOMTokenList.contains domTokens "ouch"
+      assert bool "That is wrong"
+
+listener
+  :: forall target. IsEventTarget target
+  => (Event -> Effect Unit)
+  -> EventType
+  -> target
+  -> Effect Unit
+listener f evtType e =
+  EventTarget.eventListener f >>=
+  \f' -> EventTarget.addEventListener evtType f' false (toEventTarget e)
+
 main :: Effect Unit
 main = do
   parentNode <- effParentNode
-  makeGreen <- effMakeGreen
   mEl <- runReaderT getElement {parentNode: parentNode, targetElement : "#make-green"}
   case mEl of
     Nothing -> pure unit
     Just el -> do
-      EventTarget.addEventListener EventTypes.click makeGreen false (Element.toEventTarget el)
+      listener makeGreen' EventType.click el
       log "Hello"
       warn "OH NOOOO"
       error "Shit!"
