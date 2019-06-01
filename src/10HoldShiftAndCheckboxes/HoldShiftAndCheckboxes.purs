@@ -21,17 +21,24 @@ import Web.DOM.NodeList as NodeList
 import Web.DOM.ParentNode (ParentNode, QuerySelector(..))
 import Web.DOM.ParentNode as ParentNode
 import Web.Event.Event as Event
-import Web.Event.EventTarget (EventListener, EventTarget)
+import Web.Event.Event (EventType)
+import Web.Event.EventTarget (EventTarget)
 import Web.Event.EventTarget as EventTarget
 import Web.Event.Internal.Types (Event)
 import Web.HTML as HTML
-import Web.HTML.Event.EventTypes as EventTypes
+import Web.HTML.Event.EventTypes as EventType
 import Web.HTML.HTMLDocument as HTMLDocument
 import Web.HTML.HTMLInputElement (HTMLInputElement)
 import Web.HTML.HTMLInputElement as HTMLInputElement
 import Web.HTML.Window as Window
 import Web.UIEvent.MouseEvent (MouseEvent)
 import Web.UIEvent.MouseEvent as MouseEvent
+
+class IsEventTarget e where
+  toEventTarget :: e -> EventTarget
+
+instance nodeToEventTarget :: IsEventTarget Node where
+  toEventTarget = Node.toEventTarget
 
 foreign import eqEventTargetImpl :: EventTarget -> EventTarget -> Boolean
 
@@ -100,25 +107,29 @@ iterNodes = do
                               then HTMLInputElement.setChecked true (nodeToHtmlInputElement node)
                               else pure unit)
 
-effHandleCheck
-  :: forall m. Bind m
-  => Monad m
-  => MonadEffect m
-  => ReaderT HandleCheckEnv m EventListener
-effHandleCheck = do
-  env@{ isInBetween, lastChecked, nodes } <- ask
-  liftEffect $ EventTarget.eventListener $ \e -> void do
-    isShiftKey <- pure <<< MouseEvent.shiftKey <<< eventToMouseEvent $ e
-    case Event.target e of
-      Nothing -> pure unit
-      Just evtTarget -> do
-        isChecked <- HTMLInputElement.checked $ eventToHtmlInputElement evtTarget
-        case (isShiftKey && isChecked) of
-          true -> do
-            let evtTargetField = SProxy :: SProxy "eventTarget"
-            runReaderT iterNodes (Record.insert evtTargetField evtTarget env)
-            Ref.modify_ (const $ Just evtTarget) lastChecked
-          false -> Ref.modify_ (const Nothing) lastChecked
+handleCheck :: HandleCheckEnv -> Event -> Effect Unit
+handleCheck env@{ isInBetween, lastChecked, nodes } e = do
+  isShiftKey <- pure <<< MouseEvent.shiftKey <<< eventToMouseEvent $ e
+  case Event.target e of
+    Nothing -> pure unit
+    Just evtTarget -> do
+      isChecked <- HTMLInputElement.checked $ eventToHtmlInputElement evtTarget
+      case (isShiftKey && isChecked) of
+        true -> do
+          let evtTargetField = SProxy :: SProxy "eventTarget"
+          runReaderT iterNodes (Record.insert evtTargetField evtTarget env)
+          Ref.modify_ (const $ Just evtTarget) lastChecked
+        false -> Ref.modify_ (const Nothing) lastChecked
+
+listener
+  :: forall target. IsEventTarget target
+  => (Event -> Effect Unit)
+  -> EventType
+  -> target
+  -> Effect Unit
+listener f evtType e =
+  EventTarget.eventListener f >>=
+  \f' -> EventTarget.addEventListener evtType f' false (toEventTarget e)
 
 main :: Effect Unit
 main = do
@@ -130,8 +141,7 @@ main = do
     Ref.new false >>=
     \bool -> Ref.new Nothing >>= \lc ->
     pure { nodes: nodeArr, isInBetween: bool, lastChecked: lc }
-  handleCheck <- runReaderT effHandleCheck handleCheckEnv
   foreachE
     nodeArr
-    (\node -> EventTarget.addEventListener EventTypes.click handleCheck false (Node.toEventTarget node))
+    (\node -> listener (handleCheck handleCheckEnv) EventType.click node)
 
