@@ -1,17 +1,17 @@
 module KonamiCode where
 
 import Prelude
-import Data.Array as Array
+import Data.Array (drop, snoc)
 import Data.String as String
-import Data.String.Utils as StrUtils
+import Data.String.Utils (includes, fromCharArray)
+import Data.Foldable (length)
 
 -- Effect
 import Effect.Ref (Ref)
 import Effect.Ref as Ref
-import Effect.Console (logShow)
 import Effect (Effect)
-import Effect.Class
-import Effect.Uncurried
+import Effect.Class (class MonadEffect, liftEffect)
+import Effect.Uncurried (EffectFn1, runEffectFn1)
 
 -- DOM
 import Web.Event.EventTarget (addEventListener, eventListener)
@@ -52,10 +52,10 @@ listenerCb
   -> Event
   -> m Unit
 listenerCb refArray e = do
-  liftEffect $ Ref.modify_ (flip Array.snoc (getKey e)) refArray
-  liftEffect $ Ref.modify_ (Array.drop =<< (flip (-)) (String.length secretKeyword) <<< Array.length) refArray
+  liftEffect $ Ref.modify_ (flip snoc (getKey e)) refArray
+  liftEffect $ Ref.modify_ (drop =<< (flip (-)) (String.length secretKeyword) <<< length) refArray
   arr <- liftEffect $ Ref.read refArray
-  if StrUtils.includes secretKeyword (StrUtils.fromCharArray arr)
+  if includes secretKeyword (fromCharArray arr)
      then liftEffect $ cornifyAdd unit
      else pure unit
 
