@@ -255,29 +255,29 @@ main = do
           case mProgressBar of
             Nothing -> pure unit
             Just progressBar ->
-            case mPlayback of
-              Nothing -> pure unit
-              Just playback ->
-                case mVolume of
-                  Nothing -> pure unit
-                  Just volume ->
-                    case mVideo of
-                      Nothing -> pure unit
-                      Just video -> do
-                        case mToggle of
-                          Nothing -> pure unit
-                          Just toggle -> do
-                            listener (tooglePlay video) EventType.click video
-                            listener (tooglePlay video) EventType.click toggle
-                            listener (updateButton toggle) (EventType "play") video
-                            listener (updateButton toggle) (EventType "pause") video
-                            foreachE skipButtons (listener (skipListener video) EventType.click)
-                            listener (handleVolumeUpdate video) MouseEventType.mousedown volume
-                            listener (handleVolumeUpdate video) EventType.change volume
-                            listener (handlePlaybackUpdate video) MouseEventType.mousedown playback
-                            listener (handlePlaybackUpdate video) EventType.change playback
-                            listener (const $ handleProgress video progressBar) (EventType "timeupdate") video
-                            listener (handleScrub video progress isMouseDownRef) EventType.click progress
-                            listener (handleScrub video progress isMouseDownRef) MouseEventType.mousemove progress
-                            listener (const $ setMouseDownToTrue isMouseDownRef) MouseEventType.mousedown progress
-                            listener (const $ setMouseDownToFalse isMouseDownRef) MouseEventType.mouseup progress
+              case mPlayback of
+                Nothing -> pure unit
+                Just playback ->
+                  case mVolume of
+                    Nothing -> pure unit
+                    Just volume ->
+                      case mVideo of
+                        Nothing -> pure unit
+                        Just video -> do
+                          case mToggle of
+                            Nothing -> pure unit
+                            Just toggle -> do
+                              listener (tooglePlay video) EventType.click video
+                              listener (tooglePlay video) EventType.click toggle
+                              listener (updateButton toggle) (EventType "play") video
+                              listener (updateButton toggle) (EventType "pause") video
+                              foreachE skipButtons (listener (skipListener video) EventType.click)
+                              listener (handleVolumeUpdate video) MouseEventType.mousedown volume
+                              listener (handleVolumeUpdate video) EventType.change volume
+                              listener (handlePlaybackUpdate video) MouseEventType.mousedown playback
+                              listener (handlePlaybackUpdate video) EventType.change playback
+                              listener (const $ handleProgress video progressBar) (EventType "timeupdate") video
+                              listener (handleScrub video progress isMouseDownRef) EventType.click progress
+                              listener (handleScrub video progress isMouseDownRef) MouseEventType.mousemove progress
+                              listener (const $ setMouseDownToTrue isMouseDownRef) MouseEventType.mousedown progress
+                              listener (const $ setMouseDownToFalse isMouseDownRef) MouseEventType.mouseup progress
