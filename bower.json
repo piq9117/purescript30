@@ -31,7 +31,9 @@
     "purescript-refs": "^4.1.0",
     "purescript-unsafe-coerce": "^4.0.0",
     "purescript-profunctor-lenses": "^6.2.0",
-    "purescript-parseint": "^1.1.0"
+    "purescript-parseint": "^1.1.0",
+    "purescript-event": "^1.2.4",
+    "purescript-datetime": "^4.1.1"
   },
   "devDependencies": {
     "purescript-psci-support": "^4.0.0"

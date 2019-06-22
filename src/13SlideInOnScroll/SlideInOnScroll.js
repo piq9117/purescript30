@@ -1,3 +1,3 @@
-exports.nodeHeight = function(node) {
+exports.nodeHeightImpl = function(node) {
   return node.height;
 };
